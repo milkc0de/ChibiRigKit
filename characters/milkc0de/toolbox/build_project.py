@@ -7,7 +7,7 @@ import numpy as np
 from head_pose import build_head_pose, build_neck_sway, fill_sclera
 from rig_contract import validate_plan, verify_sources, digest, local_path, validate_project
 from pathlib import Path
-from player_output import preview_path, export_player
+from player_output import preview_path, export_player, launcher_files
 from PIL import Image, ImageChops
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -155,7 +155,7 @@ motion_template={'$schema':'motion.schema.json','format':'chibirigkit.motion','v
 
 tpl=(ROOT/'runtime'/'index.template.html').read_text().replace('__LICENSE_TEXT__',(ROOT/'LICENSE.txt').read_text()).replace('__RECORDING_JS__',(ROOT/'runtime'/'recording.js').read_text()).replace('__BUNDLE_JS__',(ROOT/'runtime'/'bundle.js').read_text()).replace('__HEAD_POSE_JS__',(ROOT/'runtime'/'head_pose.js').read_text()).replace('__PROJECT_IO_JS__',(ROOT/'runtime'/'project_io.js').read_text()).replace('__BACKGROUND_JS__',(ROOT/'runtime'/'background.js').read_text()).replace('__MOTION_CLIP_JS__',(ROOT/'runtime'/'motion_clip.js').read_text()).replace('__CAPTURE_PLAYER_JS__',(ROOT/'runtime'/'capture_player.js').read_text()).replace('__EXPRESSION_UNDERPAINT_JS__',(ROOT/'runtime'/'expression_underpaint.js').read_text()).replace('__HAIR_DYNAMICS_JS__',(ROOT/'runtime'/'hair_dynamics.js').read_text()).replace('__HAIR_PLAYER_JS__',(ROOT/'runtime'/'hair_player.js').read_text()).replace('__TRACKING_CORE_JS__',(ROOT/'runtime'/'tracking_core.js').read_text()).replace('__TRACKING_JS__',(ROOT/'runtime'/'tracking.js').read_text()).replace('__OUTPUT_JS__',(ROOT/'runtime'/'output.js').read_text())
 payload=json.dumps(project,ensure_ascii=False,separators=(',',':')).replace('<','\\u003c')
-rendered=tpl.replace('__TITLE__',html.escape(project['name'])).replace('__W__',str(W)).replace('__H__',str(H)).replace('__PROJECT_JSON__',payload)
+rendered=tpl.replace('__PLAYER_LAUNCHERS_JSON__',json.dumps(launcher_files(),ensure_ascii=False).replace('<','\\u003c')).replace('__TITLE__',html.escape(project['name'])).replace('__W__',str(W)).replace('__H__',str(H)).replace('__PROJECT_JSON__',payload)
 preview_path(ROOT).parent.mkdir(parents=True,exist_ok=True)
 preview_path(ROOT).write_text(rendered)
 validate_project(ROOT,project)

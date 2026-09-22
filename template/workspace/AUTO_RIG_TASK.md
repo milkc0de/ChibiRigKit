@@ -15,7 +15,7 @@ The original files under `input/` and `work/aligned/` are immutable. Never edit 
 You must create:
 1. `rig.plan.json` conforming to `rig.plan.schema.json`.
 2. Full-canvas PNG masks under `work/masks/` for every part.
-3. Run `python3 toolbox/build_project.py` to create `rig.project.json`, `work/player/index.html`, `assets/layers`, and `assets/masks`; the builder also writes the final HTML and ZIP under the kit root `dist/` and records paths in `work/player-output.json`. The final output folder and ZIP contain only `index.html` and `LICENSE.txt`; embed images and settings in HTML, and keep external assets and authoring JSON in the character workspace.
+3. Run `python3 toolbox/build_project.py` to create `rig.project.json`, `work/player/index.html`, `assets/layers`, and `assets/masks`; the builder also writes the final HTML and ZIP under the kit root `dist/` and records paths in `work/player-output.json`. The final output folder and ZIP contain `index.html`, `LICENSE.txt`, and the four `START_SERVER` launchers (`.ps1`, `.cmd`, `.command`, `.sh`); the launchers locate Python 3 and serve the completed folder only on `127.0.0.1:5510`, never on LAN or the public internet; embed images and settings in HTML, and keep external assets and authoring JSON in the character workspace.
 4. Run `python3 toolbox/validate_character.py` and inspect `checks/validation_sheet.png` plus the source images.
 5. Correct masks/plan and rebuild until the rig is coherent.
 

@@ -8,11 +8,13 @@ import {spawnSync} from 'node:child_process';
 const dir=new URL('../template/workspace/runtime/',import.meta.url),bundle=fs.readFileSync(new URL('bundle.js',dir),'utf8'),record=fs.readFileSync(new URL('recording.js',dir),'utf8');
 test('ZIP opens in a standard reader with UTF-8 paths, binary bytes and valid CRC',async()=>{
   const c=vm.createContext({TextEncoder,Blob,$:()=>({})});vm.runInContext(bundle,c);
-  const blob=c.createZip({'index.html':'<p>完成品</p>','assets/日本語.png':Uint8Array.from([0,255,17,23])});
+  const blob=c.createZip({'index.html':'<p>完成品</p>','assets/日本語.png':Uint8Array.from([0,255,17,23]),'START_SERVER.command':'#!/bin/sh\necho test\n'});
   const bytes=Buffer.from(await blob.arrayBuffer());
   const result=spawnSync('python3',['-c',`import sys,io,zipfile
 z=zipfile.ZipFile(io.BytesIO(sys.stdin.buffer.read()))
 assert z.testzip() is None
+assert (z.getinfo('START_SERVER.command').external_attr>>16)&0o777==0o755
+assert (z.getinfo('index.html').external_attr>>16)&0o777==0o644
 assert z.read('index.html').decode()=='<p>完成品</p>'
 assert z.read('assets/日本語.png')==bytes([0,255,17,23])
 `],{input:bytes});assert.equal(result.status,0,result.stderr.toString());

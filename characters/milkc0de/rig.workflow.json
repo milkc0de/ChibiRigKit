@@ -194,7 +194,7 @@
     },
     "player_handoff": {
       "format": "self_contained_html_and_zip",
-      "output_files": ["index.html", "LICENSE.txt"],
+      "output_files": ["index.html", "LICENSE.txt", "START_SERVER.ps1", "START_SERVER.cmd", "START_SERVER.command", "START_SERVER.sh"],
       "embedded_data": [
         "projectData",
         "bundleSnapshot"

@@ -12,7 +12,7 @@ function createZip(files){
     const crc=zipCRC32(bytes),local=new Uint8Array(30+filename.length),l=new DataView(local.buffer);
     l.setUint32(0,0x04034b50,true);l.setUint16(4,20,true);l.setUint16(6,0x800,true);l.setUint16(12,33,true);l.setUint32(14,crc,true);l.setUint32(18,bytes.length,true);l.setUint32(22,bytes.length,true);l.setUint16(26,filename.length,true);local.set(filename,30);
     const central=new Uint8Array(46+filename.length),c=new DataView(central.buffer);
-    c.setUint32(0,0x02014b50,true);c.setUint16(4,20,true);c.setUint16(6,20,true);c.setUint16(8,0x800,true);c.setUint16(14,33,true);c.setUint32(16,crc,true);c.setUint32(20,bytes.length,true);c.setUint32(24,bytes.length,true);c.setUint16(28,filename.length,true);c.setUint32(42,offset,true);central.set(filename,46);
+    c.setUint32(0,0x02014b50,true);c.setUint16(4,0x314,true);c.setUint16(6,20,true);c.setUint16(8,0x800,true);c.setUint16(14,33,true);c.setUint32(16,crc,true);c.setUint32(20,bytes.length,true);c.setUint32(24,bytes.length,true);c.setUint16(28,filename.length,true);c.setUint32(38,((/\.(sh|command)$/.test(name)?0o100755:0o100644)<<16)>>>0,true);c.setUint32(42,offset,true);central.set(filename,46);
     chunks.push(local,bytes);directory.push(central);offset+=local.length+bytes.length;
   }
   const count=directory.length,size=directory.reduce((sum,d)=>sum+d.length,0);
@@ -50,7 +50,9 @@ function bundleFiles(){
   sanitizeExportPage(page);
   for(const control of page.querySelectorAll('input,button,select'))control.removeAttribute('disabled');
   page.querySelector('#recordCancel').hidden=true;page.querySelector('#record').textContent='WebM録画';page.querySelector('#bundle').textContent='完成品をdistに保存';page.querySelector('#recordStatus').textContent='';page.querySelector('#bundleStatus').textContent='';page.querySelector('#recordProgress').hidden=true;
-  return {'index.html':'<!DOCTYPE html>\n'+page.outerHTML,
+  const launchers=JSON.parse(document.getElementById('playerLaunchers').textContent);
+  const launcherFiles=Object.fromEntries(['START_SERVER.ps1','START_SERVER.cmd','START_SERVER.command','START_SERVER.sh'].map(name=>{if(typeof launchers[name]!=='string')throw Error('起動ファイルがありません。画面を再読み込みしてください');return [name,launchers[name]]}));
+  return {...launcherFiles,'index.html':'<!DOCTYPE html>\n'+page.outerHTML,
     'LICENSE.txt':document.getElementById('licenseData').textContent};
 }
 async function restoreBundleSnapshot(){

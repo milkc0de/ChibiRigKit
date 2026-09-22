@@ -15,7 +15,10 @@ class PlayerOutputTests(unittest.TestCase):
             self.assertEqual(Path(result['html']),kit/'dist/hero/index.html');self.assertEqual(Path(result['zip']),kit/'dist/hero.zip')
             self.assertEqual((root/'input/normal.png').read_bytes(),b'original');self.assertFalse((root/'index.html').exists())
             with zipfile.ZipFile(result['zip']) as z:
-                self.assertIsNone(z.testzip());self.assertEqual(z.read('index.html').decode(),html);self.assertEqual(set(z.namelist()),{'index.html','LICENSE.txt'});self.assertEqual(z.read('LICENSE.txt'),b'MIT')
+                self.assertIsNone(z.testzip());self.assertEqual(z.read('index.html').decode(),html);self.assertEqual(set(z.namelist()),{'index.html','LICENSE.txt',*out.LAUNCHER_NAMES});self.assertEqual(z.read('LICENSE.txt'),b'MIT')
+                for name in ['START_SERVER.sh','START_SERVER.command']:
+                    self.assertEqual((z.getinfo(name).external_attr>>16)&0o777,0o755)
+                    self.assertEqual((Path(result['directory'])/name).stat().st_mode&0o777,0o755)
             self.assertEqual(json.loads((root/'work/player-output.json').read_text()),result)
 
     def test_reexport_removes_previous_private_artifacts_but_keeps_unrelated_files(self):
@@ -31,4 +34,4 @@ class PlayerOutputTests(unittest.TestCase):
             with patch.dict(os.environ,{'CHIBIRIG_DIST_ROOT':str(kit/'dist')}):out.export_player(root,html,project)
             for f in ['assets','rig.project.json','README.txt','capture.chibimotion.json','background.json']:self.assertFalse((folder/f).exists())
             self.assertEqual((folder/'my-note.txt').read_text(),'keep')
-            self.assertEqual({f.name for f in folder.iterdir()},{'index.html','LICENSE.txt','my-note.txt'})
+            self.assertEqual({f.name for f in folder.iterdir()},{'index.html','LICENSE.txt','my-note.txt',*out.LAUNCHER_NAMES})

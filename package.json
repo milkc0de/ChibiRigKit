@@ -1,6 +1,6 @@
 {
   "name": "chibirigkit",
-  "version": "1.0.0-beta.3",
+  "version": "1.0.0-beta.4",
   "private": true,
   "type": "module",
   "description": "Create 2D character animations from a single image.",

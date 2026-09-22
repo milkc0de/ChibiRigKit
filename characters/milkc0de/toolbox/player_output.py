@@ -4,6 +4,11 @@
 import base64,json,re,zipfile,os,uuid
 from pathlib import Path
 
+LAUNCHER_NAMES=('START_SERVER.ps1','START_SERVER.cmd','START_SERVER.command','START_SERVER.sh')
+def launcher_files(runtime_root=None):
+    folder=Path(runtime_root or Path(__file__).resolve().parents[1])/'launchers'
+    return {name:(folder/name).read_bytes().decode('utf-8') for name in LAUNCHER_NAMES}
+
 def preview_path(root):return Path(root)/'work/player/index.html'
 def output_paths(root,character_name=None):
     root=Path(root).resolve();kit=None
@@ -20,7 +25,7 @@ def export_player(root,rendered,project):
     embedded=re.search(r'<script id="projectData" type="application/json">(.*?)</script>',rendered,re.S)
     if not embedded or json.loads(embedded[1])!=project:raise ValueError('Export HTML and project differ; rebuild the preview first')
     dist,name=output_paths(root,project.get('name'));folder=dist/name
-    files={'index.html':rendered.encode(),'LICENSE.txt':(root/'LICENSE.txt').read_bytes()}
+    files={'index.html':rendered.encode(),'LICENSE.txt':(root/'LICENSE.txt').read_bytes(),**{name:source.encode() for name,source in launcher_files().items()}}
     def image(url):
         if not re.fullmatch(r'data:image/(png|webp|jpeg);base64,[a-zA-Z0-9+/=]+',url):raise ValueError('Only embedded raster images can be exported')
         base64.b64decode(url.split(',',1)[1],validate=True)
@@ -49,11 +54,15 @@ def export_player(root,rendered,project):
         target.parent.mkdir(parents=True,exist_ok=True);temp=target.with_name(target.name+'.'+uuid.uuid4().hex+'.tmp')
         try:
             with temp.open('xb') as handle:handle.write(data)
+            if target.suffix in {'.sh','.command'}:temp.chmod(0o755)
             os.replace(temp,target)
         finally:temp.unlink(missing_ok=True)
     temp=archive.with_name(archive.name+'.'+uuid.uuid4().hex+'.tmp')
     with zipfile.ZipFile(temp,'w',compression=zipfile.ZIP_DEFLATED,compresslevel=6) as z:
-        for relative,data in files.items():z.writestr(relative,data)
+        for relative,data in files.items():
+            info=zipfile.ZipInfo(relative);info.create_system=3;info.compress_type=zipfile.ZIP_DEFLATED
+            info.external_attr=(0o100755 if relative.endswith(('.sh','.command')) else 0o100644)<<16
+            z.writestr(info,data)
     os.replace(temp,archive)
     for target in obsolete:
         target.unlink(missing_ok=True)
