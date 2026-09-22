@@ -1,0 +1,37 @@
+{
+  "name": "character",
+  "inputs": {
+    "normal": "normal.png",
+    "flat": null,
+    "blink": null,
+    "mouth_closed": null
+  },
+  "targets": {
+    "hair_parts": [
+      3,
+      7
+    ],
+    "arm_parts": [
+      2,
+      6
+    ],
+    "torso_parts": [
+      2,
+      6
+    ],
+    "skirt_parts": [
+      1,
+      5
+    ],
+    "leg_parts": [
+      2,
+      6
+    ]
+  },
+  "blink": {
+    "closed_eye_swap_start": 0.92,
+    "closed_eye_swap_end": 0.995
+  },
+  "review_passes": 2,
+  "auto_generate_references": true
+}

@@ -1,0 +1,12 @@
+{
+  "status": "ready_for_validation",
+  "artifacts": [
+    "rig.plan.json",
+    "rig.project.json",
+    "index.html",
+    "work/masks/",
+    "assets/layers/",
+    "checks/report.json"
+  ],
+  "issues": []
+}

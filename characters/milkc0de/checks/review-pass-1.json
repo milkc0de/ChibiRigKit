@@ -1,0 +1,71 @@
+{
+  "phase": "review",
+  "pass": 1,
+  "status": "ready_for_validation",
+  "repairs": {
+    "transferred_source_pixels": {
+      "hair_side_left": 1405,
+      "hair_back_right": 1127
+    },
+    "scope": "Explicit correction masks only; original RGB copied unchanged; no new parts or pose changes."
+  },
+  "preserved": {
+    "part_count": 32,
+    "plan_unchanged": true,
+    "protected_files_unchanged": 29,
+    "source_rgb": {
+      "normal": {
+        "changed_pixels": 0,
+        "max_channel_delta": 0
+      },
+      "blink": {
+        "changed_pixels": 0,
+        "max_channel_delta": 0
+      },
+      "mouth_closed": {
+        "changed_pixels": 0,
+        "max_channel_delta": 0
+      }
+    }
+  },
+  "visual_review": {
+    "supplied_browser_motion_frames": 16,
+    "supplied_browser_head_directions": 9,
+    "post_repair_offline_motion_frames": 16,
+    "post_repair_offline_head_directions": 9,
+    "post_repair_offline_random_sway_frames": 8,
+    "findings": [
+      "Transferred stationary left-loop and lower-right curl fragments to existing hair layers.",
+      "Nine directions retain coherent far-eye width, iris placement, face outline, mouth placement and hair coverage within shallow 2D range.",
+      "No gross limb duplication, missing shoe tips or exposed alpha holes seen in reviewed post-repair offline frames.",
+      "Estimated eyelid skin fill and fine antialiasing/hidden-material boundaries remain approximate."
+    ]
+  },
+  "static": {
+    "integrity": "passed",
+    "scope": "static reconstruction; browser motion checks are separate",
+    "open": {
+      "rgb_mae": 0.0,
+      "alpha_iou": 1.0
+    },
+    "blink": {
+      "rgb_mae": 0.0,
+      "alpha_iou": 1.0
+    }
+  },
+  "geometry": {
+    "passed": true,
+    "headMeshChecks": 6069
+  },
+  "browser": {
+    "supplied_pre_repair_acceptance": "passed",
+    "evidence": "checks/review1_before/runtime-report.json",
+    "post_repair_acceptance": "pending_parent_orchestrator",
+    "reason": "Prior sandbox Chrome launch failed and automatic approval review rejected local-file browser harness under browser policy. No bypass or new browser attempt; offline previews are not browser validation."
+  },
+  "current_build_sha256": {
+    "rig.plan.json": "ac4b194fc40a5b8598bcc0d9c93236e4177f9a921f1f4c7be61749011635adc4",
+    "rig.project.json": "b6168821ccfb66e4e270588e4a79363a097465569911c1343447d6fa83985f0e",
+    "index.html": "682022ea86fb19493aedd0f8b74640b6368089dad152e52862179e282488f95c"
+  }
+}

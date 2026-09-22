@@ -1,0 +1,33 @@
+{
+  "status": "ready_for_validation",
+  "artifacts": [
+    "rig.plan.json",
+    "rig.project.json",
+    "index.html",
+    "work/masks/",
+    "assets/layers/",
+    "checks/report.json",
+    "checks/final-audit.json",
+    "checks/validation_sheet.png"
+  ],
+  "issues": [
+    {
+      "code": "ambiguous_art",
+      "severity": "warning",
+      "artifact": "work/generated_references/manifest.json",
+      "detail": "Facial references are estimated artwork; flat-fill edges remain visible around the eyes."
+    },
+    {
+      "code": "ambiguous_art",
+      "severity": "warning",
+      "artifact": "work/masks/",
+      "detail": "Fine hair boundaries and hidden joint/background material remain approximate."
+    },
+    {
+      "code": "browser_unavailable",
+      "severity": "warning",
+      "artifact": "checks/report.json",
+      "detail": "Static validation and source-hash checks passed. Chrome launch failed, and automatic approval review rejected the local-file browser harness under browser policy. Parent orchestrator must complete runtime acceptance, including motionIO; offline checks are not browser validation."
+    }
+  ]
+}

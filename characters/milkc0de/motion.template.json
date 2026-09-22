@@ -1,0 +1,332 @@
+{
+  "$schema": "motion.schema.json",
+  "format": "chibirigkit.motion",
+  "version": 1,
+  "layout_signature": "e86c4febeabb4152dac108539e846b947ee8152225ff0c3507dc9eff98b82dc4",
+  "settings": {
+    "duration_seconds": 5,
+    "fps": 60,
+    "motion_intensity": 1,
+    "head_motion_amount": 1.5,
+    "gaze_motion_amount": 1.5,
+    "neck_sway": true,
+    "neck_sway_degrees": 6,
+    "neck_yaw_degrees": 12,
+    "neck_pitch_degrees": 8,
+    "expression": 0,
+    "auto_blink": true,
+    "auto_expression": false,
+    "blink": {
+      "closed_eye_swap_start": 0.92,
+      "closed_eye_swap_end": 0.995
+    },
+    "head_random": true,
+    "motion_speed": 1
+  },
+  "parts": {
+    "background": {
+      "rot_deg": 0,
+      "x_px": 0,
+      "y_px": 0,
+      "scale_x_pct": 0,
+      "scale_y_pct": 0,
+      "phase": 0,
+      "freq": 1
+    },
+    "background_hidden_margin": {
+      "rot_deg": 0,
+      "x_px": 0,
+      "y_px": 0,
+      "scale_x_pct": 0,
+      "scale_y_pct": 0,
+      "phase": 0,
+      "freq": 1
+    },
+    "hair_back_left": {
+      "rot_deg": 0.4,
+      "x_px": 0.25,
+      "y_px": 0.25,
+      "scale_x_pct": 0,
+      "scale_y_pct": 0,
+      "phase": 0.12,
+      "freq": 1
+    },
+    "hair_back_right": {
+      "rot_deg": 0.4,
+      "x_px": 0.25,
+      "y_px": 0.25,
+      "scale_x_pct": 0,
+      "scale_y_pct": 0,
+      "phase": 0.145,
+      "freq": 1
+    },
+    "leg_back_right": {
+      "rot_deg": 0,
+      "x_px": 0,
+      "y_px": 0,
+      "scale_x_pct": 0,
+      "scale_y_pct": 0,
+      "phase": 0.16999999999999998,
+      "freq": 1
+    },
+    "leg_front_left": {
+      "rot_deg": 0,
+      "x_px": 0,
+      "y_px": 0,
+      "scale_x_pct": 0,
+      "scale_y_pct": 0,
+      "phase": 0.195,
+      "freq": 1
+    },
+    "skirt": {
+      "rot_deg": 0,
+      "x_px": 0,
+      "y_px": 0,
+      "scale_x_pct": 0,
+      "scale_y_pct": 0,
+      "phase": 0.22,
+      "freq": 1
+    },
+    "torso_blouse": {
+      "rot_deg": 0,
+      "x_px": 0,
+      "y_px": 0,
+      "scale_x_pct": 0,
+      "scale_y_pct": 0,
+      "phase": 0.245,
+      "freq": 1
+    },
+    "face_skin": {
+      "rot_deg": 0,
+      "x_px": 0,
+      "y_px": 0,
+      "scale_x_pct": 0,
+      "scale_y_pct": 0,
+      "phase": 0.27,
+      "freq": 1
+    },
+    "hair_cap": {
+      "rot_deg": 0,
+      "x_px": 0,
+      "y_px": 0,
+      "scale_x_pct": 0,
+      "scale_y_pct": 0,
+      "phase": 0.29500000000000004,
+      "freq": 1
+    },
+    "hair_side_left": {
+      "rot_deg": 0.18,
+      "x_px": 0.1,
+      "y_px": 0.1,
+      "scale_x_pct": 0,
+      "scale_y_pct": 0,
+      "phase": 0.32,
+      "freq": 1
+    },
+    "hair_side_right": {
+      "rot_deg": 0.18,
+      "x_px": 0.1,
+      "y_px": 0.1,
+      "scale_x_pct": 0,
+      "scale_y_pct": 0,
+      "phase": 0.345,
+      "freq": 1
+    },
+    "hair_bangs": {
+      "rot_deg": 0,
+      "x_px": 0,
+      "y_px": 0,
+      "scale_x_pct": 0,
+      "scale_y_pct": 0,
+      "phase": 0.37,
+      "freq": 1
+    },
+    "hair_cowlick": {
+      "rot_deg": 0.65,
+      "x_px": 0.15,
+      "y_px": 0.15,
+      "scale_x_pct": 0,
+      "scale_y_pct": 0,
+      "phase": 0.395,
+      "freq": 1
+    },
+    "ribbon_head": {
+      "rot_deg": 0.6,
+      "x_px": 0.2,
+      "y_px": 0.2,
+      "scale_x_pct": 0,
+      "scale_y_pct": 0,
+      "phase": 0.27,
+      "freq": 1
+    },
+    "arm_left_sleeve": {
+      "rot_deg": 0,
+      "x_px": 0,
+      "y_px": 0,
+      "scale_x_pct": 0,
+      "scale_y_pct": 0,
+      "phase": 0.445,
+      "freq": 1
+    },
+    "arm_right_sleeve": {
+      "rot_deg": 0,
+      "x_px": 0,
+      "y_px": 0,
+      "scale_x_pct": 0,
+      "scale_y_pct": 0,
+      "phase": 0.47000000000000003,
+      "freq": 1
+    },
+    "torso_neck_bow": {
+      "rot_deg": 0,
+      "x_px": 0,
+      "y_px": 0,
+      "scale_x_pct": 0,
+      "scale_y_pct": 0,
+      "phase": 0.495,
+      "freq": 1
+    },
+    "hand_left": {
+      "rot_deg": 0,
+      "x_px": 0,
+      "y_px": 0,
+      "scale_x_pct": 0,
+      "scale_y_pct": 0,
+      "phase": 0.52,
+      "freq": 1
+    },
+    "hand_right": {
+      "rot_deg": 0,
+      "x_px": 0,
+      "y_px": 0,
+      "scale_x_pct": 0,
+      "scale_y_pct": 0,
+      "phase": 0.545,
+      "freq": 1
+    },
+    "eye_left_sclera": {
+      "rot_deg": 0,
+      "x_px": 0,
+      "y_px": 0,
+      "scale_x_pct": 0,
+      "scale_y_pct": 0,
+      "phase": 0,
+      "freq": 1
+    },
+    "eye_left_iris": {
+      "rot_deg": 0,
+      "x_px": 0,
+      "y_px": 0,
+      "scale_x_pct": 0,
+      "scale_y_pct": 0,
+      "phase": 0,
+      "freq": 1
+    },
+    "eye_left_line": {
+      "rot_deg": 0,
+      "x_px": 0,
+      "y_px": 0,
+      "scale_x_pct": 0,
+      "scale_y_pct": 0,
+      "phase": 0,
+      "freq": 1
+    },
+    "eye_left_closed": {
+      "rot_deg": 0,
+      "x_px": 0,
+      "y_px": 0,
+      "scale_x_pct": 0,
+      "scale_y_pct": 0,
+      "phase": 0,
+      "freq": 1
+    },
+    "eye_right_sclera": {
+      "rot_deg": 0,
+      "x_px": 0,
+      "y_px": 0,
+      "scale_x_pct": 0,
+      "scale_y_pct": 0,
+      "phase": 0,
+      "freq": 1
+    },
+    "eye_right_iris": {
+      "rot_deg": 0,
+      "x_px": 0,
+      "y_px": 0,
+      "scale_x_pct": 0,
+      "scale_y_pct": 0,
+      "phase": 0,
+      "freq": 1
+    },
+    "eye_right_line": {
+      "rot_deg": 0,
+      "x_px": 0,
+      "y_px": 0,
+      "scale_x_pct": 0,
+      "scale_y_pct": 0,
+      "phase": 0,
+      "freq": 1
+    },
+    "eye_right_closed": {
+      "rot_deg": 0,
+      "x_px": 0,
+      "y_px": 0,
+      "scale_x_pct": 0,
+      "scale_y_pct": 0,
+      "phase": 0,
+      "freq": 1
+    },
+    "mouth_open": {
+      "rot_deg": 0,
+      "x_px": 0,
+      "y_px": 0,
+      "scale_x_pct": 0,
+      "scale_y_pct": 0,
+      "phase": 0,
+      "freq": 1
+    },
+    "mouth_closed": {
+      "rot_deg": 0,
+      "x_px": 0,
+      "y_px": 0,
+      "scale_x_pct": 0,
+      "scale_y_pct": 0,
+      "phase": 0,
+      "freq": 1
+    },
+    "brow_left": {
+      "rot_deg": 0,
+      "x_px": 0,
+      "y_px": 0,
+      "scale_x_pct": 0,
+      "scale_y_pct": 0,
+      "phase": 0,
+      "freq": 1
+    },
+    "brow_right": {
+      "rot_deg": 0,
+      "x_px": 0,
+      "y_px": 0,
+      "scale_x_pct": 0,
+      "scale_y_pct": 0,
+      "phase": 0,
+      "freq": 1
+    }
+  },
+  "groups": {
+    "body_sway": {
+      "rot_deg": 0.85,
+      "x_px": 1.5,
+      "y_px": 2.8,
+      "phase": 0,
+      "freq": 1
+    },
+    "head_sway": {
+      "rot_deg": 0.85,
+      "x_px": 1.5,
+      "y_px": 2.8,
+      "phase": 0,
+      "freq": 1
+    }
+  }
+}

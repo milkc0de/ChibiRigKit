@@ -1,0 +1,197 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "eyes",
+    "mouth"
+  ],
+  "properties": {
+    "eyes": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "mask",
+          "closed_curve",
+          "stroke_width"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$"
+          },
+          "mask": {
+            "type": "string"
+          },
+          "closed_curve": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 64,
+            "items": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": {
+                "type": "number"
+              }
+            }
+          },
+          "stroke_width": {
+            "type": "number",
+            "minimum": 0.5,
+            "maximum": 20
+          },
+          "margin": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 6
+          },
+          "line_color": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 3,
+            "items": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 255
+            }
+          },
+          "skin_color": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 3,
+            "items": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 255
+            }
+          },
+          "lashes": {
+            "type": "array",
+            "maxItems": 8,
+            "items": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 64,
+              "items": {
+                "type": "array",
+                "minItems": 2,
+                "maxItems": 2,
+                "items": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "already_closed": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "mouth": {
+      "anyOf": [
+        {
+          "type": "object",
+          "required": [
+            "id",
+            "mask",
+            "closed_curve",
+            "stroke_width"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$"
+            },
+            "mask": {
+              "type": "string"
+            },
+            "closed_curve": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 64,
+              "items": {
+                "type": "array",
+                "minItems": 2,
+                "maxItems": 2,
+                "items": {
+                  "type": "number"
+                }
+              }
+            },
+            "stroke_width": {
+              "type": "number",
+              "minimum": 0.5,
+              "maximum": 20
+            },
+            "margin": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6
+            },
+            "line_color": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 255
+              }
+            },
+            "skin_color": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 255
+              }
+            },
+            "lashes": {
+              "type": "array",
+              "maxItems": 8,
+              "items": {
+                "type": "array",
+                "minItems": 2,
+                "maxItems": 64,
+                "items": {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "items": {
+                    "type": "number"
+                  }
+                }
+              }
+            },
+            "already_closed": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "flat_extra_masks": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "inpaint_radius": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 10
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,281 @@
+{
+  "version": 1,
+  "engine": {
+    "model": "gpt-6-astra",
+    "effort": "high"
+  },
+  "communication": {
+    "progress": "tool_events_only",
+    "final": "structured_json",
+    "clarification": "only_if_blocked"
+  },
+  "protected_paths": [
+    "input/",
+    "work/aligned/",
+    "character.config.json",
+    "rig.workflow.json",
+    "rig.workflow.schema.json",
+    "rig.result.schema.json",
+    "toolbox/",
+    "runtime/"
+  ],
+  "coordinates": {
+    "origin": "top_left",
+    "units": "source_pixels",
+    "canonical_source": "normal",
+    "mask_size": "canvas",
+    "mask_mode": "L"
+  },
+  "rules": {
+    "source_pixels": {
+      "immutable": true,
+      "source_hash_check": true,
+      "repairs": "derived_layers_inside_explicit_masks_only"
+    },
+    "references": {
+      "provided_inputs": "take_precedence",
+      "generate_only_missing": [
+        "flat",
+        "blink",
+        "mouth_closed"
+      ],
+      "method": "feature_masks_inpaint_closed_curves",
+      "already_closed": "preserve_source",
+      "missing_mouth": "null",
+      "absent_eyes": [],
+      "estimated": true,
+      "forbidden_edits": [
+        "outer_silhouette",
+        "unrelated_hair",
+        "body",
+        "clothing"
+      ],
+      "flat_scope": "face_features_only"
+    },
+    "parts": {
+      "ids": "unique_safe_filenames",
+      "draw_order": "each_part_exactly_once",
+      "coverage": "no_duplicate_static_moving_parts",
+      "mask_edges": "follow_visible_art",
+      "exclude_contamination": [
+        "opposite_limb",
+        "hair_skin_islands",
+        "hair_clothing_frills",
+        "eye_cheek_blush"
+      ],
+      "preserve": [
+        "source_colors",
+        "asymmetry",
+        "toes",
+        "sock_silhouette",
+        "lashes",
+        "blush"
+      ],
+      "base": "stationary_remainder_only",
+      "pivot": "anatomical_attachment"
+    },
+    "eyes": {
+      "components": [
+        "eye_sclera",
+        "eye_iris",
+        "eye_line",
+        "drawn_eye_closed"
+      ],
+      "mesh": "blink_eye_radial",
+      "iris_clip": "posed_sclera_alpha",
+      "sclera_underpaint": "iris_mask_only",
+      "sclera_color": "sample_visible_sclera",
+      "closed_part": "paired_endpoint",
+      "shared_transform": true,
+      "full_blink_open_opacity": 0,
+      "intermediate_blink": "continuous_mesh_deformation",
+      "draw_closed_after_open": true
+    },
+    "mouth": {
+      "mesh": "mouth_open_close",
+      "closed_part": "paired_endpoint",
+      "shared_transform": true,
+      "blush_survives_expression": true
+    },
+    "head": {
+      "face_mesh": "face_grid",
+      "anchors": [
+        "center",
+        "left",
+        "right",
+        "up",
+        "down",
+        "up_left",
+        "up_right",
+        "down_left",
+        "down_right"
+      ],
+      "x_positive": "screen_right",
+      "y_positive": "screen_down",
+      "interpolation": "bilinear",
+      "include": [
+        "face",
+        "eyes",
+        "mouth",
+        "brows",
+        "head_hair",
+        "head_accessories"
+      ],
+      "exclude": [
+        "torso",
+        "arms",
+        "legs",
+        "clothing"
+      ],
+      "autoplay": "random_with_existing_sway",
+      "circle": "inspection_only",
+      "review": [
+        "far_eye_width",
+        "iris_center",
+        "outline",
+        "mouth_position",
+        "hair_coverage"
+      ],
+      "require_nonfolding_mesh": true,
+      "initial_status": "suggested",
+      "rotation_scope": "front_facing_2d",
+      "reference_layout_order": [
+        "render_nine_yaw_pitch_stills",
+        "relayout_parts_per_direction",
+        "inspect_and_correct_all_nine",
+        "save_authored_part_placements",
+        "attach_shared_head_parent_mesh",
+        "interpolate_saved_reference_meshes"
+      ]
+    },
+    "seams": {
+      "mask": "explicit_joint_region",
+      "preserve_shoe_tips": true,
+      "padding_max": 64,
+      "runtime_model_calls": false,
+      "global_blur": false,
+      "stale_frames": false
+    },
+    "browser_blocked_in_agent": {
+      "action": "record_issue_and_finish_turn",
+      "final_check_owner": "parent_orchestrator",
+      "offline_checks_count_as_browser_validation": false
+    },
+    "resume": {
+      "inspect_existing_outputs_first": true,
+      "preserve_correct_work": true,
+      "restart_from_scratch": false
+    }
+  },
+  "phases": {
+    "reference-planning": {
+      "actions": [
+        "inspect_normal",
+        "author_feature_masks",
+        "author_closed_curves",
+        "validate_reference_plan"
+      ],
+      "required_outputs": [
+        "reference.plan.json"
+      ],
+      "build_rig": false
+    },
+    "rigging": {
+      "actions": [
+        "inspect_aligned_sources",
+        "decompose_semantic_parts",
+        "author_masks",
+        "author_rig_plan",
+        "build_project",
+        "validate_static",
+        "inspect_validation_images",
+        "repair_observed_defects"
+      ],
+      "required_outputs": [
+        "rig.plan.json",
+        "rig.project.json",
+        "index.html",
+        "checks/report.json"
+      ]
+    },
+    "review": {
+      "actions": [
+        "inspect_validation_images",
+        "inspect_motion_frames",
+        "inspect_nine_head_directions",
+        "repair_observed_defects",
+        "build_project",
+        "validate_static"
+      ],
+      "required_outputs": [
+        "rig.plan.json",
+        "rig.project.json",
+        "index.html",
+        "checks/report.json"
+      ],
+      "preserve_correct_parts": true
+    }
+  },
+  "acceptance": {
+    "static": [
+      {
+        "path": "integrity",
+        "equals": "passed"
+      }
+    ],
+    "runtime": [
+      {
+        "path": "combinations",
+        "equals": 48
+      },
+      {
+        "path": "motionFrames",
+        "equals": 16
+      },
+      {
+        "path": "trailCheck",
+        "equals": true
+      },
+      {
+        "path": "basePreserved",
+        "equals": true
+      },
+      {
+        "path": "motionIO.roundtrip",
+        "equals": true
+      },
+      {
+        "path": "motionIO.pixelIdentical",
+        "equals": true
+      },
+      {
+        "path": "motionIO.atomic",
+        "equals": true
+      },
+      {
+        "path": "motionIO.legacyJSON",
+        "equals": true
+      },
+      {
+        "path": "motionIO.rejectedImports",
+        "equals": 4
+      },
+      {
+        "path": "head.directions",
+        "equals": 9,
+        "when": {
+          "path": "head.enabled",
+          "equals": true
+        }
+      },
+      {
+        "path": "head.randomSwayFrames",
+        "equals": 24,
+        "when": {
+          "path": "head.enabled",
+          "equals": true
+        }
+      }
+    ]
+  }
+}

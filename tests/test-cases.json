@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "suites": [
+    {
+      "id": "python-contracts",
+      "runner": "python-unittest",
+      "directory": "tests",
+      "pattern": "test_*.py"
+    },
+    {
+      "id": "javascript-contracts",
+      "runner": "node-test",
+      "directory": "tests",
+      "suffix": ".test.mjs"
+    }
+  ],
+  "browser": {
+    "runner": "toolbox/validate_runtime.cjs",
+    "interactive": "runtime-check.html",
+    "report": "checks/runtime-report.json",
+    "acceptance": "rig.workflow.json#/acceptance/runtime"
+  },
+  "coverage": [
+    "full_motion_json_roundtrip",
+    "legacy_motion_json_defaults",
+    "invalid_import_preserves_live_state",
+    "wrong_character_rejected",
+    "pixel_identical_after_motion_import",
+    "group_and_part_motion_restored",
+    "reference_generation_preserves_source",
+    "app_server_request_schema",
+    "long_turn_without_fixed_deadline",
+    "disconnect_and_requested_deadline",
+    "structured_task_and_result_protocol",
+    "resume_checkpoint_offline_transport",
+    "measured_acceptance_fails_closed",
+    "character_specific_motion_template",
+    "compact_motion_json_pixel_roundtrip",
+    "reported_file_and_directory_artifacts",
+    "required_outputs_remain_files",
+    "automatic_pupil_gaze_changes_pixels",
+    "neutral_mesh_matches_rigid_under_rotation",
+    "continuous_strip_boundaries",
+    "background_modes_and_transparency",
+    "background_preserves_static_character_layers",
+    "background_restore_and_reset",
+    "background_async_selection_race",
+    "independent_head_and_gaze_amounts",
+    "motion_amount_zero_and_amplification",
+    "motion_amount_json_roundtrip_and_reset",
+    "shared_neck_pivot_all_head_layers",
+    "neck_sway_body_independence",
+    "neck_sway_json_and_reset",
+    "shared_head_parent_mesh",
+    "nine_yaw_pitch_reference_meshes",
+    "recording_60_seconds_progress_and_cancel",
+    "portable_zip_crc_and_files",
+    "windows_command_launcher"
+  ]
+}

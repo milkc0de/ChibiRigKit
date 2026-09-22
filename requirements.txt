@@ -1,0 +1,4 @@
+Pillow>=10.4
+numpy>=2.0
+opencv-python-headless>=4.10
+jsonschema>=4.23

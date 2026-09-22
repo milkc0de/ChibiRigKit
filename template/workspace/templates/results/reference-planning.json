@@ -1,0 +1,8 @@
+{
+  "status": "ready_for_validation",
+  "artifacts": [
+    "reference.plan.json",
+    "work/reference_masks/"
+  ],
+  "issues": []
+}

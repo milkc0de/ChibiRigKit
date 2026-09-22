@@ -1,0 +1,290 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "name",
+    "parts",
+    "draw_order"
+  ],
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "duration_seconds": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 60
+    },
+    "groups": {
+      "type": "object"
+    },
+    "parts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "source",
+          "mask",
+          "role",
+          "kind"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$"
+          },
+          "source": {
+            "enum": [
+              "normal",
+              "flat",
+              "blink",
+              "mouth_closed"
+            ]
+          },
+          "mask": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "normal",
+              "static",
+              "eye_open",
+              "drawn_eye_closed",
+              "eye_closed",
+              "mouth_open",
+              "mouth_closed",
+              "mouth_smile",
+              "blush",
+              "brow",
+              "eye_sclera",
+              "eye_iris",
+              "eye_line"
+            ]
+          },
+          "parent": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "pivot": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 2,
+            "maxItems": 2
+          },
+          "opacity": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "pad": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 64
+          },
+          "motion": {
+            "type": "object"
+          },
+          "mesh": {
+            "type": "object",
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "enum": [
+                  "blink_eye_radial",
+                  "blink_eye_grid",
+                  "blink_eye_curve",
+                  "blink_eye",
+                  "bend_vertical",
+                  "bend_strip",
+                  "soft_body",
+                  "soft_strip",
+                  "mouth_open_close",
+                  "face_grid"
+                ]
+              },
+              "rings": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 12
+              },
+              "spokes": {
+                "type": "integer",
+                "minimum": 8,
+                "maximum": 128
+              },
+              "slices": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 128
+              },
+              "center": {
+                "$ref": "#/$defs/point"
+              },
+              "closed_center": {
+                "$ref": "#/$defs/point"
+              },
+              "close_curve": {
+                "type": "object",
+                "required": [
+                  "x",
+                  "y",
+                  "curvature"
+                ],
+                "properties": {
+                  "x": {
+                    "type": "number"
+                  },
+                  "y": {
+                    "type": "number"
+                  },
+                  "curvature": {
+                    "type": "number"
+                  }
+                }
+              },
+              "closed_width_ratio": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "maximum": 2
+              },
+              "closed_slope": {
+                "type": "number"
+              },
+              "min_open": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "maximum": 1
+              }
+            },
+            "additionalProperties": true
+          },
+          "static_blush": {
+            "type": "boolean"
+          },
+          "closed_part": {
+            "type": "string",
+            "description": "Matching closed-eye or closed-mouth ID. Uses the same transform as the open part."
+          },
+          "transform_from": {
+            "type": "string",
+            "description": "Share all motion and pivot with this part; cycles are invalid."
+          },
+          "texture_repair": {
+            "type": "object",
+            "required": [
+              "file",
+              "mask"
+            ],
+            "properties": {
+              "file": {
+                "type": "string"
+              },
+              "mask": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false,
+            "description": "Full-canvas prepared PNG and explicit full-canvas grayscale region mask, relative to workspace. Originals remain unchanged."
+          },
+          "seam": {
+            "type": "object",
+            "required": [
+              "file",
+              "mask"
+            ],
+            "properties": {
+              "file": {
+                "type": "string"
+              },
+              "mask": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false,
+            "description": "Full-canvas prepared PNG and explicit full-canvas grayscale region mask, relative to workspace. Originals remain unchanged."
+          },
+          "head": {
+            "type": "boolean"
+          },
+          "iris_part": {
+            "type": "string"
+          },
+          "clip_to": {
+            "type": "string"
+          },
+          "sclera_fill": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 3,
+            "items": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 255
+            }
+          }
+        },
+        "additionalProperties": true
+      },
+      "minItems": 1
+    },
+    "draw_order": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "head_pose": {
+      "type": "object",
+      "properties": {
+        "columns": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8
+        },
+        "rows": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8
+        },
+        "poses": {
+          "type": "object"
+        },
+        "layout_signature": {
+          "type": "string"
+        },
+        "autoplay": {
+          "type": "boolean"
+        }
+      }
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "point": {
+      "type": "object",
+      "required": [
+        "x",
+        "y"
+      ],
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        }
+      }
+    }
+  }
+}

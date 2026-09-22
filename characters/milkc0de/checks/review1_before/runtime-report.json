@@ -1,0 +1,34 @@
+{
+  "motionIO": {
+    "compactPreset": true,
+    "templatePreservesHead": true,
+    "roundtrip": true,
+    "pixelIdentical": true,
+    "globalSettings": true,
+    "groupMotion": true,
+    "legacyJSON": true,
+    "rejectedImports": 4,
+    "atomic": true
+  },
+  "head": {
+    "enabled": true,
+    "directions": 9,
+    "distinctRenders": 9,
+    "circleFrames": 32,
+    "randomSamples": 240,
+    "randomSwayFrames": 24,
+    "renderCount": 83,
+    "pupilClipChecks": 54,
+    "storageRoundtrip": true,
+    "wrongLayoutRejected": true,
+    "elapsedMs": 10448
+  },
+  "combinations": 48,
+  "motionFrames": 16,
+  "trailCheck": true,
+  "basePreserved": true,
+  "reset": true,
+  "mouthDeformationChecks": 1,
+  "seamChangedChannels": 0,
+  "browserErrors": []
+}

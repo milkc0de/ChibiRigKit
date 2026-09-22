@@ -1,0 +1,72 @@
+{
+  "phase": "review",
+  "pass": 2,
+  "total_passes": 2,
+  "status": "ready_for_validation",
+  "repairs": {
+    "transferred_source_pixels": {
+      "hair_back_left": 873,
+      "hair_side_left": 320
+    },
+    "method": "Source pixels transferred from static background into existing hair masks inside two explicit reviewed regions; RGB unchanged."
+  },
+  "preserved": {
+    "part_count": 32,
+    "plan_unchanged": true,
+    "protected_files_unchanged": 29,
+    "reconstruction": {
+      "normal": {
+        "changed_pixels": 0,
+        "max_channel_delta": 0
+      },
+      "blink": {
+        "changed_pixels": 0,
+        "max_channel_delta": 0
+      },
+      "mouth_closed": {
+        "changed_pixels": 0,
+        "max_channel_delta": 0
+      }
+    }
+  },
+  "visual_review": {
+    "supplied_browser_motion_frames": 16,
+    "supplied_browser_head_directions": 9,
+    "post_repair_offline_motion_frames": 16,
+    "post_repair_offline_head_directions": 9,
+    "findings": [
+      "Recovered two stationary brown strand fragments into existing left hair layers without changing source RGB or poses.",
+      "Reviewed all supplied motion frames and nine head directions: no new gross separation, eye drift, shoe clipping or mouth-placement defects observed at supplied resolution.",
+      "Final offline previews retain coherent far-eye widths, iris centers, facial outline, mouth placement and hair coverage.",
+      "Close-up correction overlays reviewed; shaded cafe pixels excluded by tracing the lock boundary.",
+      "Fine edge traces and hidden material remain approximate; generated eyelids and skin fill remain estimated artwork."
+    ]
+  },
+  "static": {
+    "integrity": "passed",
+    "scope": "static reconstruction; browser motion checks are separate",
+    "open": {
+      "rgb_mae": 0.0,
+      "alpha_iou": 1.0
+    },
+    "blink": {
+      "rgb_mae": 0.0,
+      "alpha_iou": 1.0
+    }
+  },
+  "geometry": {
+    "passed": true,
+    "headMeshChecks": 6069
+  },
+  "browser": {
+    "supplied_pre_repair_acceptance": "passed",
+    "supplied_report_snapshot": "work/rig_authoring/review2_before.json",
+    "post_repair_acceptance": "pending_parent_orchestrator",
+    "reason": "Prior automatic approval review rejected the local-file harness under browser policy; no bypass attempted. Offline checks are not browser validation."
+  },
+  "current_build_sha256": {
+    "rig.plan.json": "ac4b194fc40a5b8598bcc0d9c93236e4177f9a921f1f4c7be61749011635adc4",
+    "rig.project.json": "8bd0f869162c7bd6c99a1a7d60cdc7bdc305c915b13528d05f242605e02a2989",
+    "index.html": "6c976782dd0e26a653ccc7afe6fb9a7036e81f56b70e25d0e9d6b387d8ccca87"
+  }
+}

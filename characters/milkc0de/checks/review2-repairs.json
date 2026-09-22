@@ -1,0 +1,7 @@
+{
+  "transferred_source_pixels": {
+    "hair_back_left": 873,
+    "hair_side_left": 320
+  },
+  "method": "Source pixels transferred from static background into existing hair masks inside two explicit reviewed regions; RGB unchanged."
+}

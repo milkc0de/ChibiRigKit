@@ -1,0 +1,14 @@
+{
+  "codex": {
+    "model": "gpt-6-astra",
+    "effort": "high",
+    "strict": true,
+    "transport": "stdio",
+    "service_name": "chibirigkit"
+  },
+  "pipeline": {
+    "review_passes": 2,
+    "source_images_are_immutable": true,
+    "closed_eye_strategy": "mesh_open_eye_then_swap_full_color_closed_eye_near_full_closure"
+  }
+}

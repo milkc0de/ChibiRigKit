@@ -1,0 +1,12 @@
+{
+  "status": "blocked",
+  "artifacts": [],
+  "issues": [
+    {
+      "code": "validation_failed",
+      "severity": "blocker",
+      "artifact": null,
+      "detail": "Replace with the observed blocking condition."
+    }
+  ]
+}

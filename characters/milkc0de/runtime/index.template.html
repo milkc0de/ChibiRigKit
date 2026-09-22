@@ -1,0 +1,302 @@
+<!doctype html>
+<!--
+SPDX-FileCopyrightText: 2026 milkc0de
+SPDX-License-Identifier: MIT
+Applies to the software code; character images retain their own rights.
+-->
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>__TITLE__</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+*{box-sizing:border-box}body{margin:0;display:grid;grid-template-columns:minmax(420px,1fr) 390px;min-height:100vh;background:#151515;color:#f4f4f4}
+main{display:flex;align-items:center;justify-content:center;padding:22px;overflow:auto}.stage{width:min(74vh,72vw);aspect-ratio:__W__/__H__;border-radius:18px;overflow:hidden;background:linear-gradient(45deg,#2b2b2b 25%,transparent 25%,transparent 75%,#2b2b2b 75%),linear-gradient(45deg,#2b2b2b 25%,#202020 25%,#202020 75%,#2b2b2b 75%);background-size:24px 24px;background-position:0 0,12px 12px;box-shadow:0 18px 70px #0009}canvas{width:100%;height:100%;display:block}
+aside{padding:18px;background:#0f0f0f;border-left:1px solid #292929;overflow:auto}h1{font-size:18px;margin:0 0 6px}h2{font-size:13px;margin:18px 0 8px;color:#ddd}p,.note{font-size:11px;line-height:1.55;color:#aaa}label.line{display:grid;grid-template-columns:1fr 72px;gap:8px;align-items:center;font-size:12px;margin:9px 0 3px}output{text-align:right;font-variant-numeric:tabular-nums;color:#ddd}input[type=range]{width:100%}select,button{width:100%;padding:9px 10px;border-radius:9px;border:1px solid #333;background:#202020;color:#eee}button{cursor:pointer;font-weight:650}button.primary{background:#eee;color:#111;border-color:#eee}.row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.check{display:flex;align-items:center;gap:7px;font-size:12px;margin:8px 0}.sep{height:1px;background:#292929;margin:15px 0}.small{font-size:10px;color:#7f7f7f}@media(max-width:900px){body{grid-template-columns:1fr}.stage{width:min(95vw,70vh)}aside{border-left:0;border-top:1px solid #292929}}
+.head-directions{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}.head-directions [aria-pressed="true"]{background:#357887;border-color:#69d7ef}#headPanel label{font-size:12px}#headPanel input[type=file]{max-width:100%}#headPanel[hidden]{display:none}canvas{touch-action:none}
+body{height:100vh;overflow:hidden}main,aside{min-height:0;height:100vh}aside{overflow-y:auto}.stage{max-height:calc(100vh - 44px)}
+#headPanel:has(#headEdit:not(:checked)) .head-editor{display:none}
+@media(max-width:900px){body{grid-template-rows:44vh 56vh}main{height:44vh;padding:12px}.stage{height:calc(44vh - 24px);width:auto;max-width:95vw}aside{height:56vh}}
+</style>
+</head>
+<body>
+<main><div class="stage"><canvas id="c" width="__W__" height="__H__"></canvas></div></main>
+<aside>
+<h1>__TITLE__</h1>
+<p>顔や視線、首振り、体の揺れを調整できます。できあがったら動画や完成品ZIPを保存してください。</p>
+<section id="headPanel">
+<h2>顔・視線・首振り</h2>
+<div class="check"><input id="headRandom" type="checkbox"><label for="headRandom">顔と黒目をランダムに動かす</label></div>
+<label class="check"><input id="neckSway" type="checkbox" checked> 首を支点に頭全体をランダムに動かす</label>
+<label class="line" for="neckYaw">ヨー（左右を向く） <output id="neckYawOut">12.0°</output></label><input id="neckYaw" type="range" min="0" max="30" step="0.5" value="12">
+<label class="line" for="neckPitch">ピッチ（うなずく） <output id="neckPitchOut">8.0°</output></label><input id="neckPitch" type="range" min="0" max="20" step="0.5" value="8">
+<label class="line" for="neckAmount">ロール（左右に傾く） <output id="neckAmountOut">6.0°</output></label><input id="neckAmount" type="range" min="0" max="15" step="0.5" value="6">
+<label class="line" for="headAmount">顔の動きの量 <output id="headAmountOut">1.50×</output></label><input id="headAmount" type="range" min="0" max="4" step="0.05" value="1.5">
+<label class="line" for="gazeAmount">黒目の動きの量 <output id="gazeAmountOut">1.50×</output></label><input id="gazeAmount" type="range" min="0" max="4" step="0.05" value="1.5">
+<p class="note">自動の動きの強さです。0で停止、1が従来の強さ。体の揺れは変わりません。</p>
+<div class="check"><input id="showHeadMesh" type="checkbox"><label for="showHeadMesh">頭全体のメッシュを表示</label></div>
+<details id="headDetails"><summary>詳細な顔配置の調整</summary>
+<p>正面と8方向の配置をつないで動かします。左・右は画面から見た向きです。</p>
+<div class="head-directions" role="group" aria-label="保存する顔の向き">
+<button type="button" data-head-direction="up_left" aria-pressed="false"></button>
+<button type="button" data-head-direction="up" aria-pressed="false"></button>
+<button type="button" data-head-direction="up_right" aria-pressed="false"></button>
+<button type="button" data-head-direction="left" aria-pressed="false"></button>
+<button type="button" data-head-direction="center" aria-pressed="false"></button>
+<button type="button" data-head-direction="right" aria-pressed="false"></button>
+<button type="button" data-head-direction="down_left" aria-pressed="false"></button>
+<button type="button" data-head-direction="down" aria-pressed="false"></button>
+<button type="button" data-head-direction="down_right" aria-pressed="false"></button>
+</div>
+<label class="line" for="headX">顔の左右 <output id="headXOut">0.00</output></label><input id="headX" type="range" min="-1" max="1" step="0.01" value="0">
+<label class="line" for="headY">顔の上下 <output id="headYOut">0.00</output></label><input id="headY" type="range" min="-1" max="1" step="0.01" value="0">
+<div class="check"><input id="headCircle" type="checkbox"><label for="headCircle">顔をぐるぐる動かす</label></div>
+<label class="line" for="gazeX">黒目の左右（手動調整）</label><input id="gazeX" type="range" min="-1" max="1" step="0.01" value="0">
+<label class="line" for="gazeY">黒目の上下（手動調整）</label><input id="gazeY" type="range" min="-1" max="1" step="0.01" value="0">
+<div class="check"><input id="headEdit" type="checkbox"><label for="headEdit">選択した方向の配置を編集</label></div>
+<div class="head-editor"><p>編集中は正面の目・口で動きを止めます。パーツを選び、位置・大きさとメッシュの点を調整してください。点は絵の上でもドラッグできます。</p>
+<label for="headPart">配置を調整するパーツ</label><select id="headPart"></select>
+<label class="line" for="poseX">左右の位置 <output id="poseXOut"></output></label><input id="poseX" type="range" min="-100" max="100" step="0.1" value="0">
+<label class="line" for="poseY">上下の位置 <output id="poseYOut"></output></label><input id="poseY" type="range" min="-100" max="100" step="0.1" value="0">
+<label class="line" for="poseRotation">傾き <output id="poseRotationOut"></output></label><input id="poseRotation" type="range" min="-45" max="45" step="0.1" value="0">
+<label class="line" for="poseScaleX">横の大きさ <output id="poseScaleXOut"></output></label><input id="poseScaleX" type="range" min="0.3" max="2" step="0.01" value="1">
+<label class="line" for="poseScaleY">縦の大きさ <output id="poseScaleYOut"></output></label><input id="poseScaleY" type="range" min="0.3" max="2" step="0.01" value="1">
+<label for="headVertex">顔・パーツのメッシュ</label><select id="headVertex"></select>
+<label class="line" for="vertexX">点の横移動 <output id="vertexXOut"></output></label><input id="vertexX" type="range" min="-100" max="100" step="0.1" value="0">
+<label class="line" for="vertexY">点の縦移動 <output id="vertexYOut"></output></label><input id="vertexY" type="range" min="-100" max="100" step="0.1" value="0">
+</div><div class="row"><button id="saveHeadPose">この配置を保存</button><button id="exportHeadPose">9方向をJSON保存</button></div>
+<div class="row"><button id="resetHeadPose">この方向を初期値に戻す</button><button id="resetAllHeadPoses">9方向すべてを初期値に戻す</button></div>
+<label class="check" for="importHeadPose">保存した9方向を読み込む</label><input id="importHeadPose" type="file" accept=".json,application/json">
+<p id="headStatus" role="status">初期配置はたたき台です。絵に合わせて調整してください。</p>
+</details><div class="sep"></div></section>
+<section id="backgroundPanel"><h2>背景</h2>
+<label for="backgroundMode" class="note">背景の種類</label><select id="backgroundMode"><option value="original">元の背景</option><option value="color">単色</option><option value="image">画像</option><option value="transparent">透明</option></select>
+<label class="line" for="backgroundColor">背景色</label><input id="backgroundColor" type="color" value="#e9dfd3" style="width:100%;height:34px">
+<label class="check" for="backgroundFile">背景画像を選ぶ</label><input id="backgroundFile" type="file" accept="image/png,image/jpeg,image/webp" style="max-width:100%">
+<label class="check" for="backgroundFit">画像の表示方法</label><select id="backgroundFit"><option value="cover">画面いっぱい（はみ出しを切り取り）</option><option value="contain">画像全体を表示</option></select>
+<div class="row"><button id="resetBackground">元の背景に戻す</button></div><p id="backgroundStatus" role="status" class="note">選んだ背景はこのブラウザに保存されます。透明部分は市松模様で表示します。</p>
+</section><div class="sep"></div>
+<h2>再生</h2>
+<label class="line">ループ秒数 <output id="durationOut"></output></label><input id="duration" type="range" min="1" max="60" step="0.1" value="4">
+<label class="line">全体モーション量 <output id="motionOut"></output></label><input id="motionIntensity" type="range" min="0" max="5" step="0.05" value="1">
+<label class="line">全体モーション速度 <output id="speedOut"></output></label><input id="motionSpeed" type="range" min="0.1" max="5" step="0.05" value="1">
+<label class="line">表情 0↔1 <output id="expressionOut"></output></label><input id="expression" type="range" min="0" max="1" step="0.01" value="0">
+<label class="line">目開閉 <output id="eyeOpenOut"></output></label><input id="eyeOpenTest" type="range" min="0" max="1" step="0.01" value="1">
+<div class="check"><input id="manualEyeOpen" type="checkbox"><label for="manualEyeOpen">手動の目開閉</label></div>
+<label class="line">口開閉 <output id="mouthOpenOut"></output></label><input id="mouthOpenTest" type="range" min="0" max="1" step="0.01" value="1">
+<div class="check"><input id="manualMouthOpen" type="checkbox"><label for="manualMouthOpen">手動の口開閉</label></div>
+<div class="check"><input id="autoBlink" type="checkbox" checked><label for="autoBlink">自動まばたき</label></div>
+<div class="check"><input id="autoExpression" type="checkbox"><label for="autoExpression">ゆっくり表情変化</label></div>
+<div class="check"><input id="showPivots" type="checkbox"><label for="showPivots">支点表示</label></div>
+<div class="check"><input id="showMesh" type="checkbox"><label for="showMesh">メッシュ表示</label></div>
+<div class="check"><input id="showSeams" type="checkbox" checked><label for="showSeams">準備済みの継ぎ目補完</label></div>
+<div class="check"><input id="showBaseOnly" type="checkbox"><label for="showBaseOnly">下地だけ表示</label></div>
+<div class="row"><button id="pause">一時停止</button><button id="reset">揺れの初期値</button></div>
+<div class="sep"></div><h2>選択パーツ</h2><select id="partSelect"></select>
+<label class="line">回転振幅 ° <output id="partRotOut"></output></label><input id="partRot" type="range" min="0" max="15" step="0.05">
+<label class="line">横移動 px <output id="partXOut"></output></label><input id="partX" type="range" min="0" max="20" step="0.05">
+<label class="line">縦移動 px <output id="partYOut"></output></label><input id="partY" type="range" min="0" max="20" step="0.05">
+<label class="line">位相 <output id="partPhaseOut"></output></label><input id="partPhase" type="range" min="0" max="1" step="0.01">
+<p id="recordStatus" role="status"></p><progress id="recordProgress" hidden max="60" value="0" aria-label="録画の進み具合"></progress>
+<button id="bundle">完成品一式をダウンロード</button><p id="bundleStatus" role="status"></p>
+<div class="sep"></div><div class="row"><button id="exportJson">全体の動きをJSON保存</button><button id="record" class="primary">WebM録画</button><button id="recordCancel" hidden>録画中止</button></div>
+<label class="check" for="importJson">全体の動きJSONを読み込む</label><input id="importJson" type="file" accept=".json,application/json" style="max-width:100%">
+<p id="motionIOStatus" class="note" role="status">同じキャラの全体JSONから、揺れ・速度・瞬き・顔配置をまとめて復元します。</p>
+
+<p id="loadStatus" role="status">画像を読み込み中…</p>
+<svg width="0" height="0" aria-hidden="true"><filter id="seamEnvelope" x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB"><feMorphology operator="dilate" radius="2"/><feMorphology operator="erode" radius="2"/></filter></svg>
+<script id="licenseData" type="text/plain">__LICENSE_TEXT__</script>
+<script id="projectData" type="application/json">__PROJECT_JSON__</script>
+<script>
+const PROJECT=JSON.parse(document.getElementById('projectData').textContent),canvas=document.getElementById('c'),ctx=canvas.getContext('2d',{alpha:true,willReadFrequently:location.pathname.endsWith('/runtime-check.html')||location.search.includes('validate=1')}),$=id=>document.getElementById(id);
+const controls={showHeadMesh:$('showHeadMesh'),neckYaw:$('neckYaw'),neckPitch:$('neckPitch'),neckSway:$('neckSway'),neckAmount:$('neckAmount'),headAmount:$('headAmount'),gazeAmount:$('gazeAmount'),headRandom:$('headRandom'),headX:$('headX'),headY:$('headY'),headCircle:$('headCircle'),headEdit:$('headEdit'),duration:$('duration'),motionIntensity:$('motionIntensity'),motionSpeed:$('motionSpeed'),expression:$('expression'),autoBlink:$('autoBlink'),autoExpression:$('autoExpression'),showPivots:$('showPivots'),showMesh:$('showMesh'),showBaseOnly:$('showBaseOnly'),showSeams:$('showSeams'),eyeOpenTest:$('eyeOpenTest'),manualEyeOpen:$('manualEyeOpen'),mouthOpenTest:$('mouthOpenTest'),manualMouthOpen:$('manualMouthOpen')};
+const initialParts=structuredClone(PROJECT.parts),initialGroups=structuredClone(PROJECT.groups||{}),initialSettings=structuredClone(PROJECT.settings||{});
+let images={},running=true,start=performance.now(),pausedAt=0,frameDirty=true;
+function loadImage(src){return new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=reject;im.src=src})}
+async function loadAll(){
+  for(const p of Object.values(PROJECT.parts))images[p.file]=await loadImage(p.image_data_url||p.file);
+  for(const p of Object.values(PROJECT.parts))if(p.seam){
+    // The exact prepared bytes are embedded by the builder; stale disk margins are never loaded.
+    images[p.seam.file]=await loadImage(p.seam.data_url);
+  }
+}
+function mul(A,B){return[A[0]*B[0]+A[2]*B[1],A[1]*B[0]+A[3]*B[1],A[0]*B[2]+A[2]*B[3],A[1]*B[2]+A[3]*B[3],A[0]*B[4]+A[2]*B[5]+A[4],A[1]*B[4]+A[3]*B[5]+A[5]]}
+function around(pivot,rotDeg,tx,ty,sx=1,sy=1){const r=rotDeg*Math.PI/180,c=Math.cos(r),s=Math.sin(r),px=pivot.x,py=pivot.y,R=[c*sx,s*sx,-s*sy,c*sy,0,0],T1=[1,0,0,1,px+tx,py+ty],T2=[1,0,0,1,-px,-py];return mul(mul(T1,R),T2)}
+// Motion uses a fixed four-second base cycle; recording length never rescales time.
+function evalMotion(obj,t,intensity=1){const m=obj.motion||{},dur=4,speed=parseFloat(controls.motionSpeed.value||1),a=(((t*speed)/dur)*(m.freq||1)+(m.phase||0))*Math.PI*2;return{rot:(m.rot_deg||0)*Math.sin(a)*intensity,x:(m.x_px||0)*Math.sin(a+.37)*intensity,y:(m.y_px||0)*Math.sin(a*2)*intensity,sx:1+((m.scale_x_pct||0)/100)*(.5+.5*Math.sin(a*2-1.57))*intensity,sy:1+((m.scale_y_pct||0)/100)*(.5+.5*Math.sin(a*2-1.57))*intensity}}
+function groupMatrix(name,t,intensity){if(!name||!PROJECT.groups?.[name])return[1,0,0,1,0,0];const g=PROJECT.groups[name],e=evalMotion(g,t,intensity);return around(g.pivot,e.rot,e.x,e.y,e.sx,e.sy)}
+function smoothstep(a,b,x){const t=Math.max(0,Math.min(1,(x-a)/(b-a)));return t*t*(3-2*t)}
+function blinkPulse(t){if(!controls.autoBlink.checked)return 0;const d=4,time=t*Number(controls.motionSpeed.value||1),p=(time%d)/d;let b=0;for(const c of [.36,.40,.83]){const x=Math.abs(p-c);if(x<.032)b=Math.max(b,Math.sin((1-x/.032)*Math.PI/2))}return Math.min(1,b)}
+function expressionValue(t){return controls.autoExpression.checked?.5-.5*Math.cos((t/6)*Math.PI*2):parseFloat(controls.expression.value)}
+function eyeOpenValue(t,expr,blink){return controls.manualEyeOpen.checked?parseFloat(controls.eyeOpenTest.value):1-Math.max(expr,blink)}
+function mouthOpenValue(){if(controls.headEdit.checked)return 1;return controls.manualMouthOpen.checked?parseFloat(controls.mouthOpenTest.value):1}
+function eyeSwap(eyeOpen){const cfg=PROJECT.settings?.blink||{};return smoothstep(cfg.closed_eye_swap_start??.92,cfg.closed_eye_swap_end??.995,1-eyeOpen)}
+function partOpacity(part,expr,eyeOpen){
+  let op=part.opacity??1;const k=part.kind;
+  if(['eye_open','eye_sclera','eye_iris','eye_line'].includes(k))op*=1-eyeSwap(eyeOpen);
+  if(k==='drawn_eye_closed'||k==='eye_closed')op*=eyeSwap(eyeOpen);
+  const mouthWeight=smoothstep(0,.18,mouthOpenValue());
+  const hasSmile=Object.values(PROJECT.parts).some(p=>p.kind==='mouth_smile');
+  if(k==='mouth_open')op*=(hasSmile?1-expr:1)*mouthWeight;
+  if(k==='mouth_smile')op*=expr*mouthWeight;
+  if(k==='mouth_closed')op*=1-mouthWeight;
+  return op;
+}
+function transformOwner(p){return p.transform_from?transformOwner(PROJECT.parts[p.transform_from]):p}
+function partMatrix(p,t,intensity,includeNeck=true){const owner=transformOwner(p),e=evalMotion(owner,t,intensity),base=mul(groupMatrix(owner.parent,t,intensity),around(owner.pivot,e.rot,e.x,e.y,e.sx,e.sy));return includeNeck?mul(neckSwayMatrix(p,t,intensity),base):base}
+function drawRigid(im,p,target=ctx){target.drawImage(im,p.x,p.y)}
+const eyeMeshCache=new WeakMap();
+function radialEyeMesh(part){
+  if(eyeMeshCache.has(part))return eyeMeshCache.get(part);
+  const m=part.mesh,rings=m.rings||4,spokes=m.spokes||48;
+  const cx=m.center.x-part.x,cy=m.center.y-part.y,points=[[cx,cy]],triangles=[];
+  for(let r=1;r<=rings;r++)for(let i=0;i<spokes;i++){
+    const a=i*2*Math.PI/spokes,radius=m.radii[i]*r/rings;
+    points.push([cx+Math.cos(a)*radius,cy+Math.sin(a)*radius]);
+  }
+  for(let i=0;i<spokes;i++)triangles.push([0,1+i,1+(i+1)%spokes]);
+  for(let r=1;r<rings;r++)for(let i=0;i<spokes;i++){
+    const a=1+(r-1)*spokes+i,b=1+(r-1)*spokes+(i+1)%spokes,c=1+r*spokes+i,d=1+r*spokes+(i+1)%spokes;
+    triangles.push([a,c,d],[a,d,b]);
+  }
+  const area=([a,b,c])=>(b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]);
+  const curve=m.close_curve,target=points.map(([x])=>[x,curve.y-part.y+curve.curvature*(part.x+x-curve.x)**2]);
+  let minSafeOpen=m.min_open??.015;
+  for(const tri of triangles){const sa=area(tri.map(i=>points[i])),ta=area(tri.map(i=>target[i]));if(ta<0)minSafeOpen=Math.max(minSafeOpen,-ta/(sa-ta)+.005)}
+  const surface=document.createElement('canvas');surface.width=canvas.width;surface.height=canvas.height;
+  const mesh={points,triangles,minSafeOpen,surface};eyeMeshCache.set(part,mesh);return mesh;
+}
+function deformEyePoint(p,point,eyeOpen){
+  const open=Math.max(radialEyeMesh(p).minSafeOpen,eyeOpen),x=p.x+point[0],y=p.y+point[1],c=p.mesh.close_curve;
+  return [x,y*open+(c.y+c.curvature*(x-c.x)**2)*(1-open)];
+}
+function drawEyeTriangle(ctx,im,source,dest){
+  const [s0,s1,s2]=source,[d0,d1,d2]=dest;
+  const ux=s1[0]-s0[0],uy=s1[1]-s0[1],vx=s2[0]-s0[0],vy=s2[1]-s0[1];
+  const det=ux*vy-uy*vx;if(Math.abs(det)<1e-8)return;
+  const ax=d1[0]-d0[0],ay=d1[1]-d0[1],bx=d2[0]-d0[0],by=d2[1]-d0[1];
+  const a=(ax*vy-bx*uy)/det,b=(ay*vy-by*uy)/det;
+  const c=(bx*ux-ax*vx)/det,d=(by*ux-ay*vx)/det;
+  ctx.save();ctx.beginPath();
+  // Slight overlap prevents antialiasing cracks between adjacent triangles.
+  const winding=Math.sign(ax*by-ay*bx);
+  dest.forEach(([x,y],i)=>{
+    const prev=dest[(i+2)%3],next=dest[(i+1)%3];
+    const l1=Math.hypot(x-prev[0],y-prev[1])||1,l2=Math.hypot(next[0]-x,next[1]-y)||1;
+    const n1=[winding*(y-prev[1])/l1,-winding*(x-prev[0])/l1];
+    const n2=[winding*(next[1]-y)/l2,-winding*(next[0]-x)/l2];
+    const miter=0.35/Math.max(0.1,1+n1[0]*n2[0]+n1[1]*n2[1]);
+    const px=x+(n1[0]+n2[0])*miter,py=y+(n1[1]+n2[1])*miter;
+    if(i)ctx.lineTo(px,py);else ctx.moveTo(px,py);
+  });
+  ctx.closePath();ctx.clip();
+  ctx.transform(a,b,c,d,d0[0]-a*s0[0]-c*s0[1],d0[1]-b*s0[0]-d*s0[1]);
+  ctx.drawImage(im,0,0);ctx.restore();
+}
+function drawBlinkEye(im,p,eyeOpen,target=ctx){
+  if(eyeOpen>=1){drawRigid(im,p,target);return;}
+  if(p.mesh.type==='blink_eye_radial'){
+    const mesh=radialEyeMesh(p),dest=mesh.points.map(pt=>deformEyePoint(p,pt,eyeOpen)),local=mesh.surface.getContext('2d');
+    local.clearRect(0,0,mesh.surface.width,mesh.surface.height);
+    for(const tri of mesh.triangles)drawEyeTriangle(local,im,tri.map(i=>mesh.points[i]),tri.map(i=>dest[i]));
+    target.drawImage(mesh.surface,0,0);return;
+  }
+  const w=p.w,h=p.h,slices=p.mesh.slices||14,open=Math.max(p.mesh.min_open??.015,eyeOpen),center=p.mesh.close_center_y_local??h*.5;
+  for(let i=0;i<slices;i++){const sy=h*i/slices,sh=h/slices;target.drawImage(im,0,sy,w,sh,p.x,p.y+center+(sy-center)*open,w,sh*open)}
+}
+function drawMouthOpenClose(im,p,open,target=ctx){
+  if(open===1){drawRigid(im,p,target);return;}
+  const m=p.mesh,c=m.center,closedCenter=m.closed_center,closed=1-open,sx=1-closed*(1-m.closed_width_ratio),sy=.06+.94*open;
+  target.save();target.translate(c.x+(closedCenter.x-c.x)*closed,c.y+(closedCenter.y-c.y)*closed);
+  target.transform(sx,(m.closed_slope||0)*closed*sx,0,sy,0,0);target.drawImage(im,p.x-c.x,p.y-c.y);target.restore();
+}
+// Adjacent cells share their deformed boundary; independent shifted strips leave cracks.
+function drawStripMesh(im,p,slices,vertical,deform,target){
+  const points=[],dest=[];
+  for(let i=0;i<=slices;i++)for(let side=0;side<2;side++){
+    const u=i/slices,x=vertical?side*p.w:u*p.w,y=vertical?u*p.h:side*p.h;
+    points.push([x,y]);dest.push(deform(x,y,u));
+  }
+  for(let i=0;i<slices;i++)for(const tri of [[i*2,i*2+2,i*2+3],[i*2,i*2+3,i*2+1]])
+    drawEyeTriangle(target,im,tri.map(k=>points[k]),tri.map(k=>dest[k]));
+}
+function drawBendVertical(im,p,t,intensity,target=ctx){
+  const slices=p.mesh?.slices||8,amp=(p.mesh?.amp_px??4)*Math.sin(((p.motion?.phase||0)+t/4)*Math.PI*2)*intensity;
+  if(Math.abs(amp)<1e-10){drawRigid(im,p,target);return;}
+  drawStripMesh(im,p,slices,false,(x,y,u)=>[p.x+x+(u-.5)*amp*.18,p.y+y+Math.sin(u*Math.PI)*amp],target);
+}
+function drawSoftBody(im,p,t,intensity,target=ctx){
+  const amp=(p.mesh?.amp_px??1.5)*intensity,squash=(p.mesh?.squash_pct??.25)/100*intensity;
+  if(Math.abs(amp)+Math.abs(squash)<1e-10){drawRigid(im,p,target);return;}
+  const a=t*2*Math.PI/4+(p.motion?.phase||0)*2*Math.PI;
+  drawStripMesh(im,p,p.mesh?.slices||7,true,(x,y,u)=>{
+    const dx=Math.sin(a+u*Math.PI)*amp*Math.sin(u*Math.PI),sx=1+squash*Math.sin(a+u*2);
+    return [p.x+p.w/2+(x-p.w/2)*sx+dx,p.y+y];
+  },target);
+}
+function drawSoftStrip(im,p,t,intensity,target=ctx){const a=t*2*Math.PI/4+(p.motion?.phase||0)*2*Math.PI,sy=1+(p.mesh?.squash_pct??.35)/100*Math.sin(a)*intensity;target.save();target.translate(p.x+p.w/2,p.y+p.h/2);target.scale(1,sy);target.drawImage(im,-p.w/2,-p.h/2);target.restore()}
+function drawPart(im,p,t,intensity,eyeOpen,target=ctx){if(p.kind==='eye_iris'||p.kind==='eye_line')return drawSplitEye(im,p,t,intensity,eyeOpen,target);if(p.kind==='drawn_eye_closed'||p.kind==='eye_closed'||p.kind==='mouth_closed')return drawRigid(im,p,target);const type=p.mesh?.type;if(type==='blink_eye_radial'||type==='blink_eye_grid'||type==='blink_eye_curve'||type==='blink_eye')return drawBlinkEye(im,p,eyeOpen,target);if(type==='bend_vertical'||type==='bend_strip')return drawBendVertical(im,p,t,intensity,target);if(type==='soft_body')return drawSoftBody(im,p,t,intensity,target);if(type==='mouth_open_close')return drawMouthOpenClose(im,p,mouthOpenValue(),target);if(type==='soft_strip')return drawSoftStrip(im,p,t,intensity,target);drawRigid(im,p,target)}
+function drawMeshOverlay(p,t,intensity,eyeOpen){
+  ctx.save();ctx.strokeStyle='rgba(80,220,255,.75)';ctx.lineWidth=.6;
+  if(p.mesh?.type==='face_grid'&&headPoseActive(p)){
+    const grid=headGrid(p),dest=headDest(p,currentHeadSetting(p));
+    for(const tri of grid.triangles){ctx.beginPath();tri.forEach((i,k)=>k?ctx.lineTo(...dest[i]):ctx.moveTo(...dest[i]));ctx.closePath();ctx.stroke()}
+  }else if(p.mesh?.type==='blink_eye_radial'){
+    const mesh=radialEyeMesh(p),setting=headPoseActive(p)?currentHeadSetting(p):null;
+    const dest=mesh.points.map(pt=>{const point=deformEyePoint(p,pt,eyeOpen);return setting?headMapPoint(p,point,setting):point});
+    for(const tri of mesh.triangles){ctx.beginPath();tri.forEach((i,k)=>k?ctx.lineTo(...dest[i]):ctx.moveTo(...dest[i]));ctx.closePath();ctx.stroke()}
+  }else ctx.strokeRect(p.x,p.y,p.w,p.h);
+  ctx.restore();
+}
+const seamSurface=document.createElement('canvas'),envelope=document.createElement('canvas');
+for(const surface of [seamSurface,envelope]){surface.width=canvas.width;surface.height=canvas.height}
+function render(t){
+  beginHeadFrame(t);
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  drawBackground();
+  const editing=controls.headEdit.checked,intensity=editing?0:parseFloat(controls.motionIntensity.value),expr=editing?0:expressionValue(t),eyeOpen=editing?1:eyeOpenValue(t,expr,blinkPulse(t));
+  const seams=controls.showSeams.checked&&!controls.showBaseOnly.checked;
+  const sc=seamSurface.getContext('2d');sc.clearRect(0,0,canvas.width,canvas.height);
+  for(const name of PROJECT.draw_order){
+    const p=PROJECT.parts[name];if(customBackgroundActive()&&isBackgroundPart(p))continue;if(controls.showBaseOnly.checked&&p.kind!=='static'&&p.role!=='base')continue;
+    const op=partOpacity(p,expr,eyeOpen);if(op<=.002)continue;
+    const M=partMatrix(p,t,intensity),im=images[p.file];if(!im)continue;
+    // Prepared margins use the same transform AND mesh as their owning part.
+    if(seams&&p.seam){sc.save();sc.globalAlpha=op;if(headPoseActive(p)||PROJECT.neck_sway?.part_ids.includes(p.name))sc.drawImage(renderHeadSurface(p,t,intensity,eyeOpen,"seam"),0,0);else{sc.setTransform(...M);drawPart(images[p.seam.file],p,t*parseFloat(controls.motionSpeed.value),intensity,eyeOpen,sc)}sc.restore()}
+    if(headPoseActive(p)||PROJECT.neck_sway?.part_ids.includes(p.name)||p.kind==='eye_iris'||p.kind==='eye_line'){ctx.save();ctx.globalAlpha=op;ctx.drawImage(renderHeadSurface(p,t,intensity,eyeOpen),0,0);ctx.restore()}
+    else{ctx.save();ctx.setTransform(...M);ctx.globalAlpha=op;drawPart(im,p,t*parseFloat(controls.motionSpeed.value),intensity,eyeOpen);ctx.restore()}
+  }
+  if(seams){
+    const ec=envelope.getContext('2d');ec.clearRect(0,0,canvas.width,canvas.height);
+    ec.filter='url(#seamEnvelope)';ec.drawImage(canvas,0,0);ec.filter='none';
+    sc.save();sc.globalCompositeOperation='destination-in';sc.drawImage(envelope,0,0);sc.restore();
+    ctx.save();ctx.globalCompositeOperation='destination-over';ctx.drawImage(seamSurface,0,0);ctx.restore();
+  }
+  if(controls.showMesh.checked||controls.showPivots.checked)for(const p of Object.values(PROJECT.parts)){
+    if(controls.showBaseOnly.checked&&p.kind!=='static'&&p.role!=='base')continue;
+    ctx.save();ctx.setTransform(...partMatrix(p,t,intensity));
+    if(controls.showMesh.checked&&p.mesh)drawMeshOverlay(p,t,intensity,eyeOpen);
+    if(controls.showPivots.checked){const owner=transformOwner(p);ctx.beginPath();ctx.arc(owner.pivot.x,owner.pivot.y,4,0,Math.PI*2);ctx.fillStyle='#ff5064';ctx.fill()}
+    ctx.restore();
+  }
+  drawNeckMasterOverlay(t,intensity);drawHeadOverlay();
+}
+function requestRender(){frameDirty=true}
+for(const event of ['input','change','click'])document.addEventListener(event,requestRender);
+function frame(now){if(running||frameDirty){frameDirty=false;render(running?(now-start)/1000:pausedAt)}requestAnimationFrame(frame)}
+function updateLabels(){$('neckYawOut').textContent=Number(controls.neckYaw.value).toFixed(1)+'°';$('neckPitchOut').textContent=Number(controls.neckPitch.value).toFixed(1)+'°';$('neckAmountOut').textContent=Number(controls.neckAmount.value).toFixed(1)+'°';$('headAmountOut').textContent=Number(controls.headAmount.value).toFixed(2)+'×';$('gazeAmountOut').textContent=Number(controls.gazeAmount.value).toFixed(2)+'×';$('durationOut').textContent=parseFloat(controls.duration.value).toFixed(1)+' s';$('motionOut').textContent=parseFloat(controls.motionIntensity.value).toFixed(2);$('speedOut').textContent=parseFloat(controls.motionSpeed.value).toFixed(2)+'x';$('expressionOut').textContent=parseFloat(controls.expression.value).toFixed(2);$('eyeOpenOut').textContent=parseFloat(controls.eyeOpenTest.value).toFixed(2);$('mouthOpenOut').textContent=parseFloat(controls.mouthOpenTest.value).toFixed(2)}Object.values(controls).forEach(c=>c?.addEventListener('input',updateLabels));controls.eyeOpenTest.addEventListener('input',()=>controls.manualEyeOpen.checked=true);controls.mouthOpenTest.addEventListener('input',()=>controls.manualMouthOpen.checked=true);updateLabels();
+$('pause').onclick=()=>{if(running){pausedAt=(performance.now()-start)/1000;running=false;$('pause').textContent='再生'}else{start=performance.now()-pausedAt*1000;running=true;$('pause').textContent='一時停止'}};
+$('reset').onclick=()=>{PROJECT.settings=structuredClone(initialSettings);PROJECT.groups=structuredClone(initialGroups);controls.neckYaw.value=PROJECT.settings?.neck_yaw_degrees??12;controls.neckPitch.value=PROJECT.settings?.neck_pitch_degrees??8;controls.neckSway.checked=PROJECT.settings?.neck_sway??true;controls.neckAmount.value=PROJECT.settings?.neck_sway_degrees??6;controls.headRandom.checked=PROJECT.settings?.head_random??false;controls.headAmount.value=PROJECT.settings?.head_motion_amount??1.5;controls.gazeAmount.value=PROJECT.settings?.gaze_motion_amount??1.5;resetRandomHead();controls.headCircle.checked=false;controls.headEdit.checked=false;controls.headX.value=0;controls.headY.value=0;$('gazeX').value=0;$('gazeY').value=0;PROJECT.parts=structuredClone(initialParts);controls.showSeams.checked=true;controls.duration.value=PROJECT.settings?.duration_seconds??4;controls.motionIntensity.value=PROJECT.settings?.motion_intensity??1;controls.motionSpeed.value=1;controls.expression.value=0;controls.autoBlink.checked=true;controls.autoExpression.checked=false;controls.showPivots.checked=false;controls.showMesh.checked=false;controls.showHeadMesh.checked=false;controls.showBaseOnly.checked=false;controls.eyeOpenTest.value=1;controls.manualEyeOpen.checked=false;controls.mouthOpenTest.value=1;controls.manualMouthOpen.checked=false;start=performance.now();pausedAt=0;running=true;$('pause').textContent='一時停止';updateLabels();syncSelected()};
+const editable=Object.keys(PROJECT.parts).filter(n=>PROJECT.parts[n].kind!=='static');for(const n of editable){const o=document.createElement('option');o.value=n;o.textContent=n;$('partSelect').appendChild(o)}
+function setPartControl(id,value){const c=$(id);c.min=Math.min(Number(c.min),value);c.max=Math.max(Number(c.max),value);c.step='any';c.value=value}
+function syncSelected(){const selected=PROJECT.parts[$('partSelect').value];if(!selected)return;const p=transformOwner(selected);setPartControl('partRot',p.motion?.rot_deg||0);setPartControl('partX',p.motion?.x_px||0);setPartControl('partY',p.motion?.y_px||0);setPartControl('partPhase',p.motion?.phase||0);updatePartLabels()}
+function updatePartLabels(){$('partRotOut').textContent=parseFloat($('partRot').value||0).toFixed(2);$('partXOut').textContent=parseFloat($('partX').value||0).toFixed(2);$('partYOut').textContent=parseFloat($('partY').value||0).toFixed(2);$('partPhaseOut').textContent=parseFloat($('partPhase').value||0).toFixed(2)}$('partSelect').onchange=syncSelected;for(const id of ['partRot','partX','partY','partPhase'])$(id).addEventListener('input',()=>{const selected=PROJECT.parts[$('partSelect').value];if(!selected)return;const p=transformOwner(selected);p.motion=p.motion||{};p.motion.rot_deg=parseFloat($('partRot').value);p.motion.x_px=parseFloat($('partX').value);p.motion.y_px=parseFloat($('partY').value);p.motion.phase=parseFloat($('partPhase').value);updatePartLabels()});
+__RECORDING_JS__
+__BUNDLE_JS__
+__BACKGROUND_JS__
+__HEAD_POSE_JS__
+__PROJECT_IO_JS__
+window.rigReady=loadAll().then(async()=>{$('reset').click();initHeadEditor();initMotionIO();await initBackground();await restoreBundleSnapshot();$('loadStatus').textContent='読み込み完了';requestAnimationFrame(frame)}).catch(e=>{$('loadStatus').textContent='画像の読み込みに失敗しました';throw e});
+</script>
+</aside></body></html>

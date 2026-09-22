@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "status": {
+      "enum": [
+        "ready_for_validation",
+        "blocked"
+      ]
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "Existing workspace-relative file or directory paths. Directory paths may end with /. Required phase outputs must still be files."
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "enum": [
+              "ambiguous_art",
+              "missing_input",
+              "browser_unavailable",
+              "validation_failed",
+              "other"
+            ]
+          },
+          "severity": {
+            "enum": [
+              "warning",
+              "blocker"
+            ]
+          },
+          "artifact": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "detail": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "severity",
+          "artifact",
+          "detail"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "status",
+    "artifacts",
+    "issues"
+  ],
+  "additionalProperties": false
+}

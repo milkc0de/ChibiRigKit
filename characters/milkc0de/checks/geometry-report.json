@@ -1,0 +1,14 @@
+{
+  "scope": "Production JavaScript geometry and expression functions in Node; no browser or Canvas execution",
+  "combinations": 48,
+  "positiveEyeTriangles": 55296,
+  "pairedTransformChecks": 144,
+  "headMeshChecks": 6069,
+  "randomSamples": 240,
+  "passed": true,
+  "browser": {
+    "status": "blocked",
+    "headless": "Chrome launch SIGABRT in sandbox",
+    "interactive": "Local-file URL rejected by browser security policy"
+  }
+}

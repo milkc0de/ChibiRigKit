@@ -1,0 +1,12 @@
+{
+  "integrity": "passed",
+  "scope": "static reconstruction; browser motion checks are separate",
+  "open": {
+    "rgb_mae": 0.0,
+    "alpha_iou": 1.0
+  },
+  "blink": {
+    "rgb_mae": 0.0,
+    "alpha_iou": 1.0
+  }
+}

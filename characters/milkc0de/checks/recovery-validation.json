@@ -1,0 +1,16 @@
+{
+  "scope": "Recovery verification of existing files; automatic model review passes remain unfinished",
+  "static_integrity": "passed",
+  "open_rgb_mae": 0,
+  "blink_rgb_mae": 0,
+  "browser": "Codex in-app Chromium",
+  "browser_result": "passed",
+  "head_directions": 9,
+  "random_samples": 240,
+  "random_sway_frames": 24,
+  "pupil_clip_checks": 54,
+  "storage_roundtrip": true,
+  "expression_combinations": 48,
+  "motion_frames": 16,
+  "trail_check": true
+}

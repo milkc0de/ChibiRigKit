@@ -1,0 +1,660 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "version",
+    "engine",
+    "communication",
+    "protected_paths",
+    "coordinates",
+    "rules",
+    "phases",
+    "acceptance"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": 1
+    },
+    "engine": {
+      "const": {
+        "model": "gpt-6-astra",
+        "effort": "high"
+      }
+    },
+    "communication": {
+      "const": {
+        "progress": "tool_events_only",
+        "final": "structured_json",
+        "clarification": "only_if_blocked"
+      }
+    },
+    "protected_paths": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "coordinates": {
+      "const": {
+        "origin": "top_left",
+        "units": "source_pixels",
+        "canonical_source": "normal",
+        "mask_size": "canvas",
+        "mask_mode": "L"
+      }
+    },
+    "rules": {
+      "type": "object",
+      "required": [
+        "source_pixels",
+        "references",
+        "parts",
+        "eyes",
+        "mouth",
+        "head",
+        "seams",
+        "browser_blocked_in_agent",
+        "resume"
+      ],
+      "properties": {
+        "source_pixels": {
+          "type": "object",
+          "required": [
+            "immutable",
+            "source_hash_check",
+            "repairs"
+          ],
+          "properties": {
+            "immutable": {
+              "const": true
+            },
+            "source_hash_check": {
+              "const": true
+            },
+            "repairs": {
+              "const": "derived_layers_inside_explicit_masks_only"
+            }
+          },
+          "additionalProperties": false
+        },
+        "references": {
+          "type": "object",
+          "required": [
+            "provided_inputs",
+            "generate_only_missing",
+            "method",
+            "already_closed",
+            "missing_mouth",
+            "absent_eyes",
+            "estimated",
+            "forbidden_edits",
+            "flat_scope"
+          ],
+          "properties": {
+            "provided_inputs": {
+              "const": "take_precedence"
+            },
+            "generate_only_missing": {
+              "const": [
+                "flat",
+                "blink",
+                "mouth_closed"
+              ]
+            },
+            "method": {
+              "const": "feature_masks_inpaint_closed_curves"
+            },
+            "already_closed": {
+              "const": "preserve_source"
+            },
+            "missing_mouth": {
+              "const": "null"
+            },
+            "absent_eyes": {
+              "const": []
+            },
+            "estimated": {
+              "const": true
+            },
+            "forbidden_edits": {
+              "const": [
+                "outer_silhouette",
+                "unrelated_hair",
+                "body",
+                "clothing"
+              ]
+            },
+            "flat_scope": {
+              "const": "face_features_only"
+            }
+          },
+          "additionalProperties": false
+        },
+        "parts": {
+          "type": "object",
+          "required": [
+            "ids",
+            "draw_order",
+            "coverage",
+            "mask_edges",
+            "exclude_contamination",
+            "preserve",
+            "base",
+            "pivot"
+          ],
+          "properties": {
+            "ids": {
+              "const": "unique_safe_filenames"
+            },
+            "draw_order": {
+              "const": "each_part_exactly_once"
+            },
+            "coverage": {
+              "const": "no_duplicate_static_moving_parts"
+            },
+            "mask_edges": {
+              "const": "follow_visible_art"
+            },
+            "exclude_contamination": {
+              "const": [
+                "opposite_limb",
+                "hair_skin_islands",
+                "hair_clothing_frills",
+                "eye_cheek_blush"
+              ]
+            },
+            "preserve": {
+              "const": [
+                "source_colors",
+                "asymmetry",
+                "toes",
+                "sock_silhouette",
+                "lashes",
+                "blush"
+              ]
+            },
+            "base": {
+              "const": "stationary_remainder_only"
+            },
+            "pivot": {
+              "const": "anatomical_attachment"
+            }
+          },
+          "additionalProperties": false
+        },
+        "eyes": {
+          "type": "object",
+          "required": [
+            "components",
+            "mesh",
+            "iris_clip",
+            "sclera_underpaint",
+            "sclera_color",
+            "closed_part",
+            "shared_transform",
+            "full_blink_open_opacity",
+            "intermediate_blink",
+            "draw_closed_after_open"
+          ],
+          "properties": {
+            "components": {
+              "const": [
+                "eye_sclera",
+                "eye_iris",
+                "eye_line",
+                "drawn_eye_closed"
+              ]
+            },
+            "mesh": {
+              "const": "blink_eye_radial"
+            },
+            "iris_clip": {
+              "const": "posed_sclera_alpha"
+            },
+            "sclera_underpaint": {
+              "const": "iris_mask_only"
+            },
+            "sclera_color": {
+              "const": "sample_visible_sclera"
+            },
+            "closed_part": {
+              "const": "paired_endpoint"
+            },
+            "shared_transform": {
+              "const": true
+            },
+            "full_blink_open_opacity": {
+              "const": 0
+            },
+            "intermediate_blink": {
+              "const": "continuous_mesh_deformation"
+            },
+            "draw_closed_after_open": {
+              "const": true
+            }
+          },
+          "additionalProperties": false
+        },
+        "mouth": {
+          "type": "object",
+          "required": [
+            "mesh",
+            "closed_part",
+            "shared_transform",
+            "blush_survives_expression"
+          ],
+          "properties": {
+            "mesh": {
+              "const": "mouth_open_close"
+            },
+            "closed_part": {
+              "const": "paired_endpoint"
+            },
+            "shared_transform": {
+              "const": true
+            },
+            "blush_survives_expression": {
+              "const": true
+            }
+          },
+          "additionalProperties": false
+        },
+        "head": {
+          "type": "object",
+          "required": [
+            "face_mesh",
+            "anchors",
+            "x_positive",
+            "y_positive",
+            "interpolation",
+            "include",
+            "exclude",
+            "autoplay",
+            "circle",
+            "review",
+            "require_nonfolding_mesh",
+            "initial_status",
+            "rotation_scope"
+          ],
+          "properties": {
+            "face_mesh": {
+              "const": "face_grid"
+            },
+            "anchors": {
+              "const": [
+                "center",
+                "left",
+                "right",
+                "up",
+                "down",
+                "up_left",
+                "up_right",
+                "down_left",
+                "down_right"
+              ]
+            },
+            "x_positive": {
+              "const": "screen_right"
+            },
+            "y_positive": {
+              "const": "screen_down"
+            },
+            "interpolation": {
+              "const": "bilinear"
+            },
+            "include": {
+              "const": [
+                "face",
+                "eyes",
+                "mouth",
+                "brows",
+                "head_hair",
+                "head_accessories"
+              ]
+            },
+            "exclude": {
+              "const": [
+                "torso",
+                "arms",
+                "legs",
+                "clothing"
+              ]
+            },
+            "autoplay": {
+              "const": "random_with_existing_sway"
+            },
+            "circle": {
+              "const": "inspection_only"
+            },
+            "review": {
+              "const": [
+                "far_eye_width",
+                "iris_center",
+                "outline",
+                "mouth_position",
+                "hair_coverage"
+              ]
+            },
+            "require_nonfolding_mesh": {
+              "const": true
+            },
+            "initial_status": {
+              "const": "suggested"
+            },
+            "rotation_scope": {
+              "const": "front_facing_2d"
+            },
+            "reference_layout_order": {
+              "const": [
+                "render_nine_yaw_pitch_stills",
+                "relayout_parts_per_direction",
+                "inspect_and_correct_all_nine",
+                "save_authored_part_placements",
+                "attach_shared_head_parent_mesh",
+                "interpolate_saved_reference_meshes"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "seams": {
+          "type": "object",
+          "required": [
+            "mask",
+            "preserve_shoe_tips",
+            "padding_max",
+            "runtime_model_calls",
+            "global_blur",
+            "stale_frames"
+          ],
+          "properties": {
+            "mask": {
+              "const": "explicit_joint_region"
+            },
+            "preserve_shoe_tips": {
+              "const": true
+            },
+            "padding_max": {
+              "const": 64
+            },
+            "runtime_model_calls": {
+              "const": false
+            },
+            "global_blur": {
+              "const": false
+            },
+            "stale_frames": {
+              "const": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "browser_blocked_in_agent": {
+          "type": "object",
+          "required": [
+            "action",
+            "final_check_owner",
+            "offline_checks_count_as_browser_validation"
+          ],
+          "properties": {
+            "action": {
+              "const": "record_issue_and_finish_turn"
+            },
+            "final_check_owner": {
+              "const": "parent_orchestrator"
+            },
+            "offline_checks_count_as_browser_validation": {
+              "const": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "resume": {
+          "type": "object",
+          "required": [
+            "inspect_existing_outputs_first",
+            "preserve_correct_work",
+            "restart_from_scratch"
+          ],
+          "properties": {
+            "inspect_existing_outputs_first": {
+              "const": true
+            },
+            "preserve_correct_work": {
+              "const": true
+            },
+            "restart_from_scratch": {
+              "const": false
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "phases": {
+      "type": "object",
+      "required": [
+        "reference-planning",
+        "rigging",
+        "review"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "reference-planning": {
+          "type": "object",
+          "required": [
+            "actions",
+            "required_outputs"
+          ],
+          "properties": {
+            "actions": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "enum": [
+                  "author_closed_curves",
+                  "author_feature_masks",
+                  "author_masks",
+                  "author_rig_plan",
+                  "build_project",
+                  "decompose_semantic_parts",
+                  "inspect_aligned_sources",
+                  "inspect_motion_frames",
+                  "inspect_nine_head_directions",
+                  "inspect_normal",
+                  "inspect_validation_images",
+                  "repair_observed_defects",
+                  "validate_reference_plan",
+                  "validate_static"
+                ]
+              }
+            },
+            "required_outputs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^(?!/)(?!.*\\.\\.).+$"
+              }
+            },
+            "build_rig": {
+              "type": "boolean"
+            },
+            "preserve_correct_parts": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        "rigging": {
+          "type": "object",
+          "required": [
+            "actions",
+            "required_outputs"
+          ],
+          "properties": {
+            "actions": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "enum": [
+                  "author_closed_curves",
+                  "author_feature_masks",
+                  "author_masks",
+                  "author_rig_plan",
+                  "build_project",
+                  "decompose_semantic_parts",
+                  "inspect_aligned_sources",
+                  "inspect_motion_frames",
+                  "inspect_nine_head_directions",
+                  "inspect_normal",
+                  "inspect_validation_images",
+                  "repair_observed_defects",
+                  "validate_reference_plan",
+                  "validate_static"
+                ]
+              }
+            },
+            "required_outputs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^(?!/)(?!.*\\.\\.).+$"
+              }
+            },
+            "build_rig": {
+              "type": "boolean"
+            },
+            "preserve_correct_parts": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        "review": {
+          "type": "object",
+          "required": [
+            "actions",
+            "required_outputs"
+          ],
+          "properties": {
+            "actions": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "enum": [
+                  "author_closed_curves",
+                  "author_feature_masks",
+                  "author_masks",
+                  "author_rig_plan",
+                  "build_project",
+                  "decompose_semantic_parts",
+                  "inspect_aligned_sources",
+                  "inspect_motion_frames",
+                  "inspect_nine_head_directions",
+                  "inspect_normal",
+                  "inspect_validation_images",
+                  "repair_observed_defects",
+                  "validate_reference_plan",
+                  "validate_static"
+                ]
+              }
+            },
+            "required_outputs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^(?!/)(?!.*\\.\\.).+$"
+              }
+            },
+            "build_rig": {
+              "type": "boolean"
+            },
+            "preserve_correct_parts": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "acceptance": {
+      "type": "object",
+      "required": [
+        "static",
+        "runtime"
+      ],
+      "properties": {
+        "static": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "path",
+              "equals"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "pattern": "^[A-Za-z][A-Za-z0-9_.]*$"
+              },
+              "equals": {},
+              "when": {
+                "type": "object",
+                "required": [
+                  "path",
+                  "equals"
+                ],
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "equals": {}
+                },
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "runtime": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "path",
+              "equals"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "pattern": "^[A-Za-z][A-Za-z0-9_.]*$"
+              },
+              "equals": {},
+              "when": {
+                "type": "object",
+                "required": [
+                  "path",
+                  "equals"
+                ],
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "equals": {}
+                },
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

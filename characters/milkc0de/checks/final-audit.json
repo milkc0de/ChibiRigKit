@@ -1,0 +1,159 @@
+{
+  "status": "passed",
+  "parts": 32,
+  "full_canvas_masks": 32,
+  "target_counts": {
+    "hair_parts": 7,
+    "arm_parts": 4,
+    "torso_parts": 2,
+    "skirt_parts": 1,
+    "leg_parts": 2
+  },
+  "immutable_sources": "verified",
+  "config_unchanged": true,
+  "source_colors": {
+    "background": {
+      "verified_unmodified_source_pixels": 823659,
+      "changed": 0
+    },
+    "background_hidden_margin": {
+      "verified_unmodified_source_pixels": 0,
+      "changed": 0
+    },
+    "hair_back_left": {
+      "verified_unmodified_source_pixels": 61367,
+      "changed": 0
+    },
+    "hair_back_right": {
+      "verified_unmodified_source_pixels": 93836,
+      "changed": 0
+    },
+    "leg_back_right": {
+      "verified_unmodified_source_pixels": 29719,
+      "changed": 0
+    },
+    "leg_front_left": {
+      "verified_unmodified_source_pixels": 30015,
+      "changed": 0
+    },
+    "skirt": {
+      "verified_unmodified_source_pixels": 96669,
+      "changed": 0
+    },
+    "torso_blouse": {
+      "verified_unmodified_source_pixels": 15648,
+      "changed": 0
+    },
+    "face_skin": {
+      "verified_unmodified_source_pixels": 77925,
+      "changed": 0
+    },
+    "hair_cap": {
+      "verified_unmodified_source_pixels": 117542,
+      "changed": 0
+    },
+    "hair_side_left": {
+      "verified_unmodified_source_pixels": 27717,
+      "changed": 0
+    },
+    "hair_side_right": {
+      "verified_unmodified_source_pixels": 35014,
+      "changed": 0
+    },
+    "hair_bangs": {
+      "verified_unmodified_source_pixels": 59221,
+      "changed": 0
+    },
+    "hair_cowlick": {
+      "verified_unmodified_source_pixels": 2501,
+      "changed": 0
+    },
+    "ribbon_head": {
+      "verified_unmodified_source_pixels": 41829,
+      "changed": 0
+    },
+    "arm_left_sleeve": {
+      "verified_unmodified_source_pixels": 11612,
+      "changed": 0
+    },
+    "arm_right_sleeve": {
+      "verified_unmodified_source_pixels": 16996,
+      "changed": 0
+    },
+    "torso_neck_bow": {
+      "verified_unmodified_source_pixels": 17133,
+      "changed": 0
+    },
+    "hand_left": {
+      "verified_unmodified_source_pixels": 4186,
+      "changed": 0
+    },
+    "hand_right": {
+      "verified_unmodified_source_pixels": 10478,
+      "changed": 0
+    },
+    "eye_left_sclera": {
+      "verified_unmodified_source_pixels": 6093,
+      "changed": 0
+    },
+    "eye_left_iris": {
+      "verified_unmodified_source_pixels": 7230,
+      "changed": 0
+    },
+    "eye_left_line": {
+      "verified_unmodified_source_pixels": 2583,
+      "changed": 0
+    },
+    "eye_left_closed": {
+      "verified_unmodified_source_pixels": 1904,
+      "changed": 0
+    },
+    "eye_right_sclera": {
+      "verified_unmodified_source_pixels": 5680,
+      "changed": 0
+    },
+    "eye_right_iris": {
+      "verified_unmodified_source_pixels": 7287,
+      "changed": 0
+    },
+    "eye_right_line": {
+      "verified_unmodified_source_pixels": 2844,
+      "changed": 0
+    },
+    "eye_right_closed": {
+      "verified_unmodified_source_pixels": 1773,
+      "changed": 0
+    },
+    "mouth_open": {
+      "verified_unmodified_source_pixels": 1888,
+      "changed": 0
+    },
+    "mouth_closed": {
+      "verified_unmodified_source_pixels": 562,
+      "changed": 0
+    },
+    "brow_left": {
+      "verified_unmodified_source_pixels": 275,
+      "changed": 0
+    },
+    "brow_right": {
+      "verified_unmodified_source_pixels": 290,
+      "changed": 0
+    }
+  },
+  "reconstruction": {
+    "normal": {
+      "changed_pixels": 0,
+      "max_channel_delta": 0
+    },
+    "blink": {
+      "changed_pixels": 0,
+      "max_channel_delta": 0
+    },
+    "mouth_closed": {
+      "changed_pixels": 0,
+      "max_channel_delta": 0
+    }
+  },
+  "generated_expressions_estimated": true
+}

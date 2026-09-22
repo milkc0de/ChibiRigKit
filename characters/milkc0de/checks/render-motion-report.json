@@ -1,0 +1,48 @@
+{
+  "scope": "Focused browser rendering comparison, not general artistic approval",
+  "character": "milkc0de",
+  "source_images_changed": false,
+  "rig_settings_changed": false,
+  "automatic_gaze": {
+    "before_offset_x": [
+      0,
+      0
+    ],
+    "after_offset_x": [
+      -6.9696,
+      6.9696
+    ],
+    "before_changed_channels": 0,
+    "after_changed_channels": 28630,
+    "head_angles_x": [
+      -0.8,
+      0.8
+    ],
+    "manual_gaze": [
+      0,
+      0
+    ]
+  },
+  "neutral_mesh_under_rotation": {
+    "part": "torso_blouse",
+    "rotation_deg": 0.85,
+    "before_changed_channels_vs_rigid": 2087,
+    "after_changed_channels_vs_rigid": 0
+  },
+  "visual_review": {
+    "comparison_time_seconds": 1.25,
+    "head_angle": [
+      0.8,
+      0.3
+    ],
+    "crops": [
+      "face",
+      "body"
+    ],
+    "observed": "Horizontal and vertical strip boundary lines visible on sleeves, hands, skirt and legs before the change are absent in the matched after-render crop."
+  },
+  "limitations": [
+    "Prepared seam patches are not registered for this character; this change fixes rendering boundaries, not AI inpainting strength.",
+    "Unseen geometry and artistic quality of all possible edited poses are not certified."
+  ]
+}

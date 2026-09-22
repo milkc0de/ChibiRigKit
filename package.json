@@ -1,0 +1,20 @@
+{
+  "name": "chibirigkit",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Create 2D character animations from a single image.",
+  "scripts": {
+    "new": "python3 scripts/new_character.py",
+    "auto": "node scripts/auto-rig.mjs",
+    "serve": "node scripts/serve.mjs",
+    "test": "node scripts/run-tests.mjs",
+    "test:runtime": "node work/regression-character/toolbox/validate_runtime.cjs"
+  },
+  "dependencies": {
+    "ws": "^8.18.3",
+    "playwright": "1.63.0"
+  },
+  "author": "milkc0de",
+  "license": "MIT"
+}

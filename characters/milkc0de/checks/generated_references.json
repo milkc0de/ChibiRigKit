@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "method": "vision masks + local inpainting + authored closed curves",
+  "estimated": true,
+  "source_sha256": "31bcf03fcda011170f8b5b82df25cc999c0818f3f78a0e9e6c88c469322d2aa1",
+  "plan_sha256": "3e983f5d8d6544fb1d112f79c6bf4e350ef5daf802fb3d95d08df02ea7b48aeb",
+  "mask_sha256": {
+    "work/reference_masks/eye_viewer_left.png": "a1f3a4dc27d2be45d873f6be8eec4b4822630ab347a72f79ff124c6188ab677d",
+    "work/reference_masks/eye_viewer_right.png": "2def4f0c1cb453d468339021feb5d803048e560951fb2146c8662ac96f644ca5",
+    "work/reference_masks/mouth.png": "07b9baf62bf561d8f34b6cfc119b6b231b566f398c4b5d3a21fe5c2d04c98bdd"
+  },
+  "roles": {
+    "flat": {
+      "file": "work/generated_references/flat.png",
+      "sha256": "b7b96e02d9152f0544bc9ebb00630667d42cf9c6b52d5a1fb98e0a77728db541",
+      "changed_pixels": 28177,
+      "edited_region_pixels": 28178
+    },
+    "blink": {
+      "file": "work/generated_references/blink.png",
+      "sha256": "fcd2bc971716cfd3206ad65f286187825b4a4bf6b7b77ce858915eb0a1f3ae7a",
+      "changed_pixels": 26289,
+      "edited_region_pixels": 26290
+    },
+    "mouth_closed": {
+      "file": "work/generated_references/mouth_closed.png",
+      "sha256": "49283a597ed8deee22c2f09cb12cbfd074689cf940d204254ccecfe084f4b167",
+      "changed_pixels": 1888,
+      "edited_region_pixels": 1888
+    }
+  },
+  "masks": {
+    "eye_viewer_left_closed": "work/generated_references/masks/eye_viewer_left_closed.png",
+    "eye_viewer_right_closed": "work/generated_references/masks/eye_viewer_right_closed.png",
+    "mouth_closed": "work/generated_references/masks/mouth_closed.png"
+  }
+}

@@ -1,0 +1,225 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ChibiRigKit character motion preset",
+  "type": "object",
+  "required": [
+    "format",
+    "version",
+    "layout_signature",
+    "settings",
+    "parts",
+    "groups"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "format": {
+      "const": "chibirigkit.motion"
+    },
+    "version": {
+      "const": 1
+    },
+    "layout_signature": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "settings": {
+      "type": "object",
+      "properties": {
+        "duration_seconds": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 60
+        },
+        "motion_intensity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "motion_speed": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 5
+        },
+        "expression": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "eye_open": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "mouth_open": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "head_x": {
+          "type": "number",
+          "minimum": -1,
+          "maximum": 1
+        },
+        "head_y": {
+          "type": "number",
+          "minimum": -1,
+          "maximum": 1
+        },
+        "gaze_x": {
+          "type": "number",
+          "minimum": -1,
+          "maximum": 1
+        },
+        "gaze_y": {
+          "type": "number",
+          "minimum": -1,
+          "maximum": 1
+        },
+        "auto_blink": {
+          "type": "boolean"
+        },
+        "auto_expression": {
+          "type": "boolean"
+        },
+        "manual_eye_open": {
+          "type": "boolean"
+        },
+        "manual_mouth_open": {
+          "type": "boolean"
+        },
+        "head_random": {
+          "type": "boolean"
+        },
+        "head_circle": {
+          "type": "boolean"
+        },
+        "show_seams": {
+          "type": "boolean"
+        },
+        "head_motion_amount": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 4
+        },
+        "gaze_motion_amount": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 4
+        },
+        "neck_sway": {
+          "type": "boolean"
+        },
+        "neck_sway_degrees": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 15
+        },
+        "neck_yaw_degrees": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 30
+        },
+        "neck_pitch_degrees": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 20
+        }
+      }
+    },
+    "parts": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "rot_deg": {
+            "type": "number",
+            "minimum": -1000000,
+            "maximum": 1000000
+          },
+          "x_px": {
+            "type": "number",
+            "minimum": -1000000,
+            "maximum": 1000000
+          },
+          "y_px": {
+            "type": "number",
+            "minimum": -1000000,
+            "maximum": 1000000
+          },
+          "scale_x_pct": {
+            "type": "number",
+            "maximum": 1000000,
+            "exclusiveMinimum": -100
+          },
+          "scale_y_pct": {
+            "type": "number",
+            "maximum": 1000000,
+            "exclusiveMinimum": -100
+          },
+          "phase": {
+            "type": "number",
+            "minimum": -1000000,
+            "maximum": 1000000
+          },
+          "freq": {
+            "type": "number",
+            "maximum": 1000000,
+            "exclusiveMinimum": 0
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "groups": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "rot_deg": {
+            "type": "number",
+            "minimum": -1000000,
+            "maximum": 1000000
+          },
+          "x_px": {
+            "type": "number",
+            "minimum": -1000000,
+            "maximum": 1000000
+          },
+          "y_px": {
+            "type": "number",
+            "minimum": -1000000,
+            "maximum": 1000000
+          },
+          "scale_x_pct": {
+            "type": "number",
+            "maximum": 1000000,
+            "exclusiveMinimum": -100
+          },
+          "scale_y_pct": {
+            "type": "number",
+            "maximum": 1000000,
+            "exclusiveMinimum": -100
+          },
+          "phase": {
+            "type": "number",
+            "minimum": -1000000,
+            "maximum": 1000000
+          },
+          "freq": {
+            "type": "number",
+            "maximum": 1000000,
+            "exclusiveMinimum": 0
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "head_pose": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": false
+}

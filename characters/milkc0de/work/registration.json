@@ -1,0 +1,85 @@
+{
+  "canonical_role": "normal",
+  "canvas": {
+    "width": 1152,
+    "height": 1366
+  },
+  "roles": {
+    "normal": {
+      "input": "input/normal.png",
+      "generated": false,
+      "aligned": "work/aligned/normal.png",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ]
+      ],
+      "feature_inliers": 0,
+      "median_error": 0
+    },
+    "flat": {
+      "input": "work/generated_references/flat.png",
+      "generated": true,
+      "aligned": "work/aligned/flat.png",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ]
+      ],
+      "feature_inliers": 0,
+      "median_error": 0
+    },
+    "blink": {
+      "input": "work/generated_references/blink.png",
+      "generated": true,
+      "aligned": "work/aligned/blink.png",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ]
+      ],
+      "feature_inliers": 0,
+      "median_error": 0
+    },
+    "mouth_closed": {
+      "input": "work/generated_references/mouth_closed.png",
+      "generated": true,
+      "aligned": "work/aligned/mouth_closed.png",
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ]
+      ],
+      "feature_inliers": 0,
+      "median_error": 0
+    }
+  }
+}

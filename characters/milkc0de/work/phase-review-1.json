@@ -1,0 +1,27 @@
+{
+  "status": "ready_for_validation",
+  "artifacts": [
+    "rig.plan.json",
+    "rig.project.json",
+    "index.html",
+    "work/masks/",
+    "assets/layers/",
+    "checks/report.json",
+    "checks/review-pass-1.json",
+    "checks/review1-correction-comparison.png"
+  ],
+  "issues": [
+    {
+      "code": "ambiguous_art",
+      "severity": "warning",
+      "artifact": "work/masks/",
+      "detail": "Reassigned 2,532 stationary hair pixels to moving locks. Static reconstruction remains exact; estimated facial artwork and fine boundaries remain approximate."
+    },
+    {
+      "code": "browser_unavailable",
+      "severity": "warning",
+      "artifact": "checks/review-pass-1.json",
+      "detail": "Supplied browser checks passed before repairs. Parent must revalidate the rebuilt project: prior automatic approval review rejected the local-file harness under browser policy. Offline previews are not browser validation."
+    }
+  ]
+}
