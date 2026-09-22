@@ -4,12 +4,14 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
+import {installCaptureInputs} from './runtime-fixture.mjs';
 const head=fs.readFileSync(new URL('../template/workspace/runtime/head_pose.js',import.meta.url),'utf8');
 const html=fs.readFileSync(new URL('../template/workspace/runtime/index.template.html',import.meta.url),'utf8');
 function fixture(){
   const controls={headEdit:{checked:false},headRandom:{checked:true},headCircle:{checked:false},duration:{value:5}};
   const fields={gazeX:{value:0},gazeY:{value:0}},cells=[];let rigid=0;
   const context=vm.createContext({PROJECT:{},crypto:{getRandomValues:a=>a},controls,$:id=>fields[id],structuredClone,drawRigid:()=>rigid++,drawEyeTriangle:(_ctx,_im,source,dest)=>cells.push({source,dest}),ctx:{}});
+  installCaptureInputs(context,controls);
   vm.runInContext(head,context);
   vm.runInContext(html.slice(html.indexOf('function drawStripMesh('),html.indexOf('function drawSoftStrip(')),context);
   return {context,controls,fields,cells,rigid:()=>rigid,angle:v=>vm.runInContext(`headAngle=${JSON.stringify(v)}`,context)};

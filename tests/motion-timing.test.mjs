@@ -4,6 +4,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
+import {installCaptureInputs} from './runtime-fixture.mjs';
 const root=new URL('../template/workspace/runtime/',import.meta.url);
 const html=fs.readFileSync(new URL('index.template.html',root),'utf8');
 const head=fs.readFileSync(new URL('head_pose.js',root),'utf8');
@@ -12,6 +13,7 @@ function fixture(){
   const calls=[];
   const target=Object.fromEntries(['save','translate','scale','drawImage','restore'].map(k=>[k,(...args)=>calls.push([k,...args])]));
   const c=vm.createContext({PROJECT:{head_pose:{}},controls,crypto:{getRandomValues:a=>a},structuredClone,$:()=>({}),ctx:target,drawEyeTriangle:(_ctx,_im,src,dest)=>calls.push(dest)});
+  installCaptureInputs(c,controls);
   vm.runInContext(html.slice(html.indexOf('function mul('),html.indexOf('function expressionValue(')),c);
   vm.runInContext(html.slice(html.indexOf('function drawStripMesh('),html.indexOf('function drawPart(')),c);
   vm.runInContext(head,c);

@@ -15,3 +15,9 @@ code-run.json
 /characters/*/work/codex-run.json
 /characters/*/work/codex-run.json.tmp
 /characters/*/work/template-backups/
+
+# Private capture data and generated integration previews
+/tmp/
+/characters/*/tmp/
+/characters/*/work/
+/vendor/

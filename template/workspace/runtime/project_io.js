@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: 2026 milkc0de
 // SPDX-License-Identifier: MIT
 // Import motion settings only; source images, masks and rig topology stay local.
-const motionControls={neck_yaw_degrees:'neckYaw',neck_pitch_degrees:'neckPitch',neck_sway:'neckSway',neck_sway_degrees:'neckAmount',head_motion_amount:'headAmount',gaze_motion_amount:'gazeAmount',duration_seconds:'duration',motion_intensity:'motionIntensity',motion_speed:'motionSpeed',expression:'expression',auto_blink:'autoBlink',auto_expression:'autoExpression',eye_open:'eyeOpenTest',manual_eye_open:'manualEyeOpen',mouth_open:'mouthOpenTest',manual_mouth_open:'manualMouthOpen',head_random:'headRandom',head_circle:'headCircle',head_x:'headX',head_y:'headY',gaze_x:'gazeX',gaze_y:'gazeY',show_seams:'showSeams'};
-const motionRanges={neck_yaw_degrees:[0,30],neck_pitch_degrees:[0,20],neck_sway_degrees:[0,15],head_motion_amount:[0,4],gaze_motion_amount:[0,4],duration_seconds:[1,60],motion_intensity:[0,5],motion_speed:[.1,5],expression:[0,1],eye_open:[0,1],mouth_open:[0,1],head_x:[-1,1],head_y:[-1,1],gaze_x:[-1,1],gaze_y:[-1,1]};
+const motionControls={capture_yaw_gain:'captureYawGain',capture_pitch_gain:'capturePitchGain',capture_roll_gain:'captureRollGain',capture_mouth_gain:'captureMouthGain',capture_brow_gain:'captureBrowGain',neck_yaw_degrees:'neckYaw',neck_pitch_degrees:'neckPitch',neck_sway:'neckSway',neck_sway_degrees:'neckAmount',head_motion_amount:'headAmount',gaze_motion_amount:'gazeAmount',duration_seconds:'duration',motion_intensity:'motionIntensity',motion_speed:'motionSpeed',expression:'expression',auto_blink:'autoBlink',auto_expression:'autoExpression',eye_open:'eyeOpenTest',manual_eye_open:'manualEyeOpen',mouth_open:'mouthOpenTest',manual_mouth_open:'manualMouthOpen',head_random:'headRandom',head_circle:'headCircle',head_x:'headX',head_y:'headY',gaze_x:'gazeX',gaze_y:'gazeY',show_seams:'showSeams'};
+const motionRanges={capture_yaw_gain:[0,3],capture_pitch_gain:[0,3],capture_roll_gain:[0,3],capture_mouth_gain:[.5,8],capture_brow_gain:[.5,4],neck_yaw_degrees:[0,30],neck_pitch_degrees:[0,25],neck_sway_degrees:[0,15],head_motion_amount:[0,4],gaze_motion_amount:[0,4],duration_seconds:[1,60],motion_intensity:[0,5],motion_speed:[.1,5],expression:[0,1],eye_open:[0,1],mouth_open:[0,1],head_x:[-1,1],head_y:[-1,1],gaze_x:[-1,1],gaze_y:[-1,1]};
 function stableRigJSON(value){
   if(Array.isArray(value))return '['+value.map(stableRigJSON).join(',')+']';
   if(value&&typeof value==='object')return '{'+Object.keys(value).sort().map(k=>JSON.stringify(k)+':'+stableRigJSON(value[k])).join(',')+'}';
@@ -80,12 +80,13 @@ function collectMotionPreset(){
 function applyMotionProject(data){
   // Validation completes before changing any live data or controls.
   const candidate=validateMotionProject(data);
+  clearCaptureMotion();
   for(const [id,motion] of Object.entries(candidate.parts))PROJECT.parts[id].motion=motion;
   for(const [id,motion] of Object.entries(candidate.groups))PROJECT.groups[id].motion=motion;
   PROJECT.settings=candidate.settings;
   controls.headEdit.checked=false;
   if(candidate.head_pose){PROJECT.head_pose=candidate.head_pose;headDraft=null;headDirty=false;selectHeadDirection('center')}
-  const defaults={neck_yaw_degrees:12,neck_pitch_degrees:8,neck_sway:true,neck_sway_degrees:6,head_motion_amount:1.5,gaze_motion_amount:1.5,motion_speed:1,expression:0,auto_blink:true,auto_expression:false,eye_open:1,manual_eye_open:false,mouth_open:1,manual_mouth_open:false,head_random:false,head_circle:false,head_x:0,head_y:0,gaze_x:0,gaze_y:0,show_seams:true};
+  const defaults={capture_yaw_gain:1,capture_pitch_gain:1,capture_roll_gain:1,capture_mouth_gain:1,capture_brow_gain:2,neck_yaw_degrees:12,neck_pitch_degrees:8,neck_sway:true,neck_sway_degrees:6,head_motion_amount:1.5,gaze_motion_amount:1.5,motion_speed:1,expression:0,auto_blink:true,auto_expression:false,eye_open:1,manual_eye_open:false,mouth_open:1,manual_mouth_open:false,head_random:false,head_circle:false,head_x:0,head_y:0,gaze_x:0,gaze_y:0,show_seams:true};
   for(const [key,id] of Object.entries(motionControls)){
     const control=$(id),value=candidate.settings[key]??defaults[key];
     if(value===undefined)continue;
@@ -95,6 +96,8 @@ function applyMotionProject(data){
   updateLabels();syncSelected();render(0);
 }
 function initMotionIO(){
+  for(const [key,id] of Object.entries(motionControls)){const control=$(id),value=initialSettings[key];if(value===undefined)continue;if(control.type==='checkbox')control.checked=value;else control.value=value;}
+  updateLabels();
   $('exportJson').onclick=()=>{try{
     const blob=new Blob([JSON.stringify(collectMotionPreset(),null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');
     a.href=url;a.download='motion.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);

@@ -9,7 +9,7 @@ function fixture(){
   const poses=Object.fromEntries(['center','left','right','up','down','up_left','up_right','down_left','down_right'].map(k=>[k,{status:'authored',parts:{eye:{x:k==='left'?-3:0,y:0}}}]));
   const PROJECT={head_pose:{layout_signature:'reset-fixture',poses},settings:{motion_intensity:1},parts:{eye:{motion:{rot_deg:0}}}};
   const initial=structuredClone(PROJECT.head_pose),store=new Map(),elements={gazeX:{value:.7},gazeY:{value:-.3},headStatus:{}};
-  const context=vm.createContext({PROJECT,structuredClone,crypto:{getRandomValues:a=>a},localStorage:{setItem:(k,v)=>store.set(k,v)},$:id=>elements[id],controls:{headEdit:{checked:false},headRandom:{checked:true},headCircle:{checked:false},headX:{value:0},headY:{value:0}},document:{querySelectorAll:()=>[]}});
+  const context=vm.createContext({PROJECT,structuredClone,crypto:{getRandomValues:a=>a},localStorage:{setItem:(k,v)=>store.set(k,v)},$:id=>elements[id],controls:{neckSway:{checked:false},headEdit:{checked:false},headRandom:{checked:true},headCircle:{checked:false},headX:{value:0},headY:{value:0}},document:{querySelectorAll:()=>[]}});
   vm.runInContext(source,context);
   // Geometry validation has independent coverage; exercise real reset, selection and draft code here.
   vm.runInContext('validateHeadConfig=()=>true;syncHeadEditor=()=>{};',context);

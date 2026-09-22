@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ChibiRig Motion v1",
+  "type": "object",
+  "required": [
+    "format",
+    "version",
+    "timeUnit",
+    "duration",
+    "loop",
+    "channels",
+    "frames"
+  ],
+  "properties": {
+    "format": {
+      "const": "ChibiRigMotion"
+    },
+    "version": {
+      "const": 1
+    },
+    "timeUnit": {
+      "const": "seconds"
+    },
+    "duration": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "maximum": 3600
+    },
+    "loop": {
+      "type": "boolean"
+    },
+    "channels": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 21,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "headYaw",
+          "headPitch",
+          "headRoll",
+          "eyeLeft",
+          "eyeRight",
+          "gazeX",
+          "gazeY",
+          "mouthOpen",
+          "mouthShape",
+          "bodyYaw",
+          "bodyPitch",
+          "bodyRoll",
+          "breath",
+          "browLeftX",
+          "browRightX",
+          "browLeftY",
+          "browRightY",
+          "browLeftAngle",
+          "browRightAngle",
+          "browLeftShape",
+          "browRightShape"
+        ]
+      }
+    },
+    "frames": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 120001,
+      "items": {
+        "type": "array",
+        "minItems": 2,
+        "maxItems": 22,
+        "items": {
+          "type": "number"
+        }
+      }
+    },
+    "metadata": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": false
+}

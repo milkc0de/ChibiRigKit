@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from rig_contract import validate_project
 from pathlib import Path
+from player_output import preview_path
 import numpy as np
 from PIL import Image,ImageChops,ImageDraw
 
@@ -55,7 +56,7 @@ for i,(label,im) in enumerate(imgs):
 sheet.save(CHECK/'validation_sheet.png');(CHECK/'report.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2))
 
 # The same browser assertions can also be opened interactively when headless launch is unavailable.
-html=(ROOT/'index.html').read_text()
+html=preview_path(ROOT).read_text()
 harness="""<style>body{display:flex;flex-direction:column;height:auto;overflow:auto}main,aside{display:none}body>pre{order:-1;padding:16px;white-space:pre-wrap}body>img{max-width:100%}</style><script src="toolbox/head_checks.js"></script><script src="toolbox/neck_checks.js"></script><script src="toolbox/motion_io_checks.js"></script><script src="toolbox/runtime_checks.js"></script><script>
 window.rigReady.then(()=>{try{const result=window.runRigChecks();
 const image=document.createElement('img');image.src='data:image/png;base64,'+result.png;image.style.width='100%';

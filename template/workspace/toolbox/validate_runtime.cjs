@@ -12,7 +12,7 @@ const root=path.resolve(__dirname,'..'),checks=path.join(root,'checks');
   try{
     const page=await browser.newPage({viewport:{width:1280,height:900}}),errors=[];
     page.on('pageerror',e=>errors.push(e.message));
-    await page.goto(pathToFileURL(path.join(root,'index.html')).href+'?validate=1');
+    await page.goto(pathToFileURL(path.join(root,'work/player/index.html')).href+'?validate=1');
     await page.evaluate(()=>window.rigReady);
     await page.addScriptTag({path:path.join(__dirname,'head_checks.js')});
     await page.addScriptTag({path:path.join(__dirname,'neck_checks.js')});

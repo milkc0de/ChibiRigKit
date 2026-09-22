@@ -7,6 +7,7 @@ import numpy as np
 from head_pose import build_head_pose, build_neck_sway, fill_sclera
 from rig_contract import validate_plan, verify_sources, digest, local_path, validate_project
 from pathlib import Path
+from player_output import preview_path, export_player
 from PIL import Image, ImageChops
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -67,7 +68,7 @@ for spec in plan['parts']:
     part['sha256']=digest(ROOT/layer_rel)
     part['image_data_url']='data:image/png;base64,'+base64.b64encode((ROOT/layer_rel).read_bytes()).decode()
     if spec.get('mesh'):part['mesh']=dict(spec['mesh'])
-    for key in ('closed_part','transform_from','clip_to','iris_part'):
+    for key in ('closed_part','transform_from','clip_to','iris_part','capture_side','physics'):
         if spec.get(key):part[key]=spec[key]
     if 'head' in spec:part['head']=spec['head']
     if spec['kind']=='eye_sclera':part['sclera_fill']=sclera_color
@@ -138,6 +139,8 @@ if head_pose:
     project['settings']['head_random']=plan.get('head_pose',{}).get('autoplay',True)
 neck_sway=build_neck_sway(plan,parts,project['canvas'])
 if neck_sway:project['neck_sway']=neck_sway
+if plan.get('neck_fill'):
+    fill=plan['neck_fill'];project['neck_fill']={**fill,'data_url':'data:image/png;base64,'+base64.b64encode((ROOT/fill['file']).read_bytes()).decode()}
 # Character-specific motion template omits image bytes and immutable rig geometry.
 layout={'canvas':project['canvas'],'draw_order':project['draw_order'],
         'parts':{pid:{k:v for k,v in part.items() if k not in ('motion','image_data_url')} for pid,part in parts.items()},
@@ -150,9 +153,11 @@ motion_template={'$schema':'motion.schema.json','format':'chibirigkit.motion','v
 (ROOT/'motion.template.json').write_text(json.dumps(motion_template,ensure_ascii=False,indent=2)+'\n')
 (ROOT/'rig.project.json').write_text(json.dumps(project,ensure_ascii=False,indent=2)+'\n')
 
-tpl=(ROOT/'runtime'/'index.template.html').read_text().replace('__LICENSE_TEXT__',(ROOT/'LICENSE.txt').read_text()).replace('__RECORDING_JS__',(ROOT/'runtime'/'recording.js').read_text()).replace('__BUNDLE_JS__',(ROOT/'runtime'/'bundle.js').read_text()).replace('__HEAD_POSE_JS__',(ROOT/'runtime'/'head_pose.js').read_text()).replace('__PROJECT_IO_JS__',(ROOT/'runtime'/'project_io.js').read_text()).replace('__BACKGROUND_JS__',(ROOT/'runtime'/'background.js').read_text())
+tpl=(ROOT/'runtime'/'index.template.html').read_text().replace('__LICENSE_TEXT__',(ROOT/'LICENSE.txt').read_text()).replace('__RECORDING_JS__',(ROOT/'runtime'/'recording.js').read_text()).replace('__BUNDLE_JS__',(ROOT/'runtime'/'bundle.js').read_text()).replace('__HEAD_POSE_JS__',(ROOT/'runtime'/'head_pose.js').read_text()).replace('__PROJECT_IO_JS__',(ROOT/'runtime'/'project_io.js').read_text()).replace('__BACKGROUND_JS__',(ROOT/'runtime'/'background.js').read_text()).replace('__MOTION_CLIP_JS__',(ROOT/'runtime'/'motion_clip.js').read_text()).replace('__CAPTURE_PLAYER_JS__',(ROOT/'runtime'/'capture_player.js').read_text()).replace('__EXPRESSION_UNDERPAINT_JS__',(ROOT/'runtime'/'expression_underpaint.js').read_text()).replace('__HAIR_DYNAMICS_JS__',(ROOT/'runtime'/'hair_dynamics.js').read_text()).replace('__HAIR_PLAYER_JS__',(ROOT/'runtime'/'hair_player.js').read_text()).replace('__TRACKING_CORE_JS__',(ROOT/'runtime'/'tracking_core.js').read_text()).replace('__TRACKING_JS__',(ROOT/'runtime'/'tracking.js').read_text()).replace('__OUTPUT_JS__',(ROOT/'runtime'/'output.js').read_text())
 payload=json.dumps(project,ensure_ascii=False,separators=(',',':')).replace('<','\\u003c')
 rendered=tpl.replace('__TITLE__',html.escape(project['name'])).replace('__W__',str(W)).replace('__H__',str(H)).replace('__PROJECT_JSON__',payload)
-(ROOT/'index.html').write_text(rendered)
+preview_path(ROOT).parent.mkdir(parents=True,exist_ok=True)
+preview_path(ROOT).write_text(rendered)
 validate_project(ROOT,project)
+export_player(ROOT,rendered,project)
 print(json.dumps({'parts':len(parts),'canvas':[W,H],'project':'rig.project.json'},ensure_ascii=False))

@@ -1,570 +1,77 @@
 <!doctype html>
-<html lang="en">
+<!-- SPDX-FileCopyrightText: 2026 milkc0de; SPDX-License-Identifier: MIT -->
+<html lang="ja">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#fff8f2">
-<meta name="description" content="ChibiRigKit turns one character illustration into an editable animated 2D rig.">
-<meta property="og:title" content="ChibiRigKit — Bring your character to life">
-<meta property="og:description" content="One image. AI-assisted rigging. Editable 2D motion. Open source.">
-<meta property="og:url" content="https://milkc0de.github.io/ChibiRigKit/">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image" content="https://milkc0de.github.io/ChibiRigKit/ogp.png">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="ChibiRigKit — Bring your character to life">
-<meta name="twitter:description" content="One image. AI-assisted rigging. Editable 2D motion. Open source.">
-<meta name="twitter:image" content="https://milkc0de.github.io/ChibiRigKit/ogp.png">
-<title>ChibiRigKit — Bring your character to life</title>
-<style>
-:root{--ink:#302530;--muted:#7e6f7a;--paper:#fffafd;--pink:#ff78ad;--lav:#ae91f4;--mint:#8fd5bd;--gold:#ffd27d;--line:rgba(70,45,67,.13);--shadow:0 25px 80px rgba(112,72,105,.18);--max:1180px}*{box-sizing:border-box}html{scroll-behavior:smooth;background:var(--paper)}body{margin:0;color:var(--ink);font-family:ui-rounded,"SF Pro Rounded","Segoe UI",system-ui,-apple-system,sans-serif;line-height:1.6;background:radial-gradient(circle at 8% 4%,rgba(255,183,209,.34),transparent 28rem),radial-gradient(circle at 92% 10%,rgba(174,145,244,.22),transparent 28rem),linear-gradient(180deg,#fffafd,#fff8fb 42%,#fbfbff);overflow-x:hidden}button,a{font:inherit;-webkit-tap-highlight-color:transparent}button{cursor:pointer}button:focus-visible,a:focus-visible{outline:3px solid rgba(255,120,173,.35);outline-offset:4px}#spark{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.65}.hud{position:sticky;top:0;z-index:80;min-height:66px;padding:10px clamp(14px,3vw,34px);display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,.8);background:rgba(255,250,252,.77);backdrop-filter:blur(20px) saturate(1.2)}.brand{display:inline-flex;align-items:center;gap:9px;width:max-content;color:inherit;text-decoration:none;font-weight:950;letter-spacing:-.03em}.mark{width:32px;height:32px;display:grid;place-items:center;border-radius:11px;color:white;background:linear-gradient(135deg,var(--pink),var(--lav));box-shadow:0 8px 18px rgba(255,120,173,.3)}.hudmid,.hudright{display:flex;gap:8px;align-items:center}.hudmid{justify-content:center}.hudright{justify-content:flex-end}.pill,.ui{padding:7px 11px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.76);font-size:12px;font-weight:900;letter-spacing:.06em;white-space:nowrap}.ui{border-radius:12px;color:inherit;text-decoration:none;transition:.2s}.ui:hover{transform:translateY(-2px);border-color:rgba(255,120,173,.38)}main{position:relative;z-index:1}.wrap{width:min(var(--max),calc(100% - 32px));margin:auto}.hero{min-height:760px;padding:clamp(72px,10vw,130px) 0 100px;display:grid;grid-template-columns:1.02fr .98fr;gap:clamp(34px,6vw,80px);align-items:center;position:relative}.eyebrow,.kicker{margin:0 0 14px;color:#9e6684;font-size:12px;font-weight:950;letter-spacing:.16em}.hero h1{margin:0;font-size:clamp(56px,7.5vw,104px);line-height:.91;letter-spacing:-.075em;font-weight:950}.grad{display:block;color:transparent;background:linear-gradient(105deg,#f565a0,#a27ded 54%,#5bb89c);background-clip:text;-webkit-background-clip:text}.lead{max-width:680px;margin:30px 0 0;color:var(--muted);font-size:clamp(18px,2vw,22px)}.actions{margin-top:34px;display:flex;gap:12px;flex-wrap:wrap}.primary,.secondary{min-height:54px;padding:12px 20px;display:inline-flex;align-items:center;justify-content:center;gap:9px;border-radius:16px;text-decoration:none;font-weight:950;border:1px solid transparent;transition:.2s}.primary{color:white;background:linear-gradient(135deg,#ff6ca7,#a98af3);box-shadow:0 14px 30px rgba(216,104,169,.28)}.secondary{color:var(--ink);background:rgba(255,255,255,.78);border-color:var(--line)}.primary:hover,.secondary:hover{transform:translateY(-3px) scale(1.01)}.stats{margin-top:32px;display:flex;gap:10px;flex-wrap:wrap}.stats span{padding:9px 12px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.58);color:var(--muted);font-size:12px;font-weight:800}.stats strong{color:var(--ink);font-size:14px}.visual{min-width:0;position:relative;display:grid;place-items:center;perspective:1000px}.card{width:min(100%,510px);position:relative;z-index:4;overflow:hidden;border:1px solid rgba(255,255,255,.92);border-radius:32px;background:rgba(255,255,255,.73);box-shadow:var(--shadow);backdrop-filter:blur(16px);transform-style:preserve-3d;transition:transform .18s ease-out}.bar{min-height:45px;padding:10px 14px;display:flex;align-items:center;gap:9px;border-bottom:1px solid var(--line);color:var(--muted);font:800 11px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.06em}.bar.bottom{justify-content:space-between;border-top:1px solid var(--line);border-bottom:0}.dot{width:9px;height:9px;border-radius:50%;background:#6fd2a6;box-shadow:0 0 0 5px rgba(111,210,166,.12);animation:pulse 1.7s ease-in-out infinite}.stageimg{min-height:505px;position:relative;display:grid;place-items:center;overflow:hidden;background:linear-gradient(rgba(255,255,255,.3),rgba(255,255,255,.3)),repeating-linear-gradient(0deg,transparent,transparent 23px,rgba(138,96,127,.045) 24px),repeating-linear-gradient(90deg,transparent,transparent 23px,rgba(138,96,127,.045) 24px)}.stageimg img{width:min(94%,490px);max-height:495px;object-fit:contain;filter:drop-shadow(0 20px 28px rgba(72,48,68,.13));transform-origin:50% 72%}.scan{position:absolute;inset-inline:5%;height:1px;top:12%;background:linear-gradient(90deg,transparent,rgba(255,120,173,.75),transparent);box-shadow:0 0 12px rgba(255,120,173,.6);animation:scan 5s ease-in-out infinite}.chip{position:absolute;z-index:6;padding:10px 13px;border:1px solid rgba(255,255,255,.9);border-radius:999px;background:rgba(255,255,255,.88);box-shadow:0 12px 34px rgba(90,61,84,.13);font:900 11px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em;animation:float 4.8s ease-in-out infinite}.c1{left:-5%;top:23%}.c2{right:-6%;top:44%;animation-delay:-1.3s}.c3{left:1%;bottom:9%;animation-delay:-2.2s}.section{padding:105px 0}.head{max-width:820px;margin-bottom:48px}.head.center{text-align:center;margin-inline:auto}.head h2{margin:0;font-size:clamp(40px,5vw,68px);line-height:1;letter-spacing:-.055em}.head p:last-child{margin:18px 0 0;color:var(--muted);font-size:18px}.arcade{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(270px,.55fr);gap:22px;align-items:start}.panel{border:1px solid rgba(255,255,255,.88);background:rgba(255,255,255,.65);box-shadow:0 20px 55px rgba(91,60,83,.12);backdrop-filter:blur(18px)}.arcadescreen{overflow:hidden;border-radius:32px}.screenbar{min-height:52px;padding:13px 18px;display:flex;justify-content:space-between;gap:12px;align-items:center;border-bottom:1px solid var(--line);font:900 11px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em}.demozone{min-height:480px;position:relative;display:grid;place-items:center;overflow:hidden;background:radial-gradient(circle at 50% 45%,rgba(255,255,255,.96),rgba(255,240,247,.72) 47%,rgba(211,201,255,.25) 100%),repeating-linear-gradient(0deg,transparent,transparent 29px,rgba(110,80,105,.05) 30px),repeating-linear-gradient(90deg,transparent,transparent 29px,rgba(110,80,105,.05) 30px)}.demozone img{width:min(82%,480px);max-height:455px;object-fit:contain;filter:drop-shadow(0 28px 34px rgba(67,39,60,.15));transform-origin:50% 72%}.motionlabel{position:absolute;left:16px;bottom:15px;padding:7px 10px;border-radius:9px;color:white;background:rgba(47,36,48,.78);font:900 10px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em}.powers{padding:14px;display:grid;grid-template-columns:repeat(5,1fr);gap:9px;border-top:1px solid var(--line)}.power{min-height:104px;padding:12px 8px;display:grid;place-items:center;align-content:center;gap:5px;border:1px solid var(--line);border-radius:17px;color:var(--ink);background:rgba(255,255,255,.72);transition:.18s}.power:hover{transform:translateY(-3px);border-color:rgba(255,120,173,.35)}.power.used{background:linear-gradient(145deg,rgba(255,183,209,.25),rgba(174,145,244,.22));border-color:rgba(224,126,176,.35)}.power b{font-size:13px}.power small{color:var(--muted);font-size:10px}.quest{padding:24px;border-radius:32px}.quest h3{margin:0;font-size:25px;letter-spacing:-.035em}.quest>p{color:var(--muted)}.achlist{display:grid;gap:9px;margin-top:20px}.ach{min-height:64px;padding:10px 12px;display:grid;grid-template-columns:36px 1fr;align-items:center;gap:9px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.65);transition:.2s}.ach>span{width:34px;height:34px;display:grid;place-items:center;border-radius:11px;color:white;background:#c9bdc8;font-size:10px;font-weight:950}.ach b,.ach small{display:block}.ach b{font-size:13px}.ach small{color:var(--muted);font-size:11px}.ach.lock{opacity:.48;filter:grayscale(.4)}.ach.on{transform:translateX(4px);background:linear-gradient(145deg,rgba(255,183,209,.22),rgba(143,213,189,.17))}.ach.on>span{background:linear-gradient(135deg,var(--pink),var(--lav))}.posegame{display:grid;grid-template-columns:minmax(0,.95fr) minmax(320px,1.05fr);gap:26px;align-items:center}.posevis{min-height:560px;position:relative;display:grid;place-items:center;overflow:hidden}.posevis:before,.posevis:after{content:"";position:absolute;border:1px solid rgba(178,120,156,.16);border-radius:50%}.posevis:before{width:420px;height:420px}.posevis:after{width:540px;height:540px}.posevis img{width:min(78%,470px);max-height:520px;object-fit:contain;position:relative;z-index:2;transform-origin:50% 72%;transition:transform .38s cubic-bezier(.2,.85,.2,1);filter:drop-shadow(0 24px 30px rgba(76,49,70,.14))}.readout{position:absolute;z-index:4;left:22px;bottom:26px;padding:9px 12px;border-radius:13px;background:rgba(255,255,255,.84);box-shadow:0 12px 28px rgba(80,50,72,.1);font:800 10px ui-monospace,SFMono-Regular,Menlo,monospace}.readout span,.readout b{display:block}.readout span{color:var(--muted)}.console{padding:25px;border-radius:32px}.conhead{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:20px}.conhead b{font:900 14px ui-monospace,SFMono-Regular,Menlo,monospace}.posegrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.posegrid button{aspect-ratio:1.22;min-height:76px;border:1px solid var(--line);border-radius:18px;color:var(--ink);background:rgba(255,255,255,.72);font-size:25px;transition:.18s}.posegrid button:hover{transform:translateY(-3px);border-color:rgba(255,120,173,.35)}.posegrid button.used{background:linear-gradient(145deg,rgba(255,183,209,.35),rgba(174,145,244,.23));border-color:rgba(225,122,174,.4)}.note{margin:18px 0 0;color:var(--muted);font-size:12px}.pipe{padding:clamp(20px,3vw,34px);border-radius:32px}.track{display:grid;grid-template-columns:1fr auto 1fr auto 1fr auto 1fr;gap:10px;align-items:center}.node{min-height:142px;padding:16px;display:grid;align-content:center;gap:6px;text-align:left;border:1px solid var(--line);border-radius:20px;color:var(--ink);background:rgba(255,255,255,.74);transition:.18s}.node:hover{transform:translateY(-3px);border-color:rgba(255,120,173,.35)}.node.done{background:linear-gradient(145deg,rgba(143,213,189,.2),rgba(255,183,209,.2));border-color:rgba(113,194,161,.34)}.node.current{box-shadow:0 0 0 3px rgba(255,120,173,.12);border-color:rgba(255,120,173,.48)}.node em{color:#a26684;font:900 11px ui-monospace,SFMono-Regular,Menlo,monospace;font-style:normal}.node small{color:var(--muted)}.arrow{color:#bb9aab;font-size:20px;font-weight:900}.terminal{margin-top:18px;min-height:50px;padding:13px 15px;display:flex;gap:10px;align-items:center;border-radius:15px;color:#66525e;background:rgba(47,36,48,.055);font:750 12px ui-monospace,SFMono-Regular,Menlo,monospace}.features{margin-top:20px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.features article{min-height:190px;padding:23px;border:1px solid var(--line);border-radius:24px;background:rgba(255,255,255,.55)}.features h3{margin:20px 0 8px;font-size:21px;letter-spacing:-.035em}.features p{margin:0;color:var(--muted);font-size:14px}.live{overflow:hidden;border-radius:32px}.livebar{min-height:58px;padding:10px 15px;display:flex;justify-content:space-between;gap:15px;align-items:center;border-bottom:1px solid var(--line);font:800 11px ui-monospace,SFMono-Regular,Menlo,monospace}.livebar>div{display:flex;gap:9px;align-items:center}.gate{min-height:520px;display:grid;place-items:center;text-align:center;background:radial-gradient(circle at 50% 45%,rgba(255,255,255,.96),rgba(255,242,248,.8) 47%,rgba(207,197,255,.28)),repeating-linear-gradient(0deg,transparent,transparent 25px,rgba(102,73,98,.045) 26px),repeating-linear-gradient(90deg,transparent,transparent 25px,rgba(102,73,98,.045) 26px)}.gateinner{max-width:470px;padding:30px}.gateicon{width:58px;height:58px;margin:0 auto 14px;display:grid;place-items:center;border-radius:19px;color:white;background:linear-gradient(135deg,var(--pink),var(--lav));font-size:26px;box-shadow:0 18px 34px rgba(201,102,164,.25)}.gate h3{margin:0;font-size:32px;letter-spacing:-.045em}.gate p{color:var(--muted)}iframe{width:100%;height:780px;border:0;background:white}.finale{padding:100px 0 130px}.finalcard{position:relative;overflow:hidden;padding:clamp(38px,6vw,76px);border:1px solid rgba(255,255,255,.92);border-radius:40px;text-align:center;background:radial-gradient(circle at 50% -20%,rgba(255,255,255,.92),transparent 42%),linear-gradient(135deg,rgba(255,183,209,.38),rgba(174,145,244,.28),rgba(143,213,189,.2));box-shadow:var(--shadow)}.finalcard h2{max-width:820px;margin:auto;font-size:clamp(44px,6vw,76px);line-height:.98;letter-spacing:-.06em}.finalcard>p{max-width:700px;margin:20px auto 0;color:#6e5e69;font-size:18px}.clone{width:min(760px,100%);margin:34px auto 0;padding:9px 9px 9px 16px;display:flex;align-items:center;gap:12px;border-radius:17px;background:rgba(47,36,48,.86);color:#fff}.clone code{min-width:0;flex:1;overflow:auto;white-space:nowrap;font:700 12px ui-monospace,SFMono-Regular,Menlo,monospace}.clone button{min-height:38px;padding:8px 13px;border:0;border-radius:11px;background:white;color:#57414e;font-weight:950}.finalactions{justify-content:center}.toastbox{position:fixed;z-index:120;right:18px;bottom:18px;width:min(360px,calc(100% - 36px));display:grid;gap:8px;pointer-events:none}.toast{padding:14px 15px;display:grid;grid-template-columns:38px 1fr auto;gap:11px;align-items:center;border:1px solid rgba(255,255,255,.82);border-radius:18px;background:rgba(255,255,255,.94);box-shadow:0 18px 40px rgba(83,52,76,.18);animation:toastin .34s cubic-bezier(.2,.9,.2,1)}.toast i{width:38px;height:38px;display:grid;place-items:center;border-radius:12px;color:white;background:linear-gradient(135deg,var(--pink),var(--lav));font-style:normal}.toast b,.toast small{display:block}.toast small{color:var(--muted)}.toast em{color:#a15e80;font:900 11px ui-monospace,SFMono-Regular,Menlo,monospace;font-style:normal}.confetti{position:fixed;z-index:200;width:9px;height:14px;pointer-events:none;border-radius:2px;animation:fall 1.25s cubic-bezier(.15,.75,.35,1) forwards}.secret .grad{background-image:linear-gradient(90deg,#ff6ca7,#ffbf69,#7ed9bd,#a98af3,#ff6ca7);background-size:220% 100%;animation:rainbow 2s linear infinite}.secret .mark{animation:spin 1.4s linear infinite}.fx-blink img{animation:blink .48s ease}.fx-look img{animation:look .7s ease}.fx-tilt img{animation:tilt .75s ease}.fx-sway img{animation:sway 1s ease}.fx-boost img{animation:boost .9s ease}@keyframes pulse{50%{transform:scale(1.1);opacity:.8}}@keyframes scan{50%{top:88%}}@keyframes float{50%{transform:translateY(-14px)}}@keyframes blink{45%{transform:scaleY(.92)}}@keyframes look{35%{transform:translateX(-14px)}70%{transform:translateX(14px)}}@keyframes tilt{40%{transform:rotate(-7deg)}75%{transform:rotate(7deg)}}@keyframes sway{30%{transform:rotate(-3deg) translateY(-4px)}70%{transform:rotate(3deg) translateY(3px)}}@keyframes boost{45%{transform:scale(1.055);filter:drop-shadow(0 30px 40px rgba(255,120,173,.25))}}@keyframes toastin{from{opacity:0;transform:translateY(14px) scale(.97)}}@keyframes fall{to{opacity:0;transform:translate3d(var(--dx),72vh,0) rotate(var(--rot))}}@keyframes rainbow{to{background-position:220% 0}}@keyframes spin{to{transform:rotate(360deg)}}@media(max-width:980px){.hero{grid-template-columns:1fr;min-height:auto}.hero-copy{text-align:center}.lead{margin-inline:auto}.actions,.stats{justify-content:center}.arcade,.posegame{grid-template-columns:1fr}.quest{order:-1}.achlist{grid-template-columns:repeat(2,1fr)}.track{grid-template-columns:1fr}.arrow{transform:rotate(90deg);justify-self:center}.features{grid-template-columns:1fr}}@media(max-width:720px){.hud{grid-template-columns:1fr auto}.hudmid{grid-row:2;grid-column:1/-1;justify-content:flex-start}.hero{padding-top:60px}.hero h1{font-size:clamp(48px,15vw,72px)}.stageimg{min-height:390px}.chip{display:none}.section{padding:74px 0}.powers{grid-template-columns:repeat(2,1fr)}.power:last-child{grid-column:1/-1}.achlist{grid-template-columns:1fr}.posevis{min-height:420px}.posegrid button{min-height:64px}.livebar{align-items:flex-start;flex-direction:column}.livebar>div:last-child{width:100%}.livebar .ui{flex:1;text-align:center}iframe{height:640px}.clone{align-items:stretch;flex-direction:column;padding:12px}.clone button{width:100%}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}#spark{display:none}}
-.playground-first{padding-top:28px}.intro-actions{margin-top:18px}.intro-stats{margin-top:18px}.intro-stats span{padding:9px 12px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.75);font-size:12px;font-weight:800;color:var(--muted)}.intro-stats strong{color:var(--ink)}@media (max-width:720px){.playground-first{padding-top:14px}.intro-actions,.intro-stats{justify-content:center}}</style>
-
-<style id="japanese-kawaii-skin">
-/* ChibiRigKit — Japanese kawaii game skin. Structure and interactions stay the same. */
-:root{
-  --ink:#553c50;
-  --muted:#8f7486;
-  --paper:#fff9f5;
-  --pink:#f58fb3;
-  --pink-deep:#e972a1;
-  --sakura:#ffc4d5;
-  --strawberry:#ff9fc0;
-  --lav:#bca9ea;
-  --fuji:#d8caf5;
-  --ramune:#a8d9ee;
-  --mint:#b8e0c6;
-  --cream:#fff1bf;
-  --kinako:#e8c995;
-  --azuki:#785368;
-  --milk:#fffdf9;
-  --line:rgba(120,83,104,.16);
-  --shadow:0 22px 60px rgba(113,72,98,.15);
-}
-
-html{background:#fff8f3}
-body{
-  font-family:"Hiragino Maru Gothic ProN","Hiragino Kaku Gothic ProN","Yu Gothic UI","Yu Gothic",ui-rounded,"SF Pro Rounded","Segoe UI",system-ui,-apple-system,sans-serif;
-  color:var(--ink);
-  background:
-    radial-gradient(circle at 8% 3%,rgba(255,196,213,.50),transparent 24rem),
-    radial-gradient(circle at 94% 7%,rgba(216,202,245,.42),transparent 25rem),
-    radial-gradient(circle at 82% 54%,rgba(168,217,238,.22),transparent 24rem),
-    radial-gradient(circle at 16% 74%,rgba(184,224,198,.18),transparent 22rem),
-    linear-gradient(180deg,#fffaf7 0%,#fff7fb 40%,#fdf9ff 70%,#fffaf4 100%);
-}
-
-/* Soft gingham + tiny dots: Japanese stationery / cafe menu feel */
-body::before{
-  content:"";
-  position:fixed;
-  inset:0;
-  z-index:0;
-  pointer-events:none;
-  opacity:.42;
-  background-image:
-    linear-gradient(90deg,rgba(245,143,179,.055) 1px,transparent 1px),
-    linear-gradient(rgba(245,143,179,.055) 1px,transparent 1px),
-    radial-gradient(circle,rgba(120,83,104,.055) 1.2px,transparent 1.4px);
-  background-size:32px 32px,32px 32px,16px 16px;
-  mask-image:linear-gradient(to bottom,rgba(0,0,0,.9),rgba(0,0,0,.18) 64%,rgba(0,0,0,.5));
-}
-body::after{
-  content:"✿  ♡  ✦  ＊  ✿  ♡  ✦";
-  position:fixed;
-  z-index:0;
-  right:-16px;
-  top:128px;
-  writing-mode:vertical-rl;
-  color:rgba(223,122,163,.12);
-  font-size:20px;
-  letter-spacing:.72em;
-  pointer-events:none;
-}
-
-#spark{opacity:.50}
-
-/* Candy ribbon HUD */
-.hud{
-  border-bottom:1px solid rgba(195,116,150,.16);
-  background:rgba(255,250,248,.88);
-  box-shadow:0 7px 24px rgba(118,76,101,.075);
-  backdrop-filter:blur(22px) saturate(1.15);
-}
-.hud::after{
-  content:"";
-  position:absolute;
-  left:0;right:0;bottom:-7px;height:8px;
-  pointer-events:none;
-  background:radial-gradient(circle at 8px -1px,transparent 7px,#fff9f6 7.5px) 0 0/16px 8px repeat-x;
-  opacity:.95;
-}
-.brand{color:#684b60;letter-spacing:-.02em}
-.brand::after{content:" ＊";color:#e895b1;font-size:13px}
-.mark{
-  width:35px;height:35px;
-  border-radius:48% 52% 50% 46%;
-  background:linear-gradient(145deg,#ff9fc0,#c9b4ef 58%,#a9d9e8);
-  box-shadow:0 7px 16px rgba(232,120,164,.23),inset 0 0 0 3px rgba(255,255,255,.62);
-  font-size:0;
-  position:relative;
-}
-.mark::before{content:"✿";font-size:16px;color:#fff;filter:drop-shadow(0 1px 0 rgba(124,75,100,.12))}
-.mark::after{content:"";position:absolute;width:8px;height:8px;border-radius:50%;background:#fff5b9;box-shadow:0 0 0 2px rgba(255,255,255,.35)}
-
-.pill,.ui{
-  border:1px solid rgba(131,88,111,.14);
-  background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(255,247,250,.92));
-  color:#6d5362;
-  box-shadow:0 4px 12px rgba(110,73,94,.07),inset 0 1px 0 rgba(255,255,255,.95);
-}
-.pill{border-radius:14px}
-.pill:nth-child(1){box-shadow:inset 0 -3px 0 rgba(255,190,211,.42),0 4px 12px rgba(110,73,94,.06)}
-.pill:nth-child(2){box-shadow:inset 0 -3px 0 rgba(188,169,234,.36),0 4px 12px rgba(110,73,94,.06)}
-.ui:hover{background:#fff;border-color:rgba(236,127,170,.42);transform:translateY(-2px) rotate(-.4deg)}
-
-/* Hero: shoujo-game title screen rather than SaaS */
-.eyebrow,.kicker{
-  color:#a56c87;
-  letter-spacing:.18em;
-  text-shadow:0 1px 0 #fff;
-}
-.eyebrow::before,.kicker::before{content:"✿ ";color:#eb8fb0}
-.eyebrow::after,.kicker::after{content:" ✦";color:#d9b56f}
-.hero h1,.head h2,.finalcard h2{color:#543d50;text-shadow:0 2px 0 rgba(255,255,255,.82)}
-.hero h1{filter:drop-shadow(0 8px 22px rgba(188,112,151,.08))}
-.grad{
-  background:linear-gradient(100deg,#ed7fa8 0%,#f4a7c1 25%,#b596dc 52%,#8fc6df 76%,#93c9ad 100%);
-  background-clip:text;-webkit-background-clip:text;
-  text-shadow:none;
-  filter:drop-shadow(0 4px 0 rgba(255,255,255,.55));
-}
-.lead,.head p:last-child{color:#897080}
-.hero-copy{position:relative}
-.hero-copy::before{
-  content:"♡";
-  position:absolute;
-  left:-28px;top:-34px;
-  color:#f4aec4;
-  font-size:28px;
-  transform:rotate(-12deg);
-  opacity:.7;
-}
-.hero-copy::after{
-  content:"ふわり";
-  position:absolute;
-  right:4%;bottom:-34px;
-  color:#bd9ab0;
-  font-size:11px;
-  letter-spacing:.3em;
-  opacity:.46;
-  transform:rotate(-4deg);
-}
-
-.primary,.secondary{
-  border-radius:999px;
-  min-height:56px;
-  position:relative;
-  overflow:hidden;
-  letter-spacing:.045em;
-}
-.primary{
-  color:#fff;
-  border:2px solid rgba(255,255,255,.88);
-  background:linear-gradient(135deg,#f184ad 0%,#f5a4c0 32%,#c6a8e7 68%,#a4d3e5 100%);
-  box-shadow:0 11px 0 rgba(202,120,157,.12),0 16px 28px rgba(194,116,155,.18),inset 0 2px 0 rgba(255,255,255,.52);
-}
-.primary::before{content:"♡";font-size:13px;color:#fff8c8}
-.primary::after{content:"";position:absolute;left:10%;right:10%;top:3px;height:40%;border-radius:999px;background:linear-gradient(180deg,rgba(255,255,255,.34),transparent);pointer-events:none}
-.secondary{
-  color:#715569;
-  border:2px solid #f3d5df;
-  background:linear-gradient(180deg,#fffefd,#fff5f8);
-  box-shadow:0 8px 0 rgba(222,169,190,.08),0 12px 22px rgba(103,69,91,.08),inset 0 0 0 2px #fff;
-}
-.secondary::before{content:"✦";color:#d3a25e;font-size:12px}
-.primary:hover,.secondary:hover{transform:translateY(-4px) scale(1.015) rotate(-.25deg)}
-
-.stats{gap:8px}
-.stats span{
-  border:2px solid rgba(255,255,255,.93);
-  border-radius:16px;
-  background:#fffdfb;
-  color:#846d7a;
-  box-shadow:0 5px 13px rgba(112,75,96,.07),inset 0 -4px 0 rgba(245,143,179,.08);
-  transform:rotate(-.3deg);
-}
-.stats span:nth-child(2){transform:rotate(.45deg);background:#fcf9ff;box-shadow:0 5px 13px rgba(112,75,96,.07),inset 0 -4px 0 rgba(188,169,234,.10)}
-.stats span:nth-child(3){background:#f9fdff;box-shadow:0 5px 13px rgba(112,75,96,.07),inset 0 -4px 0 rgba(168,217,238,.13)}
-.stats span:nth-child(4){transform:rotate(.35deg);background:#fbfff9;box-shadow:0 5px 13px rgba(112,75,96,.07),inset 0 -4px 0 rgba(184,224,198,.14)}
-
-/* Preview becomes a cute handheld / photo-booth frame */
-.visual::before{
-  content:"CHIBI MODE ♡";
-  position:absolute;
-  z-index:7;
-  top:-18px;right:10%;
-  padding:7px 14px;
-  border:2px solid #fff;
-  border-radius:999px;
-  color:#a55f7c;
-  background:#ffe9f1;
-  box-shadow:0 7px 16px rgba(116,75,99,.11);
-  font-size:10px;font-weight:950;letter-spacing:.09em;
-  transform:rotate(3deg);
-}
-.visual::after{
-  content:"🎀";
-  position:absolute;
-  z-index:8;
-  left:-1%;bottom:6%;
-  font-size:42px;
-  transform:rotate(-10deg);
-  filter:drop-shadow(0 8px 8px rgba(127,80,105,.12));
-}
-.card,.panel,.live{
-  border:3px solid #fff;
-  background:rgba(255,253,250,.86);
-  box-shadow:0 26px 68px rgba(107,69,92,.14),0 0 0 1px rgba(229,157,184,.18),inset 0 0 0 1px rgba(255,255,255,.9);
-}
-.card{border-radius:38px;outline:1px solid rgba(231,150,181,.16);outline-offset:5px}
-.card::before,.arcadescreen::before,.quest::before,.console::before,.pipe::before,.live::before{
-  content:"";
-  position:absolute;
-  inset:8px;
-  border:2px dashed rgba(234,149,183,.20);
-  border-radius:27px;
-  pointer-events:none;
-  z-index:1;
-}
-.card::after{
-  content:"✿";
-  position:absolute;
-  z-index:6;
-  right:16px;top:12px;
-  color:#eaa1ba;
-  font-size:15px;
-}
-.card>* ,.arcadescreen>* ,.quest>* ,.console>* ,.pipe>* ,.live>*{position:relative;z-index:2}
-.bar,.screenbar,.livebar{
-  color:#7b6171;
-  background:
-    repeating-linear-gradient(135deg,rgba(255,255,255,.42) 0 8px,rgba(255,255,255,.04) 8px 16px),
-    linear-gradient(90deg,#ffe9f1,#f7efff 48%,#ebf8fc);
-}
-.dot{background:#8fcaa8;box-shadow:0 0 0 5px rgba(143,202,168,.14)}
-.stageimg,.demozone,.gate{
-  background:
-    radial-gradient(circle at 50% 38%,rgba(255,255,255,.99),rgba(255,241,247,.78) 47%,rgba(225,215,247,.34) 100%),
-    linear-gradient(45deg,rgba(244,164,194,.055) 25%,transparent 25%,transparent 75%,rgba(244,164,194,.055) 75%),
-    linear-gradient(-45deg,rgba(168,217,238,.045) 25%,transparent 25%,transparent 75%,rgba(168,217,238,.045) 75%);
-  background-size:auto,26px 26px,26px 26px;
-  background-position:0 0,0 0,13px 13px;
-}
-.stageimg::before,.demozone::before{
-  content:"✿  ·  ♡  ·  ✦";
-  position:absolute;
-  top:14px;left:18px;
-  color:rgba(221,132,169,.28);
-  font-size:13px;
-  letter-spacing:.35em;
-}
-.scan{background:linear-gradient(90deg,transparent,rgba(235,132,170,.48),transparent);box-shadow:0 0 8px rgba(235,132,170,.19)}
-.chip{
-  color:#7b5368;
-  border:2px solid #fff;
-  background:#fffdfb;
-  box-shadow:0 9px 20px rgba(103,67,89,.10),0 0 0 1px rgba(232,160,187,.16);
-  font-family:"Hiragino Maru Gothic ProN",ui-rounded,system-ui,sans-serif;
-  letter-spacing:.06em;
-}
-.chip::before{content:"♡ ";color:#ef8fb3}
-.c1{background:#fff0f5}.c2{background:#f5f0ff}.c3{background:#edfaff}
-
-/* Sections: scrapbook / sticker-board style */
-.section{position:relative}
-.section::before{
-  content:"";
-  position:absolute;
-  left:50%;top:45px;
-  width:min(880px,80%);height:1px;
-  transform:translateX(-50%);
-  background:linear-gradient(90deg,transparent,rgba(228,151,181,.18),transparent);
-}
-.head h2{position:relative}
-.head.center h2::after{content:" ♡";font-size:.34em;color:#ee96b5;vertical-align:top}
-.arcadescreen,.quest,.console,.pipe,.live{position:relative;border-radius:34px}
-.quest::after,.console::after,.pipe::after{
-  content:"✿";
-  position:absolute;
-  right:14px;bottom:10px;
-  color:rgba(225,141,175,.28);
-  font-size:20px;
-  z-index:3;
-}
-.screenbar{border-bottom:2px solid rgba(235,163,191,.14)}
-
-.power,.posegrid button,.node,.ach{
-  border:2px solid #f3e2e8;
-  color:#604757;
-  background:linear-gradient(180deg,#fffefd,#fff7f9);
-  box-shadow:0 5px 0 rgba(211,145,174,.08),inset 0 1px 0 #fff;
-}
-.power{
-  border-radius:20px 20px 15px 15px;
-  position:relative;
-  overflow:hidden;
-}
-.power::before{content:"";position:absolute;left:0;right:0;top:0;height:6px;background:#f6b4ca}
-.power:nth-child(2)::before{background:#cbb9ef}.power:nth-child(3)::before{background:#a9d9ee}.power:nth-child(4)::before{background:#b8dfc7}.power:nth-child(5)::before{background:#ffe0a0}
-.power:hover,.posegrid button:hover,.node:hover{border-color:#f0b6ca;background:#fff;transform:translateY(-4px) rotate(-.35deg)}
-.power.used,.posegrid button.used{
-  background:linear-gradient(145deg,#ffe8f0,#f3edff 52%,#edfaff);
-  border-color:#efbdd0;
-  box-shadow:0 6px 0 rgba(219,143,176,.09),inset 0 0 0 2px rgba(255,255,255,.72);
-}
-.motionlabel,.terminal{
-  border:2px solid rgba(255,255,255,.16);
-  background:#5f4656;
-  color:#fff9f5;
-  box-shadow:0 7px 18px rgba(77,48,66,.11),inset 0 0 0 1px rgba(255,255,255,.06);
-}
-
-.quest{background:linear-gradient(180deg,#fffdf9,#fff6f9)}
-.quest h3,.features h3{color:#5e4555}
-.ach{border-radius:18px;background:#fffdfb}
-.ach>span{border-radius:50%;background:#c9bdc8;box-shadow:inset 0 0 0 2px rgba(255,255,255,.5)}
-.ach.on{
-  background:linear-gradient(135deg,#fff0f5,#f5f0ff 54%,#effaf4);
-  border-color:#efc0d2;
-  transform:translateX(5px) rotate(-.2deg);
-}
-.ach.on>span{background:linear-gradient(135deg,#f18eaf,#b9a3e0);box-shadow:0 4px 10px rgba(184,112,148,.16),inset 0 0 0 2px rgba(255,255,255,.5)}
-
-.posevis::before,.posevis::after{border:2px dashed rgba(218,142,173,.18)}
-.readout{
-  border:2px solid #fff;
-  background:#fffdfb;
-  color:#715667;
-  box-shadow:0 8px 18px rgba(94,61,81,.09),0 0 0 1px rgba(232,160,187,.16);
-}
-.posegrid button{border-radius:22px;background:linear-gradient(180deg,#fff,#fff6fa);box-shadow:0 5px 0 rgba(222,157,184,.08)}
-.posegrid button:nth-child(2n){background:linear-gradient(180deg,#fff,#f8f4ff)}
-.posegrid button:nth-child(3n){background:linear-gradient(180deg,#fff,#f1fbff)}
-
-.node{border-radius:22px;background:linear-gradient(180deg,#fff,#fff8fa)}
-.node.done{background:linear-gradient(145deg,#f0fbf4,#fff0f5);border-color:#c9e6d4}
-.node.current{border-color:#efabc5;box-shadow:0 0 0 4px rgba(245,143,179,.09),0 5px 0 rgba(222,157,184,.08)}
-.arrow{color:#c397aa;text-shadow:0 1px 0 #fff}
-.features article{
-  position:relative;
-  overflow:hidden;
-  border:2px solid #fff;
-  background:#fffdfb;
-  box-shadow:0 10px 24px rgba(102,68,89,.075),0 0 0 1px rgba(232,160,187,.12);
-}
-.features article::after{content:"♡";position:absolute;right:16px;top:11px;color:rgba(230,143,177,.24);font-size:24px}
-.features article:nth-child(1){border-top:7px solid #f5b1c8}.features article:nth-child(2){border-top:7px solid #c9b9ec}.features article:nth-child(3){border-top:7px solid #add7bf}
-
-/* Final live gate = prize machine / arcade cabinet */
-.live{outline:1px solid rgba(220,144,173,.14);outline-offset:5px}
-.livebar{border-bottom:2px solid rgba(235,163,191,.14)}
-.gateicon{
-  border-radius:22px 22px 22px 9px;
-  background:linear-gradient(145deg,#f28caf,#c1a7e3 60%,#9fd3e6);
-  box-shadow:0 13px 0 rgba(195,122,156,.08),0 18px 28px rgba(176,106,143,.17),inset 0 0 0 3px rgba(255,255,255,.55);
-}
-.gate h3::after{content:" ♡";color:#ee95b5}
-
-.finalcard{
-  border:4px solid #fff;
-  background:
-    radial-gradient(circle at 50% -6%,rgba(255,255,255,.99),transparent 38%),
-    linear-gradient(135deg,#ffe6ef 0%,#f7efff 42%,#eefaff 70%,#f2fbf5 100%);
-  box-shadow:0 28px 70px rgba(102,72,90,.14),0 0 0 1px rgba(231,153,183,.16),inset 0 0 0 2px rgba(255,255,255,.58);
-  outline:2px dashed rgba(235,151,183,.18);
-  outline-offset:-14px;
-}
-.finalcard::before{
-  content:"✿  ♡  ✦  CHIBI QUEST COMPLETE  ✦  ♡  ✿";
-  display:block;
-  margin:0 auto 17px;
-  color:#a96e89;
-  font-size:11px;
-  font-weight:900;
-  letter-spacing:.18em;
-}
-.finalcard::after{
-  content:"ごほうび ♡";
-  position:absolute;
-  right:6%;top:8%;
-  color:rgba(175,118,147,.45);
-  font-size:12px;
-  letter-spacing:.22em;
-  transform:rotate(7deg);
-}
-.clone{border:3px solid #fff;background:#5b4553;color:#fffaf5;box-shadow:0 8px 20px rgba(79,50,68,.12),0 0 0 1px rgba(91,69,83,.20)}
-.clone button{color:#6a4f60;background:#fff8f3;border:1px solid #f1d3df}
-
-.toast{
-  border:3px solid #fff;
-  background:rgba(255,253,250,.96);
-  box-shadow:0 16px 38px rgba(94,66,83,.15),0 0 0 1px rgba(232,160,187,.14);
-}
-.toast i{background:linear-gradient(135deg,#f18eaf,#b8a2df);border-radius:50%}
-
-/* Extra kawaii game details */
-.pill strong{color:#80556b}
-#xp::after{content:" ✦";color:#d8a34e}
-#stage::after{content:" ♡";color:#e68cab}
-.secret .grad{background-image:linear-gradient(90deg,#f087aa,#ffc28b,#a8d9ee,#a9d0b4,#bca9ea,#f087aa)}
-
-@media(max-width:720px){
-  body::before{opacity:.30;background-size:26px 26px,26px 26px,13px 13px}
-  body::after{display:none}
-  .hero-copy::before,.hero-copy::after{display:none}
-  .visual::before{right:3%;top:-13px}
-  .visual::after{font-size:30px;left:1%}
-  .card::before,.arcadescreen::before,.quest::before,.console::before,.pipe::before,.live::before{inset:6px;border-radius:22px}
-  .finalcard::after{display:none}
-}
-</style>
-
-<style id="jp-girly-site-v3">
-:root{
- --milk:#fffaf4;--paper2:#fffdf9;--cocoa:#6c5058;--soft:#9b7e89;
- --sakura:#f6b5c8;--ichigo:#ed8faf;--fuji:#cfc2ec;--ramune:#b7deec;
- --matcha:#bedcc5;--custard:#f7dea0;--line2:#ead7dd;--pinkline:#efcad6;
-}
-body{
- color:var(--cocoa)!important;
- background-color:var(--milk)!important;
- background-image:
- radial-gradient(circle at 12px 12px,rgba(232,151,180,.10) 1.2px,transparent 1.4px),
- linear-gradient(90deg,rgba(247,181,200,.045) 50%,transparent 50%),
- linear-gradient(rgba(247,181,200,.045) 50%,transparent 50%)!important;
- background-size:24px 24px,48px 48px,48px 48px!important;
-}
-body::before{opacity:.16!important;background-size:48px 48px!important}
-body::after{display:none!important}
-#spark{opacity:.24!important}
-
-/* quiet little header, like a character site rather than a SaaS navbar */
-.hud{
- min-height:56px!important;padding:7px clamp(12px,2.4vw,28px)!important;
- border-bottom:1px solid #f1dce3!important;background:rgba(255,251,247,.94)!important;
- box-shadow:none!important;backdrop-filter:blur(12px)!important;
-}
-.hud::after{height:5px!important;bottom:-4px!important;background:radial-gradient(circle at 6px -1px,transparent 5px,#fffaf4 5.5px) 0 0/12px 6px repeat-x!important}
-.brand{font-size:15px!important;color:#775662!important}.brand::after{content:" ♡"!important;color:#e899b3!important}
-.mark{width:30px!important;height:30px!important;border-radius:50%!important;background:#f3adc2!important;box-shadow:inset 0 0 0 3px #fff!important}
-.mark::before{content:"✿"!important;font-size:14px!important}.mark::after{display:none!important}
-.pill,.ui{font-size:10px!important;letter-spacing:.08em!important;border:1px solid #ead9df!important;background:#fffdf9!important;box-shadow:none!important;color:#8a6875!important}
-.pill{padding:6px 9px!important}.ui{min-height:34px!important;padding:6px 10px!important}
-
-/* no giant marketing typography */
-.playground-first{padding-top:32px!important}
-.play-head{max-width:680px!important;margin:0 auto 26px!important;text-align:center!important}
-.kicker{font-size:10px!important;letter-spacing:.20em!important;color:#b07a8e!important;margin-bottom:9px!important}
-.kicker::before{content:"♡  "!important;color:#ed9ab5!important}.kicker::after{content:"  ♡"!important;color:#ed9ab5!important}
-.play-head h2,.head h2,.finalcard h2{
- font-size:clamp(30px,4.1vw,48px)!important;line-height:1.12!important;letter-spacing:-.035em!important;
- font-weight:800!important;color:#684d58!important;text-shadow:none!important;
-}
-.play-head p,.head p:last-child{font-size:15px!important;color:#9a7d87!important;margin-top:10px!important}
-.intro-actions{justify-content:center!important;margin-top:18px!important}.intro-stats{justify-content:center!important;margin-top:14px!important}
-.intro-stats span{padding:6px 11px!important;border:1px dashed #e9c9d4!important;border-radius:999px!important;background:#fffdf9!important;color:#9a7884!important;font-size:10px!important;box-shadow:none!important;transform:none!important;text-transform:lowercase!important}
-
-/* soft flat buttons: Japanese stationery/game menu feeling */
-.primary,.secondary{
- min-height:44px!important;padding:9px 17px!important;border-radius:13px!important;
- font-size:12px!important;font-weight:800!important;letter-spacing:.03em!important;box-shadow:0 3px 0 rgba(183,121,145,.08)!important;
- transform:none!important;
-}
-.primary{color:#795565!important;background:#ffdce7!important;border:1px solid #efbfd0!important}
-.primary::before{content:"♡"!important;color:#df829f!important}.primary::after{display:none!important}
-.secondary{color:#765f80!important;background:#f4effc!important;border:1px solid #ded1f2!important}
-.secondary::before{content:"✦"!important;color:#b6a0d9!important}
-.primary:hover,.secondary:hover{transform:translateY(-2px)!important;filter:none!important}
-
-.section{padding:76px 0!important}.section::before{display:none!important}
-.head{max-width:720px!important;margin-bottom:28px!important}.head.center{text-align:center!important;margin-inline:auto!important}
-.head.center h2::after{content:""!important}
-
-/* playground = cute portable toy / cafe-menu panel */
-.arcade{gap:18px!important;align-items:stretch!important}
-.panel,.card,.live{backdrop-filter:none!important}
-.arcadescreen,.quest,.console,.pipe,.live{
- border:1px solid var(--pinkline)!important;border-radius:24px!important;background:#fffdf9!important;
- box-shadow:0 7px 0 #f5e5ea!important;outline:none!important;
-}
-.arcadescreen::before,.quest::before,.console::before,.pipe::before,.live::before{inset:6px!important;border:1px dashed rgba(224,159,182,.25)!important;border-radius:18px!important}
-.screenbar,.livebar{
- min-height:42px!important;padding:9px 15px!important;background:#fff1f5!important;border-bottom:1px dashed #e9c7d2!important;
- color:#936c7a!important;font-size:10px!important;letter-spacing:.12em!important;
-}
-.screenbar::before{content:"🎀";margin-right:7px}.screenbar span:last-child{color:#b58494!important}
-.demozone{
- min-height:445px!important;margin:8px!important;border-radius:17px!important;overflow:hidden!important;
- background-color:#fffaf5!important;
- background-image:linear-gradient(45deg,rgba(246,181,200,.09) 25%,transparent 25%,transparent 75%,rgba(246,181,200,.09) 75%),linear-gradient(45deg,rgba(246,181,200,.09) 25%,transparent 25%,transparent 75%,rgba(246,181,200,.09) 75%)!important;
- background-position:0 0,14px 14px!important;background-size:28px 28px!important;
-}
-.demozone::before{content:"✿  little motion  ♡"!important;top:13px!important;left:16px!important;color:#d99bad!important;font-size:10px!important;letter-spacing:.16em!important}
-.demozone img{max-height:420px!important;filter:drop-shadow(0 13px 18px rgba(103,70,82,.10))!important}
-.motionlabel{left:16px!important;bottom:15px!important;padding:6px 10px!important;border:1px solid #e7d3da!important;border-radius:999px!important;background:#fffdf9!important;color:#966d7b!important;box-shadow:none!important;font-size:9px!important}
-
-.powers{padding:10px!important;gap:8px!important;border-top:0!important}
-.power{
- min-height:90px!important;border:1px solid #ead8df!important;border-radius:16px!important;background:#fffaf7!important;
- box-shadow:none!important;color:#765862!important;gap:3px!important;
-}
-.power::before{height:4px!important;border-radius:4px 4px 0 0!important}
-.power:nth-child(1){background:#fff5f8!important}.power:nth-child(2){background:#f8f5ff!important}.power:nth-child(3){background:#f2faff!important}.power:nth-child(4){background:#f5fbf6!important}.power:nth-child(5){background:#fffaf0!important}
-.power span{font-size:18px!important}.power b{font-size:11px!important}.power small{font-size:9px!important;color:#a0868f!important}
-.power:hover{transform:translateY(-2px)!important}.power.used{border-color:#e7aabd!important;box-shadow:inset 0 0 0 2px #fff!important}
-
-.quest{padding:22px!important;background:#fffaf5!important;box-shadow:0 7px 0 #f1e5d5!important;border-color:#eadbc9!important}
-.quest::before{border-color:rgba(210,176,130,.23)!important}.quest::after{content:"♡"!important;color:#e3adbb!important}
-.quest h3{font-size:20px!important;font-weight:800!important;letter-spacing:-.02em!important;margin:0!important}.quest>p:not(.kicker){font-size:12px!important;color:#a1848d!important;margin:8px 0 16px!important}
-.achlist{gap:7px!important}.ach{min-height:56px!important;padding:8px 10px!important;border:1px dashed #ead8dd!important;border-radius:13px!important;background:#fffdf9!important;box-shadow:none!important;transform:none!important}
-.ach>span{width:30px!important;height:30px!important;border-radius:50%!important;background:#f0dde3!important;color:#a88792!important;box-shadow:none!important}
-.ach b{font-size:11px!important}.ach small{font-size:9px!important;color:#a68b94!important}.ach.lock{opacity:.62!important}.ach.on{background:#fff2f6!important;border-color:#e8b8c7!important;transform:none!important}.ach.on>span{background:#f2abc0!important;color:#fff!important}
-
-/* pose section feels like a little photo/card page */
-.posegame{gap:18px!important}.posevis{min-height:500px!important;border:1px solid #ead7df!important;border-radius:24px!important;background:#fffaf6!important;box-shadow:0 7px 0 #f3e7db!important;overflow:hidden!important}
-.posevis::before,.posevis::after{border:1px dashed rgba(216,157,178,.22)!important}
-.posevis img{max-height:455px!important;filter:drop-shadow(0 13px 18px rgba(103,70,82,.10))!important}.readout{border:1px solid #ead6de!important;border-radius:12px!important;background:#fffdf9!important;box-shadow:none!important;font-size:9px!important}
-.console{padding:21px!important;background:#faf7ff!important;border-color:#ded5ef!important;box-shadow:0 7px 0 #eee9f7!important}.console::before{border-color:rgba(184,161,217,.22)!important}.conhead{margin-bottom:14px!important}.posegrid{gap:7px!important}.posegrid button{min-height:70px!important;border:1px solid #dfd4eb!important;border-radius:15px!important;background:#fff!important;box-shadow:none!important;color:#7a6684!important}.posegrid button.used{background:#f0eafa!important;border-color:#cdbbe7!important}.note{font-size:10px!important;color:#9c879f!important}
-
-/* how it works: small pastel memo cards, not a tech SaaS diagram */
-.pipe{padding:24px!important;background:#fffdf8!important;border-color:#e8dcc7!important;box-shadow:0 7px 0 #f2e8d6!important}.pipe::before{border-color:rgba(213,179,127,.20)!important}.track{gap:7px!important}.node{min-height:116px!important;border:1px solid #ead8dc!important;border-radius:14px!important;background:#fffaf8!important;box-shadow:none!important;padding:13px!important}.node:nth-of-type(2){background:#faf7ff!important;border-color:#ddd3ed!important}.node:nth-of-type(3){background:#f5fbff!important;border-color:#d3e7ee!important}.node:nth-of-type(4){background:#f5fbf6!important;border-color:#d4e7d9!important}.node em{font-size:9px!important;color:#b88999!important}.node b{font-size:12px!important}.node small{font-size:9px!important;color:#a58a92!important}.node.current{box-shadow:inset 0 0 0 2px #fff!important;border-color:#e8a9bc!important}.node.done{background:#f5fbf6!important}.arrow{font-size:15px!important;color:#c5a6b1!important}.terminal{margin-top:13px!important;min-height:42px!important;border:1px dashed #e4ccd5!important;border-radius:12px!important;background:#fffaf6!important;color:#8c707a!important;box-shadow:none!important;font-size:10px!important}.terminal b{color:#df91aa!important}
-.features{gap:10px!important;margin-top:14px!important}.features article{min-height:160px!important;padding:18px!important;border:1px solid #eadce1!important;border-top-width:4px!important;border-radius:16px!important;background:#fffdf9!important;box-shadow:none!important}.features h3{margin:15px 0 6px!important;font-size:16px!important}.features p{font-size:11px!important;line-height:1.65!important;color:#9b818a!important}.features article::after{font-size:18px!important}
-
-/* live demo = simple mint/ramune toy box */
-.live{background:#fbfeff!important;border-color:#d3e6ec!important;box-shadow:0 7px 0 #e8f1f3!important}.live::before{border-color:rgba(145,193,210,.22)!important}.livebar{background:#eff9fc!important;border-bottom-color:#cee2e9!important}.gate{min-height:455px!important;background:#fbfeff!important}.gateicon{width:52px!important;height:52px!important;border-radius:50%!important;background:#b8dfe9!important;box-shadow:inset 0 0 0 3px #fff!important;color:#fff!important}.gate h3{font-size:24px!important;color:#65777f!important}.gate h3::after{content:""!important}.gate p{font-size:12px!important;color:#84979d!important}.gate .primary{background:#dff3f6!important;border-color:#b9dae1!important;color:#617f87!important}
-
-/* end like a cute note, not a product launch finale */
-.finale{padding:70px 0 100px!important}.finalcard{padding:clamp(28px,5vw,54px)!important;border:1px solid #eccbd6!important;border-radius:24px!important;background:#fff8fa!important;box-shadow:0 7px 0 #f4e1e8!important;outline:none!important}.finalcard::before{content:"♡  thank you for playing  ♡"!important;text-transform:lowercase!important;font-size:9px!important;letter-spacing:.14em!important;color:#c48b9e!important}.finalcard::after{content:"✿"!important;right:5%!important;top:8%!important;font-size:28px!important;color:#efbdcc!important}.finalcard>p:not(.kicker){font-size:13px!important;color:#967b84!important}.clone{margin-top:24px!important;border:1px dashed #dbc9cf!important;border-radius:13px!important;background:#6d565e!important;box-shadow:none!important}.clone button{background:#fffaf5!important;border:0!important}.finalactions{margin-top:18px!important}.finalactions .primary{background:#ffdce7!important}.finalactions .secondary{background:#f5f1fb!important}
-
-.toast{border:1px solid #ead6de!important;border-radius:14px!important;background:#fffdf9!important;box-shadow:0 8px 22px rgba(103,70,82,.10)!important}.toast i{border-radius:50%!important;background:#efabc0!important}.toast em{color:#bf8096!important}
-
-@media(max-width:980px){.quest{order:0!important}.arcade{grid-template-columns:1fr!important}.quest{max-width:none!important}.play-head{padding-inline:8px!important}}
-@media(max-width:720px){.hudmid{display:none!important}.playground-first{padding-top:22px!important}.section{padding:58px 0!important}.play-head h2,.head h2,.finalcard h2{font-size:32px!important}.demozone{min-height:390px!important}.posevis{min-height:410px!important}.powers{grid-template-columns:repeat(2,1fr)!important}.power:last-child{grid-column:1/-1!important}.features{grid-template-columns:1fr!important}}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#fcf8f3">
+  <meta name="description" content="1枚のイラストから、動くキャラクターへ。ChibiRigKitはAIによる2Dリグ制作と、カメラ・音声追従、モーション録画をひとつにしたオープンソースツールです。">
+  <meta property="og:title" content="ChibiRigKit — その一枚に、小さな息づかいを。">
+  <meta property="og:description" content="イラストからつくる。ブラウザで動かす。表情も、声も、あなたらしく。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://milkc0de.github.io/ChibiRigKit/">
+  <meta property="og:image" content="https://milkc0de.github.io/ChibiRigKit/ogp.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="ChibiRigKit — その一枚に、小さな息づかいを。">
+  <meta name="twitter:image" content="https://milkc0de.github.io/ChibiRigKit/ogp.png">
+  <link rel="canonical" href="https://milkc0de.github.io/ChibiRigKit/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='20' fill='%23f4d4d1'/%3E%3Ctext x='32' y='47' text-anchor='middle' font-size='47' fill='%2384514e'%3E✿%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="site/style.css">
+  <script src="site/home.js" defer></script>
+  <title>ChibiRigKit — その一枚に、小さな息づかいを。</title>
 </head>
 <body>
-<canvas id="spark" aria-hidden="true"></canvas>
-<header class="hud"><a class="brand" id="logo" href="#top"><span class="mark">✦</span>ChibiRigKit</a><div class="hudmid"><span class="pill">PLAY <b id="stage">00</b>/04</span><span class="pill">♡ <b id="xp">000</b></span></div><div class="hudright"><button class="ui" id="sound" type="button">♪ OFF</button><a class="ui" href="https://github.com/milkc0de/ChibiRigKit" target="_blank" rel="noreferrer">GitHub</a></div></header>
-<main id="top">
-<section class="wrap section playground-first" id="s1" data-stage="1"><div class="head play-head"><p class="kicker">CHIBIRIGKIT PLAYROOM</p><h2>Let's play with motion ♡</h2><p>Tap a button and see how a little movement changes the character.</p><div class="actions intro-actions"><a class="primary" href="#live">Try the real rig</a><a class="secondary" href="https://github.com/milkc0de/ChibiRigKit" target="_blank">GitHub</a></div><div class="stats intro-stats"><span>1 image</span><span>9 poses</span><span>browser edit</span><span>MIT</span></div></div><div class="arcade"><div class="panel arcadescreen"><div class="screenbar"><span>MOTION PLAYGROUND</span><span id="moveCount">0 / 5 tried</span></div><div class="demozone" id="demo"><img src="./template/workspace/demo.gif" alt="ChibiRigKit motion arcade demo"><span class="motionlabel" id="motionLabel">IDLE</span></div><div class="powers"><button class="power" data-power="blink" data-label="BLINK"><span>◉</span><b>Blink</b><small>Expression</small></button><button class="power" data-power="look" data-label="EYE TRACK"><span>↔</span><b>Eye Track</b><small>Gaze</small></button><button class="power" data-power="tilt" data-label="HEAD TILT"><span>◇</span><b>Head Tilt</b><small>Roll</small></button><button class="power" data-power="sway" data-label="HAIR SWAY"><span>〰</span><b>Hair Sway</b><small>Secondary</small></button><button class="power" data-power="boost" data-label="MOTION BOOST"><span>✦</span><b>Motion Boost</b><small>Intensity</small></button></div></div><aside class="panel quest"><p class="kicker">TRY THESE</p><h3>Try them all ♡</h3><p>Five little motions to play with.</p><div class="achlist"><div class="ach lock" data-ach="first"><span>01</span><div><b>Hello, Motion</b><small>Try any move</small></div></div><div class="ach lock" data-ach="master"><span>02</span><div><b>All Tried ♡</b><small>Try all five</small></div></div><div class="ach lock" data-ach="poses"><span>03</span><div><b>Look Around</b><small>Try all 9 poses</small></div></div><div class="ach lock" data-ach="pipe"><span>04</span><div><b>How It Works</b><small>See the 4 steps</small></div></div><div class="ach lock" data-ach="rig"><span>05</span><div><b>Live Rig</b><small>Open the real editor</small></div></div></div></aside></div></section>
-<section class="wrap section" id="s2" data-stage="2"><div class="head center"><p class="kicker">LOOK AROUND</p><h2>Which way should she look? ♡</h2><p>Nine editable 2D poses blend together to make the head feel gently dimensional.</p></div><div class="posegame"><div class="posevis"><img id="poseTarget" src="./template/workspace/demo.gif" alt="Character demo for nine-direction pose challenge"><div class="readout"><span>POSE</span><b id="poseName">CENTER</b></div></div><div class="panel console"><div class="conhead"><div><p class="kicker" style="margin-bottom:5px">9 POSES</p><b id="poseCount">0 / 9 tried</b></div><span style="color:#5b967f;font-size:11px;font-weight:900">♡ ready</span></div><div class="posegrid"><button data-pose="TOP LEFT" data-x="-1" data-y="-1">↖</button><button data-pose="TOP" data-x="0" data-y="-1">↑</button><button data-pose="TOP RIGHT" data-x="1" data-y="-1">↗</button><button data-pose="LEFT" data-x="-1" data-y="0">←</button><button data-pose="CENTER" data-x="0" data-y="0">●</button><button data-pose="RIGHT" data-x="1" data-y="0">→</button><button data-pose="BOTTOM LEFT" data-x="-1" data-y="1">↙</button><button data-pose="BOTTOM" data-x="0" data-y="1">↓</button><button data-pose="BOTTOM RIGHT" data-x="1" data-y="1">↘</button></div><p class="note">A tiny preview for the website. The real editable rig is just below.</p></div></div></section>
-<section class="wrap section" id="s3" data-stage="3"><div class="head"><p class="kicker">HOW IT WORKS</p><h2>From one image to a moving character.</h2><p>Four small steps. AI helps with the setup, then the finished rig runs in your browser.</p></div><div class="panel pipe"><div class="track"><button class="node current" data-step="1"><em>01</em><b>One Image</b><small>your illustration</small></button><span class="arrow">→</span><button class="node" data-step="2"><em>02</em><b>AI Assist</b><small>parts + poses</small></button><span class="arrow">→</span><button class="node" data-step="3"><em>03</em><b>Editable Rig</b><small>editable data</small></button><span class="arrow">→</span><button class="node" data-step="4"><em>04</em><b>Browser Runtime</b><small>runs by itself</small></button></div><div class="terminal"><b>&gt;_</b><span id="term">Tap 01 to start ♡</span></div></div><div class="features"><article><span class="kicker">01</span><h3>AI for the setup</h3><p>Codex helps with the fiddly preparation work, so you can spend more time on the look and feel.</p></article><article><span class="kicker">02</span><h3>Still yours to edit</h3><p>Motion, poses, background, and project data stay editable after generation.</p></article><article><span class="kicker">03</span><h3>Simple browser runtime</h3><p>Once it is made, the character can keep moving without an AI connection.</p></article></div></section>
-<section class="wrap section" id="live" data-stage="4"><div class="head center"><p class="kicker">LIVE DEMO</p><h2>Try the real rig ♡</h2><p>This opens the actual generated ChibiRigKit editor from the repository.</p></div><div class="panel live"><div class="livebar"><div><span class="dot"></span><b>characters/milkc0de/index.html</b></div><div><button class="ui" id="load" type="button">OPEN RIG</button><a class="ui" href="./characters/milkc0de/index.html" target="_blank">NEW TAB ↗</a></div></div><div class="gate" id="gate"><div class="gateinner"><div class="gateicon">✦</div><h3>The full editor is about 10 MB.</h3><p>Open it when you're ready to play with all the controls.</p><button class="primary" id="loadBig" type="button">OPEN THE RIG ♡</button></div></div><iframe id="frame" title="Live ChibiRigKit browser rig" data-src="./characters/milkc0de/index.html" hidden></iframe></div></section>
-<section class="wrap finale"><div class="finalcard"><p class="kicker">MAKE YOUR OWN</p><h2>One image, a little motion, lots of charm ♡</h2><p>ChibiRigKit is open source under the MIT License. Make it yours and have fun with it.</p><div class="clone"><code>git clone https://github.com/milkc0de/ChibiRigKit.git</code><button id="copy" type="button">COPY</button></div><div class="actions finalactions"><a class="primary" href="https://github.com/milkc0de/ChibiRigKit" target="_blank">SEE THE CODE ON GITHUB ↗</a><button class="secondary" id="victory" type="button">♡ NICE!</button></div><p style="font-size:13px">Created by <a href="https://github.com/milkc0de" target="_blank">milkc0de</a></p></div></section>
-</main><div class="toastbox" id="toasts" aria-live="polite"></div>
-<script>
-(()=>{'use strict';const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)],reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;const S={xp:0,stage:0,sound:false,ach:new Set,powers:new Set,poses:new Set,step:1,secret:0,rig:false};const xp=$('#xp'),stage=$('#stage'),toasts=$('#toasts'),pad=(n,l=3)=>String(n).padStart(l,'0');function hud(){xp.textContent=pad(S.xp);stage.textContent=pad(S.stage,2)}function beep(f=520,d=.05){if(!S.sound)return;try{const A=window.AudioContext||window.webkitAudioContext;if(!A)return;const c=new A,o=c.createOscillator(),g=c.createGain();o.frequency.value=f;g.gain.setValueAtTime(.0001,c.currentTime);g.gain.exponentialRampToValueAtTime(.05,c.currentTime+.008);g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+d);o.connect(g).connect(c.destination);o.start();o.stop(c.currentTime+d+.02);o.addEventListener('ended',()=>c.close(),{once:true})}catch(e){}}function toast(t,s,x=0){const e=document.createElement('div');e.className='toast';e.innerHTML=`<i>✦</i><div><b>${t}</b><small>${s}</small></div><em>${x?`+${x} ♡`:''}</em>`;toasts.append(e);setTimeout(()=>{e.style.opacity=0;e.style.transform='translateY(8px)';setTimeout(()=>e.remove(),220)},2700)}function award(id,t,x,s='Nice ♡'){if(S.ach.has(id))return;S.ach.add(id);S.xp+=x;hud();const r=$(`[data-ach="${id}"]`);if(r){r.classList.remove('lock');r.classList.add('on')}toast(t,s,x);beep(760,.09)}function setStage(n){if(n<=S.stage)return;S.stage=Math.min(4,n);hud();toast(`Page ${pad(S.stage,2)}`,'ready ♡');beep(620,.06)}if('IntersectionObserver'in window){const o=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){const n=+e.target.dataset.stage||0;if(n)setStage(n)}}),{threshold:.35});$$('[data-stage]').forEach(e=>o.observe(e))}$('#sound').onclick=e=>{S.sound=!S.sound;e.currentTarget.textContent=S.sound?'♪ ON':'♪ OFF';if(S.sound){beep(680,.06);toast('Sound on ♡','tiny beeps enabled')}};const card=$('#heroCard');if(card&&!reduced){card.onpointermove=e=>{const r=card.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;card.style.transform=`rotateY(${x*7}deg) rotateX(${y*-7}deg) translateY(-3px)`};card.onpointerleave=()=>card.style.transform=''}const demo=$('#demo'),label=$('#motionLabel'),mc=$('#moveCount'),fx={blink:'fx-blink',look:'fx-look',tilt:'fx-tilt',sway:'fx-sway',boost:'fx-boost'};$$('.power').forEach(b=>b.onclick=()=>{const p=b.dataset.power;Object.values(fx).forEach(c=>demo.classList.remove(c));void demo.offsetWidth;demo.classList.add(fx[p]);label.textContent=b.dataset.label;S.powers.add(p);b.classList.add('used');mc.textContent=`${S.powers.size} / 5 tried`;if(S.powers.size===1)award('first','Hello, Motion',20,'Your first little motion ♡');if(S.powers.size===5){award('master','All Tried ♡',80,'All five moves discovered');confetti(30)}else beep(420+S.powers.size*45,.04)});const pt=$('#poseTarget'),pn=$('#poseName'),pc=$('#poseCount');$$('.posegrid button').forEach(b=>b.onclick=()=>{const x=+b.dataset.x,y=+b.dataset.y,k=`${x},${y}`;S.poses.add(k);b.classList.add('used');pn.textContent=b.dataset.pose;pc.textContent=`${S.poses.size} / 9 tried`;pt.style.transform=`translate(${x*15}px,${y*10}px) rotate(${x*3.5}deg)`;if(S.poses.size===9){award('poses','All 9 poses ♡',120,'She looked everywhere');confetti(42)}else beep(510+S.poses.size*18,.04)});const term=$('#term'),msgs={1:'One image is ready ♡',2:'AI helps prepare the parts and poses.',3:'The editable rig is ready.',4:'Done ♡ The finished rig runs in the browser.'};function pipeUI(){$$('.node').forEach(n=>{const v=+n.dataset.step;n.classList.toggle('done',v<S.step);n.classList.toggle('current',v===S.step)})}$$('.node').forEach(n=>n.onclick=()=>{const v=+n.dataset.step;if(v!==S.step){term.textContent=`Try them in order ♡  Next: ${pad(Math.min(S.step,4),2)} next.`;beep(210,.08);return}n.classList.add('done');term.textContent=msgs[v];S.xp+=15;hud();beep(460+v*80,.05);if(v===4){S.step=5;$$('.node').forEach(x=>x.classList.remove('current'));award('pipe','How It Works',100,'Pipeline complete');confetti(34)}else{S.step++;pipeUI()}});pipeUI();const frame=$('#frame'),gate=$('#gate');function loadRig(){if(S.rig)return;S.rig=true;frame.src=frame.dataset.src;frame.hidden=false;gate.hidden=true;award('rig','Live Rig',150,'The real editor is loading');confetti(44);setTimeout(()=>frame.scrollIntoView({behavior:reduced?'auto':'smooth',block:'start'}),120)}$('#load').onclick=loadRig;$('#loadBig').onclick=loadRig;$('#copy').onclick=async e=>{const t='git clone https://github.com/milkc0de/ChibiRigKit.git';let ok=false;try{await navigator.clipboard.writeText(t);ok=true}catch(x){}if(!ok){const a=document.createElement('textarea');a.value=t;a.style.position='fixed';a.style.opacity=0;document.body.append(a);a.select();try{ok=document.execCommand('copy')}catch(x){}a.remove()}e.currentTarget.textContent=ok?'COPIED!':'SELECT';if(ok){S.xp+=10;hud();toast('Clone command copied','Ready for your terminal',10)}setTimeout(()=>e.currentTarget.textContent='COPY',1600)};$('#victory').onclick=()=>{award('victory','Lovely ♡',200,'Thanks for playing');confetti(90)};$('#logo').onclick=e=>{S.secret++;if(S.secret>=7){e.preventDefault();if(!document.body.classList.contains('secret')){document.body.classList.add('secret');award('secret','Secret ribbon mode ♡',77,'A tiny secret appeared');confetti(70)}}};const colors=['#ff78ad','#ae91f4','#8fd5bd','#ffd27d','#fff'];function confetti(n=36){if(reduced)return;for(let i=0;i<Math.min(n,120);i++){const q=document.createElement('i');q.className='confetti';q.style.left=`${8+Math.random()*84}%`;q.style.top=`${-5-Math.random()*10}%`;q.style.background=colors[i%colors.length];q.style.setProperty('--dx',`${(Math.random()-.5)*360}px`);q.style.setProperty('--rot',`${(Math.random()-.5)*960}deg`);q.style.animationDelay=`${Math.random()*.18}s`;document.body.append(q);setTimeout(()=>q.remove(),1800)}}const c=$('#spark');if(c&&!reduced){const x=c.getContext('2d');let ps=[],raf=0,dpr=1;function resize(){const w=innerWidth,h=innerHeight;dpr=Math.min(devicePixelRatio||1,2);c.width=w*dpr;c.height=h*dpr;c.style.width=w+'px';c.style.height=h+'px';x.setTransform(dpr,0,0,dpr,0,0);ps=Array.from({length:Math.min(58,Math.max(22,Math.floor(w/25)))},()=>({x:Math.random()*w,y:Math.random()*h,r:.6+Math.random()*1.7,v:.08+Math.random()*.24,d:(Math.random()-.5)*.12,a:.16+Math.random()*.36}))}function draw(){x.clearRect(0,0,innerWidth,innerHeight);ps.forEach(p=>{p.y-=p.v;p.x+=p.d;if(p.y<-8){p.y=innerHeight+8;p.x=Math.random()*innerWidth}if(p.x<-8)p.x=innerWidth+8;if(p.x>innerWidth+8)p.x=-8;x.beginPath();x.arc(p.x,p.y,p.r,0,Math.PI*2);x.fillStyle=`rgba(190,117,160,${p.a})`;x.fill()});raf=requestAnimationFrame(draw)}resize();draw();addEventListener('resize',resize,{passive:true});addEventListener('pagehide',()=>cancelAnimationFrame(raf),{once:true})}hud()})();
-</script>
+  <a class="skip" href="#main">本文へ移動</a>
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="ChibiRigKit ホーム"><span class="brand-mark" aria-hidden="true">✿</span>Chibi<span>Rig</span>Kit<span class="brand-dot">.</span></a>
+    <nav aria-label="メインナビゲーション"><a href="#features">できること</a><a href="#start">はじめかた</a><a class="github-link" href="https://github.com/milkc0de/ChibiRigKit">GitHub <span aria-hidden="true">↗</span></a></nav>
+  </header>
+  <main id="main">
+    <section class="hero shell" id="top" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="tiny-flower" aria-hidden="true">✦</span> A LITTLE MOTION, A LOT OF CHARACTER.</p>
+        <h1 id="hero-title">その一枚に、<br>小さな<span class="petal-word">息づかい</span>を。</h1>
+        <p class="hero-description">お気に入りのイラストが、まばたきして、<br class="desktop-break">首をかしげて、あなたの声で話しはじめる。<br>つくるところから動かすところまで、ChibiRigKitで。</p>
+        <p class="offline-note"><strong>完成品はインターネット接続不要。</strong><br>ダウンロードしたHTMLで、再生・調整・動画保存までオフラインで使えます。<br><small>初回セットアップとCodexによる制作には接続が必要です。カメラ・マイクは追跡モデルを準備済みなら、ローカル起動でオフライン利用できます。</small></p>
+        <div class="actions"><a class="button primary" href="#start">自分のキャラで、はじめる <span aria-hidden="true">↗</span></a><a class="text-link" href="#features">できることを見る <span aria-hidden="true">↓</span></a></div>
+        <div class="hero-meta"><span>OPEN SOURCE</span><i aria-hidden="true"></i><span>MIT LICENSE</span><i aria-hidden="true"></i><span>MADE WITH ♡</span></div>
+      </div>
+      <figure class="hero-visual" id="demo">
+        <div class="visual-note"><span aria-hidden="true">✧</span> a little hello!</div>
+        <div class="demo-card">
+          <div class="demo-bar"><span><span class="status-dot" aria-hidden="true"></span> CHARACTER PREVIEW</span><span>01</span></div>
+          <div class="demo-image"><img id="character-demo" src="template/workspace/demo.gif" width="576" height="683" alt="ChibiRigKitで制作した、髪や体がゆっくり動くキャラクターのサンプル" fetchpriority="high"></div>
+          <figcaption><span>milkc0de <span class="caption-muted">/ サンプルアニメーション</span></span><button id="motion-toggle" type="button" hidden aria-pressed="false">Ⅱ 動きを止める</button></figcaption>
+        </div>
+        <div class="visual-sticker"><span aria-hidden="true">♡</span> illustration → motion</div>
+      </figure>
+    </section>
+    <div class="ribbon"><div class="shell"><span>1枚のイラスト</span><b aria-hidden="true">✳</b><span>9方向の表情</span><b aria-hidden="true">✳</b><span>カメラと音声で追従</span><b aria-hidden="true">✳</b><span>ブラウザで録画・保存</span></div></div>
+    <section class="section shell" id="features" aria-labelledby="features-title">
+      <div class="section-heading"><div><p class="eyebrow">LITTLE DETAILS, FULL OF LIFE</p><h2 id="features-title">かわいさは、<br>小さな動きの積み重ね。</h2></div><p>絵の魅力を残したまま、動きを足していく。<br>つくった後も、自分の手で細かく調整できます。</p></div>
+      <div class="feature-grid">
+        <article class="feature"><span class="feature-number">01 / CREATE</span><div class="feature-art pose-art" aria-hidden="true"><span>↖</span><span>↑</span><span>↗</span><span>←</span><span class="pose-center">✿</span><span>→</span><span>↙</span><span>↓</span><span>↘</span></div><h3>どの向きも、その子らしく。</h3><p>正面と8方向の配置をブレンド。輪郭、目と口の位置、見かけの大きさまで、絵に合わせて整えます。長い髪には自然な揺れも。</p><span class="feature-detail">9 directions · editable mesh</span></article>
+        <article class="feature mint"><span class="feature-number">02 / PERFORM</span><div class="feature-art sound-art" aria-hidden="true"><span class="face-icon">◡</span><div class="wave"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div><h3>表情も、声も、動きになる。</h3><p>カメラで顔の向きや表情を、マイクで口パクを。目・口・頭の追従を選んで、モーションファイルの動きと組み合わせられます。</p><span class="feature-detail">camera + voice · local processing</span></article>
+        <article class="feature lavender"><span class="feature-number">03 / KEEP</span><div class="feature-art save-art" aria-hidden="true"><div class="file-card"><span>✦</span><b>your motion</b><small>.chibimotion.json</small></div><span class="save-seal">✓</span></div><h3>お気に入りの動きを、何度でも。</h3><p>動きを録画して、保存・再生。首の3軸は倍率を個別に調整できます。WebM動画や、画像を内蔵したHTML・ZIPで持ち出すことも。</p><span class="feature-detail">motion · WebM · HTML / ZIP</span></article>
+      </div>
+    </section>
+    <section class="privacy shell" aria-labelledby="privacy-title"><div class="privacy-icon" aria-hidden="true">⌁</div><div><p class="eyebrow">YOUR CHARACTER, YOUR SPACE</p><h2 id="privacy-title">完成品を動かすときは、オフラインで。</h2><p>顔の追跡と音声の解析はローカル処理。カメラ・マイクは開始ボタンを押したときだけ使います。<br>モーションファイルに残るのは動きの数値。生映像や生音声は保存しません。</p></div><span class="local-badge"><span class="status-dot" aria-hidden="true"></span>LOCAL FIRST</span></section>
+    <section class="section shell start-section" id="start" aria-labelledby="start-title">
+      <div class="section-heading"><div><p class="eyebrow">LET'S MAKE SOMETHING MOVE</p><h2 id="start-title">まずは、動かしてみよう。</h2></div><p>制作にはCodex。再生と調整はブラウザで。<br>サンプルの再生から、気軽に始められます。</p></div>
+      <div class="start-grid"><div class="steps">
+        <article><span class="step-number">01</span><div><h3>プロジェクトを手元に。</h3><p>GitHubからダウンロード、またはgit clone。サンプル再生にはNode.js 22以上を用意します。</p></div></article>
+        <article><span class="step-number">02</span><div><h3>サンプルをブラウザで開く。</h3><p>初回のセットアップ後、<code>npm run player</code>。ターミナルに表示されたURLを開けば準備完了です。</p></div></article>
+        <article><span class="step-number">03</span><div><h3>次は、自分のイラストで。</h3><p>PythonとCodexを準備して、画像からリグを制作。別のキャラは<code>--character</code>で指定して開きます。</p><a class="text-link" href="https://github.com/milkc0de/ChibiRigKit#start">画像からつくるガイド <span aria-hidden="true">↗</span></a></div></article>
+      </div><div class="terminal-card"><div class="terminal-bar"><span class="terminal-dots" aria-hidden="true">● ● ●</span><span>QUICK START</span><button id="copy-commands" type="button" hidden>コピー</button></div><pre><code id="commands">git clone https://github.com/milkc0de/ChibiRigKit.git
+cd ChibiRigKit
+npm run player:setup
+npm run player</code></pre><p><span aria-hidden="true">✦</span> カメラ・マイクは、開いただけでは起動しません。</p><div id="copy-status" class="sr-only" role="status"></div></div></div>
+      <div class="requirements"><span>macOS / Windows / Linux</span><span>サンプル再生：Node.js 22+</span><span>リグ制作：Python 3.12+ / Codex</span></div>
+    </section>
+    <section class="closing shell"><div><p class="eyebrow">MADE TO BE YOURS</p><h2>あなたの絵に、<br>あなたらしい動きを。</h2><p>完成品の再生・調整・動画保存はオフラインで。初回セットアップとAIによる制作にはインターネット接続が必要です。</p><a class="button primary" href="https://github.com/milkc0de/ChibiRigKit">GitHubでプロジェクトを見る <span aria-hidden="true">↗</span></a></div><img src="ogp.png" alt="花とリボンに囲まれたChibiRigKitのキャラクターイラスト" width="1200" height="630" loading="lazy"></section>
+  </main>
+  <footer class="shell"><a class="brand" href="#top">ChibiRigKit<span class="brand-dot">.</span></a><p>Created with ♡ by <a href="https://github.com/milkc0de">milkc0de</a></p><div><a href="https://github.com/milkc0de/ChibiRigKit/blob/main/LICENSE">MIT License</a></div></footer>
 </body>
 </html>

@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: MIT
 import {spawn} from 'node:child_process';
 import readline from 'node:readline';
+import path from 'node:path';
+import fs from 'node:fs';
 
 export function appServerLaunch(codexBin,platform=process.platform){
   if(platform!=='win32')return {command:codexBin,args:['app-server'],options:{}};
@@ -10,18 +12,36 @@ export function appServerLaunch(codexBin,platform=process.platform){
   return {command:process.env.ComSpec||'cmd.exe',args:['/d','/s','/c',`""${codexBin}" app-server"`],options:{windowsVerbatimArguments:true}};
 }
 
+// Only loopback may use plaintext transport. Never put credentials in the URL.
+export function validateAppServerURL(value){
+  const url=new URL(value);
+  if(!['ws:','wss:'].includes(url.protocol)||url.username||url.password)throw Error('Use ws/wss without URL credentials');
+  if(url.protocol==='ws:'&&!['localhost','127.0.0.1','[::1]'].includes(url.hostname))throw Error('Remote Codex app-server requires wss://');
+  return url.href;
+}
+// Routine edits and local checks already run inside workspace-write. Approval
+// requests expand that boundary; they must never silently escape the sandbox.
+export function approvalResponse(method){
+  if(method==='item/permissions/requestApproval')return {permissions:{},scope:'turn'};
+  if(['item/commandExecution/requestApproval','item/fileChange/requestApproval'].includes(method))return {decision:'decline'};
+  if(method==='mcpServer/elicitation/request')return {action:'decline',content:null};
+  return null;
+}
+
 export class CodexAppServer {
   constructor({url=null,codexBin='codex',cwd=process.cwd()}={}){this.url=url;this.codexBin=codexBin;this.cwd=cwd;this.nextId=1;this.pending=new Map();this.listeners=[];this.messages=[];this.transportError=null;}
   async connect(){
     if(this.url){
+      const url=validateAppServerURL(this.url);
       const {default:WebSocket}=await import('ws');
-      await new Promise((resolve,reject)=>{const token=process.env.CODEX_APP_SERVER_TOKEN;this.ws=new WebSocket(this.url,token?{headers:{Authorization:`Bearer ${token}`}}:undefined);this.ws.once('open',resolve);this.ws.once('error',reject);this.ws.on('message',d=>this.#handle(String(d)));});
+      await new Promise((resolve,reject)=>{const token=process.env.CODEX_APP_SERVER_TOKEN;this.ws=new WebSocket(url,token?{headers:{Authorization:`Bearer ${token}`}}:undefined);this.ws.once('open',resolve);this.ws.once('error',reject);this.ws.on('message',d=>this.#handle(String(d)));});
       this.sendRaw=o=>this.ws.send(JSON.stringify(o));
       this.ws.on('close',()=>this.failTransport(new Error('Codex app-server connection closed')));
       this.ws.on('error',e=>this.failTransport(e));
     }else{
-      const launch=appServerLaunch(this.codexBin);
-      this.proc=spawn(launch.command,launch.args,{cwd:this.cwd,stdio:['pipe','pipe','inherit'],...launch.options});
+      const launch=appServerLaunch(this.codexBin),temp=path.join(this.cwd,'work/agent-tmp');
+      fs.mkdirSync(temp,{recursive:true});
+      this.proc=spawn(launch.command,launch.args,{cwd:this.cwd,stdio:['pipe','pipe','inherit'],env:{...process.env,TMPDIR:temp,TMP:temp,TEMP:temp,CHIBIRIG_DIST_ROOT:path.join(this.cwd,'work/agent-output')},...launch.options});
       await new Promise((resolve,reject)=>{this.proc.once('spawn',resolve);this.proc.once('error',reject);});
       const rl=readline.createInterface({input:this.proc.stdout});rl.on('line',line=>this.#handle(line));
       this.sendRaw=o=>this.proc.stdin.write(JSON.stringify(o)+'\n');
@@ -36,8 +56,8 @@ export class CodexAppServer {
     this.messages.push(m);
     if(m.id!=null && !m.method){const p=this.pending.get(m.id);if(p){this.pending.delete(m.id);m.error?p.reject(new Error(`${m.error.code}: ${m.error.message}`)):p.resolve(m.result)}return}
     if(m.id!=null && m.method){
-      // Fully automatic within the sandbox. approvalPolicy=never should normally avoid these.
-      if(m.method.includes('requestApproval')){this.sendRaw({id:m.id,result:{decision:'acceptForSession'}});return}
+      const response=approvalResponse(m.method);
+      if(response){this.sendRaw({id:m.id,result:response});return}
       this.sendRaw({id:m.id,error:{code:-32601,message:`Unsupported server request: ${m.method}`}});return
     }
     for(const fn of this.listeners)fn(m);
@@ -66,7 +86,7 @@ export class CodexAppServer {
   async runTurn({threadId,model,effort='high',cwd,input,timeoutMs=0,progressIntervalMs=30_000,onStarted=()=>{},onProgress=()=>{},outputSchema=null,streamText=true}){
     if(!Number.isFinite(timeoutMs)||timeoutMs<0)throw new Error('timeoutMs must be nonnegative (0 = no deadline)');
     const startIndex=this.messages.length,started=Date.now();
-    const result=await this.request('turn/start',{threadId,input,cwd,approvalPolicy:'never',sandboxPolicy:{type:'workspaceWrite',writableRoots:[cwd],networkAccess:false},model,effort,summary:'concise',...(outputSchema?{outputSchema}:{})});
+    const result=await this.request('turn/start',{threadId,input,cwd,approvalPolicy:'never',sandboxPolicy:{type:'workspaceWrite',writableRoots:[cwd],networkAccess:false,excludeTmpdirEnvVar:true,excludeSlashTmp:true},model,effort,summary:'concise',...(outputSchema?{outputSchema}:{})});
     const turnId=result.turn.id;
     onStarted({threadId,turnId});
     let finalText='',lastActivity=started,lastEvent='turn/start',lastItem=null;

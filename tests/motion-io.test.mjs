@@ -66,7 +66,7 @@ test('60 second recordings and three neck axes are accepted with strict limits',
   const {PROJECT,validate}=fixture(),data=structuredClone(PROJECT);
   Object.assign(data.settings,{duration_seconds:60,neck_yaw_degrees:30,neck_pitch_degrees:20,neck_sway_degrees:15});
   assert.equal(validate(data).settings.duration_seconds,60);
-  for(const [key,limit] of [['duration_seconds',60],['neck_yaw_degrees',30],['neck_pitch_degrees',20]]){
+  for(const [key,limit] of [['duration_seconds',60],['neck_yaw_degrees',30],['neck_pitch_degrees',25]]){
     const bad=structuredClone(data);bad.settings[key]=limit+.1;assert.throws(()=>validate(bad));
   }
 });

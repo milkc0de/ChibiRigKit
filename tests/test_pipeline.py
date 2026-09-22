@@ -92,7 +92,7 @@ class PipelineTests(unittest.TestCase):
         (FIXTURE/'rig.plan.json').write_text(json.dumps(self.plan))
     def test_embedded_integrity(self):
         run('build_project.py');run('validate_character.py')
-        text=(FIXTURE/'index.html').read_text()
+        text=(FIXTURE/'work/player/index.html').read_text()
         self.assertIn('\\u003c/script>',text)
         self.assertIn('&lt;rig&gt;',text)
     def test_duplicate_and_missing_order(self):
@@ -112,7 +112,7 @@ class PipelineTests(unittest.TestCase):
             self.assertIn('Immutable',run('build_project.py',False).stderr)
         finally:path.write_bytes(original)
     def test_stale_embedded_data(self):
-        run('build_project.py');path=FIXTURE/'index.html';original=path.read_text()
+        run('build_project.py');path=FIXTURE/'work/player/index.html';original=path.read_text()
         try:
             path.write_text(original.replace('"version":2','"version":99'))
             self.assertIn('differs',run('validate_character.py',False).stderr)
@@ -124,7 +124,7 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(p['mouth_open']['mesh']['type'],'mouth_open_close')
     def test_runtime_syntax(self):
         run('build_project.py')
-        html=(FIXTURE/'index.html').read_text()
+        html=(FIXTURE/'work/player/index.html').read_text()
         code=html.split('<script>')[1].split('</script>')[0]
         script=ROOT/'work/runtime-syntax.cjs';script.write_text(code)
         result=subprocess.run(['node','--check',str(script)],capture_output=True,text=True)

@@ -5,18 +5,19 @@ function recordingProgress(elapsed,duration){return `録画中 ${Math.min(durati
 async function recordLoop(){
   if(recordingActive)return;
   const button=$('record'),status=$('recordStatus'),progress=$('recordProgress');
-  if(!canvas.captureStream||!window.MediaRecorder){status.textContent='このブラウザは録画に対応していません。Chromeで開いてください。';return}
+  if(!outputCanvas.captureStream||!window.MediaRecorder){status.textContent='このブラウザは録画に対応していません。Chromeで開いてください。';return}
   const duration=Number(controls.duration.value);
   if(!Number.isFinite(duration)||duration<1||duration>60){status.textContent='ループ秒数は1〜60秒で指定してください。';return}
-  const previous={time:running?(performance.now()-start)/1000:pausedAt,running},disabled=[];
+  const live=trackingState.active;
+  const previous={time:running?(performance.now()-start)/1000:pausedAt,running,captureOffset,capturePlaying,captureHold},disabled=[];
   let stream,recorder,timer,stopTimer,cancelled=false;
   recordingActive=true;
-  for(const element of document.querySelectorAll('aside input,aside button,aside select')){disabled.push([element,element.disabled]);element.disabled=true}
+  for(const element of document.querySelectorAll('aside input,aside button,aside select')){if(element.id==='cameraStop')continue;disabled.push([element,element.disabled]);element.disabled=true}
   $('recordCancel').hidden=false;$('recordCancel').disabled=false;
   progress.hidden=false;progress.max=duration;progress.value=0;button.textContent='録画中…';
   try{
-    start=performance.now();pausedAt=0;running=true;render(0);
-    stream=canvas.captureStream(60);
+    if(!live){captureOffset=0;captureHold=0;capturePlaying=!!captureMotion;start=performance.now();pausedAt=0;running=true;render(0)}else render(captureTime());
+    stream=outputCanvas.captureStream(30);
     const mime=['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'].find(x=>MediaRecorder.isTypeSupported(x));
     if(!mime)throw Error('WebM形式で録画できません');
     recorder=new MediaRecorder(stream,{mimeType:mime});const chunks=[];
@@ -29,14 +30,14 @@ async function recordLoop(){
     await done;
     if(cancelled){status.textContent='録画を中止しました（動画は保存していません）';return}
     const blob=new Blob(chunks,{type:mime});if(!blob.size)throw Error('録画データが空でした');
-    downloadBlob(blob,'rig_idle.webm');progress.value=duration;status.textContent=`録画完了 ${duration.toFixed(1)} / ${duration.toFixed(1)} 秒（WebMを保存）`;
+    downloadBlob(blob,'chibirig-output.webm');progress.value=duration;status.textContent=`録画完了 ${duration.toFixed(1)} / ${duration.toFixed(1)} 秒（WebMを保存）`;
   }catch(error){status.textContent=`録画できません：${error.message}`}
   finally{
     clearInterval(timer);clearTimeout(stopTimer);
     if(recorder&&recorder.state!=='inactive')recorder.stop();stream?.getTracks().forEach(track=>track.stop());
-    start=performance.now()-previous.time*1000;pausedAt=previous.time;running=previous.running;
+    if(!live){captureOffset=previous.captureOffset;capturePlaying=previous.capturePlaying;captureHold=previous.captureHold;start=performance.now()-previous.time*1000;pausedAt=previous.time;running=previous.running;}
     for(const [element,value] of disabled)element.disabled=value;
-    recordingActive=false;cancelRecording=null;$('recordCancel').hidden=true;button.textContent='WebM録画';render(previous.time);
+    recordingActive=false;if(typeof trackingUI==='function')trackingUI();cancelRecording=null;$('recordCancel').hidden=true;button.textContent='WebM録画';render(live?captureTime():previous.time);
   }
 }
 $('record').onclick=recordLoop;

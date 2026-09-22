@@ -82,3 +82,30 @@ test('Windows launch resolves npm cmd shims and quotes paths with spaces',()=>{
   assert.throws(()=>appServerLaunch('bad"name','win32'));
   assert.deepEqual(appServerLaunch('/usr/local/bin/codex','darwin').args,['app-server']);
 });
+
+test('permission expansion is refused while normal local work keeps workspace-write',async()=>{
+  const {approvalResponse}=await import('../scripts/codex-app-server.mjs');
+  assert.deepEqual(approvalResponse('item/commandExecution/requestApproval'),{decision:'decline'});
+  assert.deepEqual(approvalResponse('item/fileChange/requestApproval'),{decision:'decline'});
+  assert.deepEqual(approvalResponse('item/permissions/requestApproval'),{permissions:{},scope:'turn'});
+  assert.equal(approvalResponse('unknown/requestApproval'),null);
+  const f=fixture(),pending=f.server.runTurn(f.options);await Promise.resolve();
+  assert.deepEqual(f.requests[0].params.sandboxPolicy,{type:'workspaceWrite',writableRoots:[f.options.cwd],networkAccess:false,excludeTmpdirEnvVar:true,excludeSlashTmp:true});
+  f.emit('turn/completed',f.event({turn:{id:'turn-1',status:'completed'}}));await pending;
+});
+test('remote transport must be encrypted and URL credentials are refused',async()=>{
+  const {validateAppServerURL:check}=await import('../scripts/codex-app-server.mjs');
+  for(const host of ['localhost','127.0.0.1','[::1]'])assert.equal(check(`ws://${host}:4500`),`ws://${host}:4500/`);
+  assert.equal(check('wss://rig.example/path'),'wss://rig.example/path');
+  for(const url of ['ws://rig.example','ws://localhost.attacker.example','ws://192.168.1.2:4500','wss://user:password@rig.example','https://rig.example'])assert.throws(()=>check(url));
+});
+
+test('wire approval requests receive no session grant, including unrelated threads',async()=>{
+  const {WebSocketServer}=await import('ws');
+  const wss=new WebSocketServer({host:'127.0.0.1',port:0});await new Promise(r=>wss.once('listening',r));
+  const replies=[],server=new CodexAppServer({url:`ws://127.0.0.1:${wss.address().port}`});
+  let resolve;const done=new Promise(r=>resolve=r);
+  wss.on('connection',ws=>ws.on('message',b=>{const m=JSON.parse(b);if(m.method==='initialize')ws.send(JSON.stringify({id:m.id,result:{}}));if(m.method==='initialized')for(const [id,method] of [[900,'item/commandExecution/requestApproval'],[901,'item/permissions/requestApproval']])ws.send(JSON.stringify({id,method,params:{threadId:'unrelated',turnId:'unrelated',permissions:{network:{enabled:true}}}}));if(m.id>=900){replies.push(m);if(replies.length===2)resolve()}}));
+  try{await server.connect();await done;assert.deepEqual(replies.map(x=>x.result),[{decision:'decline'},{permissions:{},scope:'turn'}])}
+  finally{server.close();await new Promise(r=>wss.close(r))}
+});

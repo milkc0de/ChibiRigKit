@@ -12,5 +12,7 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Python ライブラリのインストールに失敗しました。' }
     & npm.cmd install
     if ($LASTEXITCODE -ne 0) { throw 'Node.js ライブラリのインストールに失敗しました。' }
+    & npm.cmd run setup:tracking
+    if ($LASTEXITCODE -ne 0) { throw '追跡モデルの準備に失敗しました。' }
     Write-Host 'セットアップ完了。次に .\AUTO_RIG.ps1 "画像のパス" を実行してください。'
 } finally { Pop-Location }

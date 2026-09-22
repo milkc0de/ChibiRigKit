@@ -7,8 +7,9 @@ Applies to the software code; character images retain their own rights.
 <html lang="ja">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; worker-src 'self' blob:; connect-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>__TITLE__</title>
+<title>__TITLE__ - ChibiRigKit</title>
 <style>
 :root{color-scheme:dark;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 *{box-sizing:border-box}body{margin:0;display:grid;grid-template-columns:minmax(420px,1fr) 390px;min-height:100vh;background:#151515;color:#f4f4f4}
@@ -18,26 +19,63 @@ aside{padding:18px;background:#0f0f0f;border-left:1px solid #292929;overflow:aut
 body{height:100vh;overflow:hidden}main,aside{min-height:0;height:100vh}aside{overflow-y:auto}.stage{max-height:calc(100vh - 44px)}
 #headPanel:has(#headEdit:not(:checked)) .head-editor{display:none}
 @media(max-width:900px){body{grid-template-rows:44vh 56vh}main{height:44vh;padding:12px}.stage{height:calc(44vh - 24px);width:auto;max-width:95vw}aside{height:56vh}}
+.stage{position:relative}#cropOverlay{position:absolute;inset:0;width:100%;height:100%;cursor:crosshair}#cropOverlay[hidden]{display:none}#cameraVideo{width:100%;max-height:180px;object-fit:contain;transform:scaleX(-1);border-radius:9px;background:#222}input[type=password],input[type=text]{width:100%}button:disabled{opacity:.45;cursor:default}#audioMeter{width:100%}
 </style>
 </head>
 <body>
-<main><div class="stage"><canvas id="c" width="__W__" height="__H__"></canvas></div></main>
+<main><div class="stage"><canvas id="c" width="__W__" height="__H__"></canvas><canvas id="cropOverlay" hidden aria-label="出力範囲のドラッグ指定"></canvas></div></main>
 <aside>
 <h1>__TITLE__</h1>
 <p>顔や視線、首振り、体の揺れを調整できます。できあがったら動画や完成品ZIPを保存してください。</p>
+<section id="trackingPanel"><h2>カメラ・音声で動かす</h2>
+<label for="trackingInput" class="check">入力</label><select id="trackingInput"><option value="camera">カメラ</option><option value="both">カメラ＋マイク</option><option value="audio">マイクで口パク</option></select>
+<label for="cameraDevice" class="check">カメラ</label><select id="cameraDevice"><option value="">既定のカメラ</option></select>
+<label for="microphoneDevice" class="check">マイク</label><select id="microphoneDevice"><option value="">既定のマイク</option></select>
+<div class="row"><button id="cameraStart" class="primary">追従を開始</button><button id="cameraStop" disabled>入力を停止</button></div>
+<div class="row"><button id="cameraCalibrate" disabled>正面を合わせる</button><label class="check"><input id="cameraMirror" type="checkbox" checked>鏡の向きで追従</label></div>
+<label class="check"><input id="trackingEyesOff" type="checkbox">目・視線の追従をオフ</label>
+<label class="check"><input id="trackingMouthOff" type="checkbox">口の追従をオフ</label>
+<label class="check"><input id="trackingHeadOff" type="checkbox">頭の追従をオフ</label>
+<p id="trackingRouteStatus" class="note">オフにした部位は、再生中のモーションファイル → 通常の動きの順で使います。カメラ自体を止めるには「入力を停止」を押してください。</p>
+<div id="cameraPreview" hidden><video id="cameraVideo" autoplay playsinline muted></video></div>
+<label class="line" for="audioGain">音声の口パク感度</label><input id="audioGain" type="range" min="1" max="20" step=".5" value="6">
+<label class="line" for="audioFloor">無音とみなす音量</label><input id="audioFloor" type="range" min="0" max=".1" step=".001" value=".015"><meter id="audioMeter" min="0" max=".25" value="0" aria-label="マイク音量"></meter>
+<p id="trackingStatus" role="status">開始を押すまでカメラ・マイクは使いません。映像と音声はこの端末で処理します。</p>
+<h2>モーションを録画</h2><div class="row"><button id="takeRecord" disabled>モーション録画</button><button id="takeStop" disabled>録画を終了</button></div>
+<div class="row"><button id="takePlay" disabled>録画を再生</button><button id="takeSave" disabled>ファイルに保存</button></div>
+<p id="takeStatus" role="status">ChibiRig Motion形式で顔の動きを保存します。生の映像・音声は保存しません。</p>
+</section><div class="sep"></div>
+<section id="capturePanel" aria-label="キャプチャモーション">
+<h2>キャプチャモーション</h2>
+<button id="captureLoad" class="primary">モーションファイルを読み込む</button>
+<input id="captureFile" type="file" accept=".json,application/json" hidden>
+<div class="row"><button id="capturePlay" disabled>モーション再生</button><button id="captureRewind" disabled>先頭に戻す</button></div>
+<label class="line" for="captureSeek" style="grid-template-columns:1fr auto">再生位置 <output id="captureTime" style="white-space:nowrap">0.0 / 0.0 秒</output></label>
+<input id="captureSeek" type="range" min="0" max="1" step="0.001" value="0" disabled>
+<label class="check"><input id="captureLoop" type="checkbox" disabled> モーションをループ</label>
+<label class="line" for="captureMouthGain">口の感度 <output id="captureMouthGainOut">1.0×</output></label><input id="captureMouthGain" type="range" min="0.5" max="8" step="0.25" value="1">
+<label class="line" for="captureBrowGain">眉の感度 <output id="captureBrowGainOut">2.0×</output></label><input id="captureBrowGain" type="range" min="0.5" max="4" step="0.25" value="2">
+<label class="line" for="captureYawGain">ヨー（左右）倍率 <output id="captureYawGainOut">1.00×</output></label><input id="captureYawGain" type="range" min="0" max="3" step="0.05" value="1">
+<label class="line" for="capturePitchGain">ピッチ（上下）倍率 <output id="capturePitchGainOut">1.00×</output></label><input id="capturePitchGain" type="range" min="0" max="3" step="0.05" value="1">
+<label class="line" for="captureRollGain">ロール（傾き）倍率 <output id="captureRollGainOut">1.00×</output></label><input id="captureRollGain" type="range" min="0" max="3" step="0.05" value="1">
+<p class="note">再生・追従時の倍率です。録画データは変更しません。0でその軸を停止します。</p><button id="captureClear" disabled>モーションを解除</button>
+<p id="captureStatus" class="note" role="status">モーションファイルを読み込んで再生してください。</p>
+</section><div class="sep"></div>
 <section id="headPanel">
 <h2>顔・視線・首振り</h2>
 <div class="check"><input id="headRandom" type="checkbox"><label for="headRandom">顔と黒目をランダムに動かす</label></div>
 <label class="check"><input id="neckSway" type="checkbox" checked> 首を支点に頭全体をランダムに動かす</label>
-<label class="line" for="neckYaw">ヨー（左右を向く） <output id="neckYawOut">12.0°</output></label><input id="neckYaw" type="range" min="0" max="30" step="0.5" value="12">
-<label class="line" for="neckPitch">ピッチ（うなずく） <output id="neckPitchOut">8.0°</output></label><input id="neckPitch" type="range" min="0" max="20" step="0.5" value="8">
+<label class="line" for="neckYaw">ヨー（左右を向く） <output id="neckYawOut">12.0°</output></label><input id="neckYaw" type="range" min="0" max="25" step="0.5" value="12">
+<label class="line" for="neckPitch">ピッチ（うなずく） <output id="neckPitchOut">8.0°</output></label><input id="neckPitch" type="range" min="0" max="25" step="0.5" value="8">
 <label class="line" for="neckAmount">ロール（左右に傾く） <output id="neckAmountOut">6.0°</output></label><input id="neckAmount" type="range" min="0" max="15" step="0.5" value="6">
 <label class="line" for="headAmount">顔の動きの量 <output id="headAmountOut">1.50×</output></label><input id="headAmount" type="range" min="0" max="4" step="0.05" value="1.5">
 <label class="line" for="gazeAmount">黒目の動きの量 <output id="gazeAmountOut">1.50×</output></label><input id="gazeAmount" type="range" min="0" max="4" step="0.05" value="1.5">
 <p class="note">自動の動きの強さです。0で停止、1が従来の強さ。体の揺れは変わりません。</p>
+<label class="check"><input id="hairPhysics" type="checkbox" checked> 長い髪を物理で揺らす</label>
+<label class="line" for="hairPhysicsAmount">髪の揺れ <output id="hairPhysicsOut">1.00×</output></label><input id="hairPhysicsAmount" type="range" min="0" max="2" step="0.05" value="1">
 <div class="check"><input id="showHeadMesh" type="checkbox"><label for="showHeadMesh">頭全体のメッシュを表示</label></div>
 <details id="headDetails"><summary>詳細な顔配置の調整</summary>
-<p>正面と8方向の配置をつないで動かします。左・右は画面から見た向きです。</p>
+<p>ヨー・ピッチ −25°／0°／＋25°の9方向です。上下方向の変形は50%に抑えています。位置・大きさと頭全体のメッシュを一緒に補間します。方向ボタンを押すと自動首振りを止めて、その配置を表示します。</p>
 <div class="head-directions" role="group" aria-label="保存する顔の向き">
 <button type="button" data-head-direction="up_left" aria-pressed="false"></button>
 <button type="button" data-head-direction="up" aria-pressed="false"></button>
@@ -55,7 +93,7 @@ body{height:100vh;overflow:hidden}main,aside{min-height:0;height:100vh}aside{ove
 <label class="line" for="gazeX">黒目の左右（手動調整）</label><input id="gazeX" type="range" min="-1" max="1" step="0.01" value="0">
 <label class="line" for="gazeY">黒目の上下（手動調整）</label><input id="gazeY" type="range" min="-1" max="1" step="0.01" value="0">
 <div class="check"><input id="headEdit" type="checkbox"><label for="headEdit">選択した方向の配置を編集</label></div>
-<div class="head-editor"><p>編集中は正面の目・口で動きを止めます。パーツを選び、位置・大きさとメッシュの点を調整してください。点は絵の上でもドラッグできます。</p>
+<div class="head-editor"><p>編集中は選んだ±25°の頭・顔の形を表示し、目と口は開いた状態に固定します。パーツを選び、位置・大きさとメッシュの点を調整してください。点は絵の上でもドラッグできます。</p>
 <label for="headPart">配置を調整するパーツ</label><select id="headPart"></select>
 <label class="line" for="poseX">左右の位置 <output id="poseXOut"></output></label><input id="poseX" type="range" min="-100" max="100" step="0.1" value="0">
 <label class="line" for="poseY">上下の位置 <output id="poseYOut"></output></label><input id="poseY" type="range" min="-100" max="100" step="0.1" value="0">
@@ -70,6 +108,12 @@ body{height:100vh;overflow:hidden}main,aside{min-height:0;height:100vh}aside{ove
 <label class="check" for="importHeadPose">保存した9方向を読み込む</label><input id="importHeadPose" type="file" accept=".json,application/json">
 <p id="headStatus" role="status">初期配置はたたき台です。絵に合わせて調整してください。</p>
 </details><div class="sep"></div></section>
+<section id="outputPanel"><h2>WebM録画の範囲</h2>
+<button id="cropSelect">ドラッグで録画範囲を指定</button><div class="row"><button id="cropReset">全体に戻す</button><output id="cropInfo">全体</output></div>
+<p class="note">四隅でサイズ変更、内側で移動。Shift＋ドラッグで新しい範囲を描けます。</p>
+<label class="line" for="outputColor">録画の余白色</label><input type="color" id="outputColor" value="#202020">
+<p class="note">選択範囲を1280×720のWebM動画に保存します。</p>
+</section><div class="sep"></div>
 <section id="backgroundPanel"><h2>背景</h2>
 <label for="backgroundMode" class="note">背景の種類</label><select id="backgroundMode"><option value="original">元の背景</option><option value="color">単色</option><option value="image">画像</option><option value="transparent">透明</option></select>
 <label class="line" for="backgroundColor">背景色</label><input id="backgroundColor" type="color" value="#e9dfd3" style="width:100%;height:34px">
@@ -78,7 +122,7 @@ body{height:100vh;overflow:hidden}main,aside{min-height:0;height:100vh}aside{ove
 <div class="row"><button id="resetBackground">元の背景に戻す</button></div><p id="backgroundStatus" role="status" class="note">選んだ背景はこのブラウザに保存されます。透明部分は市松模様で表示します。</p>
 </section><div class="sep"></div>
 <h2>再生</h2>
-<label class="line">ループ秒数 <output id="durationOut"></output></label><input id="duration" type="range" min="1" max="60" step="0.1" value="4">
+<label class="line">録画秒数 <output id="durationOut"></output></label><input id="duration" type="range" min="1" max="60" step="0.1" value="4">
 <label class="line">全体モーション量 <output id="motionOut"></output></label><input id="motionIntensity" type="range" min="0" max="5" step="0.05" value="1">
 <label class="line">全体モーション速度 <output id="speedOut"></output></label><input id="motionSpeed" type="range" min="0.1" max="5" step="0.05" value="1">
 <label class="line">表情 0↔1 <output id="expressionOut"></output></label><input id="expression" type="range" min="0" max="1" step="0.01" value="0">
@@ -99,7 +143,10 @@ body{height:100vh;overflow:hidden}main,aside{min-height:0;height:100vh}aside{ove
 <label class="line">縦移動 px <output id="partYOut"></output></label><input id="partY" type="range" min="0" max="20" step="0.05">
 <label class="line">位相 <output id="partPhaseOut"></output></label><input id="partPhase" type="range" min="0" max="1" step="0.01">
 <p id="recordStatus" role="status"></p><progress id="recordProgress" hidden max="60" value="0" aria-label="録画の進み具合"></progress>
-<button id="bundle">完成品一式をダウンロード</button><p id="bundleStatus" role="status"></p>
+<p class="note">完成品の再生・調整・動画保存にインターネット接続は不要です。選択中の背景画像も完成品に含まれます。</p>
+<label class="check"><input id="bundleIncludeMotion" type="checkbox">読み込んだ録画モーションを完成品に同梱する</label>
+<p class="note">オフの場合、録画した顔の動きは同梱しません。オンの場合も録画日時・元ファイル名などの付加情報は除きます。カメラ・マイクは初回準備済みのChibiRigKitをローカル起動すると、オフラインで使えます。</p>
+<button id="bundle">完成品をdistに保存</button><p id="bundleStatus" role="status"></p>
 <div class="sep"></div><div class="row"><button id="exportJson">全体の動きをJSON保存</button><button id="record" class="primary">WebM録画</button><button id="recordCancel" hidden>録画中止</button></div>
 <label class="check" for="importJson">全体の動きJSONを読み込む</label><input id="importJson" type="file" accept=".json,application/json" style="max-width:100%">
 <p id="motionIOStatus" class="note" role="status">同じキャラの全体JSONから、揺れ・速度・瞬き・顔配置をまとめて復元します。</p>
@@ -109,13 +156,15 @@ body{height:100vh;overflow:hidden}main,aside{min-height:0;height:100vh}aside{ove
 <script id="licenseData" type="text/plain">__LICENSE_TEXT__</script>
 <script id="projectData" type="application/json">__PROJECT_JSON__</script>
 <script>
-const PROJECT=JSON.parse(document.getElementById('projectData').textContent),canvas=document.getElementById('c'),ctx=canvas.getContext('2d',{alpha:true,willReadFrequently:location.pathname.endsWith('/runtime-check.html')||location.search.includes('validate=1')}),$=id=>document.getElementById(id);
+const PROJECT=JSON.parse(document.getElementById('projectData').textContent),displayCanvas=document.getElementById('c'),canvas=document.createElement('canvas'),$=id=>document.getElementById(id);
+canvas.width=displayCanvas.width;canvas.height=displayCanvas.height;const ctx=canvas.getContext('2d',{alpha:true});
 const controls={showHeadMesh:$('showHeadMesh'),neckYaw:$('neckYaw'),neckPitch:$('neckPitch'),neckSway:$('neckSway'),neckAmount:$('neckAmount'),headAmount:$('headAmount'),gazeAmount:$('gazeAmount'),headRandom:$('headRandom'),headX:$('headX'),headY:$('headY'),headCircle:$('headCircle'),headEdit:$('headEdit'),duration:$('duration'),motionIntensity:$('motionIntensity'),motionSpeed:$('motionSpeed'),expression:$('expression'),autoBlink:$('autoBlink'),autoExpression:$('autoExpression'),showPivots:$('showPivots'),showMesh:$('showMesh'),showBaseOnly:$('showBaseOnly'),showSeams:$('showSeams'),eyeOpenTest:$('eyeOpenTest'),manualEyeOpen:$('manualEyeOpen'),mouthOpenTest:$('mouthOpenTest'),manualMouthOpen:$('manualMouthOpen')};
 const initialParts=structuredClone(PROJECT.parts),initialGroups=structuredClone(PROJECT.groups||{}),initialSettings=structuredClone(PROJECT.settings||{});
 let images={},running=true,start=performance.now(),pausedAt=0,frameDirty=true;
 function loadImage(src){return new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=reject;im.src=src})}
 async function loadAll(){
   for(const p of Object.values(PROJECT.parts))images[p.file]=await loadImage(p.image_data_url||p.file);
+  if(PROJECT.neck_fill)images[PROJECT.neck_fill.file]=await loadImage(PROJECT.neck_fill.data_url||PROJECT.neck_fill.file);
   for(const p of Object.values(PROJECT.parts))if(p.seam){
     // The exact prepared bytes are embedded by the builder; stale disk margins are never loaded.
     images[p.seam.file]=await loadImage(p.seam.data_url);
@@ -124,13 +173,13 @@ async function loadAll(){
 function mul(A,B){return[A[0]*B[0]+A[2]*B[1],A[1]*B[0]+A[3]*B[1],A[0]*B[2]+A[2]*B[3],A[1]*B[2]+A[3]*B[3],A[0]*B[4]+A[2]*B[5]+A[4],A[1]*B[4]+A[3]*B[5]+A[5]]}
 function around(pivot,rotDeg,tx,ty,sx=1,sy=1){const r=rotDeg*Math.PI/180,c=Math.cos(r),s=Math.sin(r),px=pivot.x,py=pivot.y,R=[c*sx,s*sx,-s*sy,c*sy,0,0],T1=[1,0,0,1,px+tx,py+ty],T2=[1,0,0,1,-px,-py];return mul(mul(T1,R),T2)}
 // Motion uses a fixed four-second base cycle; recording length never rescales time.
-function evalMotion(obj,t,intensity=1){const m=obj.motion||{},dur=4,speed=parseFloat(controls.motionSpeed.value||1),a=(((t*speed)/dur)*(m.freq||1)+(m.phase||0))*Math.PI*2;return{rot:(m.rot_deg||0)*Math.sin(a)*intensity,x:(m.x_px||0)*Math.sin(a+.37)*intensity,y:(m.y_px||0)*Math.sin(a*2)*intensity,sx:1+((m.scale_x_pct||0)/100)*(.5+.5*Math.sin(a*2-1.57))*intensity,sy:1+((m.scale_y_pct||0)/100)*(.5+.5*Math.sin(a*2-1.57))*intensity}}
+function evalMotion(obj,t,intensity=1){if(captureAffects(obj))return captureTransform(obj,intensity);const m=obj.motion||{},dur=4,speed=parseFloat(controls.motionSpeed.value||1),a=(((t*speed)/dur)*(m.freq||1)+(m.phase||0))*Math.PI*2;return{rot:(m.rot_deg||0)*Math.sin(a)*intensity,x:(m.x_px||0)*Math.sin(a+.37)*intensity,y:(m.y_px||0)*Math.sin(a*2)*intensity,sx:1+((m.scale_x_pct||0)/100)*(.5+.5*Math.sin(a*2-1.57))*intensity,sy:1+((m.scale_y_pct||0)/100)*(.5+.5*Math.sin(a*2-1.57))*intensity}}
 function groupMatrix(name,t,intensity){if(!name||!PROJECT.groups?.[name])return[1,0,0,1,0,0];const g=PROJECT.groups[name],e=evalMotion(g,t,intensity);return around(g.pivot,e.rot,e.x,e.y,e.sx,e.sy)}
 function smoothstep(a,b,x){const t=Math.max(0,Math.min(1,(x-a)/(b-a)));return t*t*(3-2*t)}
 function blinkPulse(t){if(!controls.autoBlink.checked)return 0;const d=4,time=t*Number(controls.motionSpeed.value||1),p=(time%d)/d;let b=0;for(const c of [.36,.40,.83]){const x=Math.abs(p-c);if(x<.032)b=Math.max(b,Math.sin((1-x/.032)*Math.PI/2))}return Math.min(1,b)}
-function expressionValue(t){return controls.autoExpression.checked?.5-.5*Math.cos((t/6)*Math.PI*2):parseFloat(controls.expression.value)}
+function expressionValue(t){if(captureHas('mouthOpen','mouthShape'))return 0;return controls.autoExpression.checked?.5-.5*Math.cos((t/6)*Math.PI*2):parseFloat(controls.expression.value)}
 function eyeOpenValue(t,expr,blink){return controls.manualEyeOpen.checked?parseFloat(controls.eyeOpenTest.value):1-Math.max(expr,blink)}
-function mouthOpenValue(){if(controls.headEdit.checked)return 1;return controls.manualMouthOpen.checked?parseFloat(controls.mouthOpenTest.value):1}
+function mouthOpenValue(){if(controls.headEdit.checked)return 1;if(captureHas('mouthOpen'))return captureMouthValue();return controls.manualMouthOpen.checked?parseFloat(controls.mouthOpenTest.value):1}
 function eyeSwap(eyeOpen){const cfg=PROJECT.settings?.blink||{};return smoothstep(cfg.closed_eye_swap_start??.92,cfg.closed_eye_swap_end??.995,1-eyeOpen)}
 function partOpacity(part,expr,eyeOpen){
   let op=part.opacity??1;const k=part.kind;
@@ -206,8 +255,9 @@ function drawBlinkEye(im,p,eyeOpen,target=ctx){
   for(let i=0;i<slices;i++){const sy=h*i/slices,sh=h/slices;target.drawImage(im,0,sy,w,sh,p.x,p.y+center+(sy-center)*open,w,sh*open)}
 }
 function drawMouthOpenClose(im,p,open,target=ctx){
-  if(open===1){drawRigid(im,p,target);return;}
-  const m=p.mesh,c=m.center,closedCenter=m.closed_center,closed=1-open,sx=1-closed*(1-m.closed_width_ratio),sy=.06+.94*open;
+  const form=captureValue('mouthShape');
+  if(open===1&&!form){drawRigid(im,p,target);return;}
+  const m=p.mesh,c=m.center,closedCenter=m.closed_center,closed=1-open,sx=(1-closed*(1-m.closed_width_ratio))*(1+form*.12),sy=.06+.94*open;
   target.save();target.translate(c.x+(closedCenter.x-c.x)*closed,c.y+(closedCenter.y-c.y)*closed);
   target.transform(sx,(m.closed_slope||0)*closed*sx,0,sy,0,0);target.drawImage(im,p.x-c.x,p.y-c.y);target.restore();
 }
@@ -236,7 +286,11 @@ function drawSoftBody(im,p,t,intensity,target=ctx){
   },target);
 }
 function drawSoftStrip(im,p,t,intensity,target=ctx){const a=t*2*Math.PI/4+(p.motion?.phase||0)*2*Math.PI,sy=1+(p.mesh?.squash_pct??.35)/100*Math.sin(a)*intensity;target.save();target.translate(p.x+p.w/2,p.y+p.h/2);target.scale(1,sy);target.drawImage(im,-p.w/2,-p.h/2);target.restore()}
-function drawPart(im,p,t,intensity,eyeOpen,target=ctx){if(p.kind==='eye_iris'||p.kind==='eye_line')return drawSplitEye(im,p,t,intensity,eyeOpen,target);if(p.kind==='drawn_eye_closed'||p.kind==='eye_closed'||p.kind==='mouth_closed')return drawRigid(im,p,target);const type=p.mesh?.type;if(type==='blink_eye_radial'||type==='blink_eye_grid'||type==='blink_eye_curve'||type==='blink_eye')return drawBlinkEye(im,p,eyeOpen,target);if(type==='bend_vertical'||type==='bend_strip')return drawBendVertical(im,p,t,intensity,target);if(type==='soft_body')return drawSoftBody(im,p,t,intensity,target);if(type==='mouth_open_close')return drawMouthOpenClose(im,p,mouthOpenValue(),target);if(type==='soft_strip')return drawSoftStrip(im,p,t,intensity,target);drawRigid(im,p,target)}
+function drawCapturedBrow(im,p,target){
+  const side=p.name.includes('left')?'Left':'Right',form=captureValue(`brow${side}Shape`),gain=Number($('captureBrowGain')?.value)||2;
+  drawStripMesh(im,p,10,false,(x,y,u)=>[p.x+x,p.y+y-Math.sin(u*Math.PI)*form*4*gain],target);
+}
+function drawPart(im,p,t,intensity,eyeOpen,target=ctx){if(captureAffects(p)&&p.kind==='brow')return drawCapturedBrow(im,p,target);if(captureAffects(p))intensity=0;if(p.kind==='eye_iris'||p.kind==='eye_line')return drawSplitEye(im,p,t,intensity,eyeOpen,target);if(p.kind==='drawn_eye_closed'||p.kind==='eye_closed'||p.kind==='mouth_closed')return drawRigid(im,p,target);const type=p.mesh?.type;if(type==='blink_eye_radial'||type==='blink_eye_grid'||type==='blink_eye_curve'||type==='blink_eye')return drawBlinkEye(im,p,eyeOpen,target);if(type==='bend_vertical'||type==='bend_strip')return drawBendVertical(im,p,t,intensity,target);if(type==='soft_body')return drawSoftBody(im,p,t,intensity,target);if(type==='mouth_open_close')return drawMouthOpenClose(im,p,mouthOpenValue(),target);if(type==='soft_strip')return drawSoftStrip(im,p,t,intensity,target);drawRigid(im,p,target)}
 function drawMeshOverlay(p,t,intensity,eyeOpen){
   ctx.save();ctx.strokeStyle='rgba(80,220,255,.75)';ctx.lineWidth=.6;
   if(p.mesh?.type==='face_grid'&&headPoseActive(p)){
@@ -252,20 +306,21 @@ function drawMeshOverlay(p,t,intensity,eyeOpen){
 const seamSurface=document.createElement('canvas'),envelope=document.createElement('canvas');
 for(const surface of [seamSurface,envelope]){surface.width=canvas.width;surface.height=canvas.height}
 function render(t){
-  beginHeadFrame(t);
+  beginCaptureFrame(t);beginHeadFrame(t);beginHairFrame(t);
   ctx.clearRect(0,0,canvas.width,canvas.height);
   drawBackground();
   const editing=controls.headEdit.checked,intensity=editing?0:parseFloat(controls.motionIntensity.value),expr=editing?0:expressionValue(t),eyeOpen=editing?1:eyeOpenValue(t,expr,blinkPulse(t));
   const seams=controls.showSeams.checked&&!controls.showBaseOnly.checked;
   const sc=seamSurface.getContext('2d');sc.clearRect(0,0,canvas.width,canvas.height);
   for(const name of PROJECT.draw_order){
-    const p=PROJECT.parts[name];if(customBackgroundActive()&&isBackgroundPart(p))continue;if(controls.showBaseOnly.checked&&p.kind!=='static'&&p.role!=='base')continue;
-    const op=partOpacity(p,expr,eyeOpen);if(op<=.002)continue;
+    const p=PROJECT.parts[name];if(name===PROJECT.neck_sway?.anchor_part)drawNeckFill(t,intensity);if(customBackgroundActive()&&isBackgroundPart(p))continue;if(controls.showBaseOnly.checked&&p.kind!=='static'&&p.role!=='base')continue;
+    const partEyeOpen=captureEyeOpen(p,eyeOpen);
+    const op=partOpacity(p,expr,partEyeOpen);if(op<=.002)continue;
     const M=partMatrix(p,t,intensity),im=images[p.file];if(!im)continue;
     // Prepared margins use the same transform AND mesh as their owning part.
-    if(seams&&p.seam){sc.save();sc.globalAlpha=op;if(headPoseActive(p)||PROJECT.neck_sway?.part_ids.includes(p.name))sc.drawImage(renderHeadSurface(p,t,intensity,eyeOpen,"seam"),0,0);else{sc.setTransform(...M);drawPart(images[p.seam.file],p,t*parseFloat(controls.motionSpeed.value),intensity,eyeOpen,sc)}sc.restore()}
-    if(headPoseActive(p)||PROJECT.neck_sway?.part_ids.includes(p.name)||p.kind==='eye_iris'||p.kind==='eye_line'){ctx.save();ctx.globalAlpha=op;ctx.drawImage(renderHeadSurface(p,t,intensity,eyeOpen),0,0);ctx.restore()}
-    else{ctx.save();ctx.setTransform(...M);ctx.globalAlpha=op;drawPart(im,p,t*parseFloat(controls.motionSpeed.value),intensity,eyeOpen);ctx.restore()}
+    if(seams&&p.seam){sc.save();sc.globalAlpha=op;if(headPoseActive(p)||PROJECT.neck_sway?.part_ids.includes(p.name))sc.drawImage(renderHeadSurface(p,t,intensity,partEyeOpen,"seam"),0,0);else{sc.setTransform(...M);drawPart(images[p.seam.file],p,t*parseFloat(controls.motionSpeed.value),intensity,partEyeOpen,sc)}sc.restore()}
+    if(headPoseActive(p)||PROJECT.neck_sway?.part_ids.includes(p.name)||p.kind==='eye_iris'||p.kind==='eye_line'){ctx.save();ctx.globalAlpha=op;ctx.drawImage(renderHeadSurface(p,t,intensity,partEyeOpen),0,0);ctx.restore()}
+    else{ctx.save();ctx.setTransform(...M);ctx.globalAlpha=op;drawPart(im,p,t*parseFloat(controls.motionSpeed.value),intensity,partEyeOpen);ctx.restore()}
   }
   if(seams){
     const ec=envelope.getContext('2d');ec.clearRect(0,0,canvas.width,canvas.height);
@@ -280,14 +335,14 @@ function render(t){
     if(controls.showPivots.checked){const owner=transformOwner(p);ctx.beginPath();ctx.arc(owner.pivot.x,owner.pivot.y,4,0,Math.PI*2);ctx.fillStyle='#ff5064';ctx.fill()}
     ctx.restore();
   }
-  drawNeckMasterOverlay(t,intensity);drawHeadOverlay();
+  drawNeckMasterOverlay(t,intensity);drawHeadOverlay();renderOutput();
 }
 function requestRender(){frameDirty=true}
 for(const event of ['input','change','click'])document.addEventListener(event,requestRender);
-function frame(now){if(running||frameDirty){frameDirty=false;render(running?(now-start)/1000:pausedAt)}requestAnimationFrame(frame)}
-function updateLabels(){$('neckYawOut').textContent=Number(controls.neckYaw.value).toFixed(1)+'°';$('neckPitchOut').textContent=Number(controls.neckPitch.value).toFixed(1)+'°';$('neckAmountOut').textContent=Number(controls.neckAmount.value).toFixed(1)+'°';$('headAmountOut').textContent=Number(controls.headAmount.value).toFixed(2)+'×';$('gazeAmountOut').textContent=Number(controls.gazeAmount.value).toFixed(2)+'×';$('durationOut').textContent=parseFloat(controls.duration.value).toFixed(1)+' s';$('motionOut').textContent=parseFloat(controls.motionIntensity.value).toFixed(2);$('speedOut').textContent=parseFloat(controls.motionSpeed.value).toFixed(2)+'x';$('expressionOut').textContent=parseFloat(controls.expression.value).toFixed(2);$('eyeOpenOut').textContent=parseFloat(controls.eyeOpenTest.value).toFixed(2);$('mouthOpenOut').textContent=parseFloat(controls.mouthOpenTest.value).toFixed(2)}Object.values(controls).forEach(c=>c?.addEventListener('input',updateLabels));controls.eyeOpenTest.addEventListener('input',()=>controls.manualEyeOpen.checked=true);controls.mouthOpenTest.addEventListener('input',()=>controls.manualMouthOpen.checked=true);updateLabels();
-$('pause').onclick=()=>{if(running){pausedAt=(performance.now()-start)/1000;running=false;$('pause').textContent='再生'}else{start=performance.now()-pausedAt*1000;running=true;$('pause').textContent='一時停止'}};
-$('reset').onclick=()=>{PROJECT.settings=structuredClone(initialSettings);PROJECT.groups=structuredClone(initialGroups);controls.neckYaw.value=PROJECT.settings?.neck_yaw_degrees??12;controls.neckPitch.value=PROJECT.settings?.neck_pitch_degrees??8;controls.neckSway.checked=PROJECT.settings?.neck_sway??true;controls.neckAmount.value=PROJECT.settings?.neck_sway_degrees??6;controls.headRandom.checked=PROJECT.settings?.head_random??false;controls.headAmount.value=PROJECT.settings?.head_motion_amount??1.5;controls.gazeAmount.value=PROJECT.settings?.gaze_motion_amount??1.5;resetRandomHead();controls.headCircle.checked=false;controls.headEdit.checked=false;controls.headX.value=0;controls.headY.value=0;$('gazeX').value=0;$('gazeY').value=0;PROJECT.parts=structuredClone(initialParts);controls.showSeams.checked=true;controls.duration.value=PROJECT.settings?.duration_seconds??4;controls.motionIntensity.value=PROJECT.settings?.motion_intensity??1;controls.motionSpeed.value=1;controls.expression.value=0;controls.autoBlink.checked=true;controls.autoExpression.checked=false;controls.showPivots.checked=false;controls.showMesh.checked=false;controls.showHeadMesh.checked=false;controls.showBaseOnly.checked=false;controls.eyeOpenTest.value=1;controls.manualEyeOpen.checked=false;controls.mouthOpenTest.value=1;controls.manualMouthOpen.checked=false;start=performance.now();pausedAt=0;running=true;$('pause').textContent='一時停止';updateLabels();syncSelected()};
+function frame(now){trackingTick(now);if(running||frameDirty||trackingState.active){frameDirty=false;render(running||trackingState.active?(now-start)/1000:pausedAt)}requestAnimationFrame(frame)}
+function updateLabels(){for(const axis of ['Yaw','Pitch','Roll'])$('capture'+axis+'GainOut').textContent=Number($('capture'+axis+'Gain').value).toFixed(2)+'×';$('neckYawOut').textContent=Number(controls.neckYaw.value).toFixed(1)+'°';$('neckPitchOut').textContent=Number(controls.neckPitch.value).toFixed(1)+'°';$('neckAmountOut').textContent=Number(controls.neckAmount.value).toFixed(1)+'°';$('headAmountOut').textContent=Number(controls.headAmount.value).toFixed(2)+'×';$('gazeAmountOut').textContent=Number(controls.gazeAmount.value).toFixed(2)+'×';$('durationOut').textContent=parseFloat(controls.duration.value).toFixed(1)+' s';$('motionOut').textContent=parseFloat(controls.motionIntensity.value).toFixed(2);$('speedOut').textContent=parseFloat(controls.motionSpeed.value).toFixed(2)+'x';$('expressionOut').textContent=parseFloat(controls.expression.value).toFixed(2);$('eyeOpenOut').textContent=parseFloat(controls.eyeOpenTest.value).toFixed(2);$('mouthOpenOut').textContent=parseFloat(controls.mouthOpenTest.value).toFixed(2)}Object.values(controls).forEach(c=>c?.addEventListener('input',updateLabels));controls.eyeOpenTest.addEventListener('input',()=>controls.manualEyeOpen.checked=true);controls.mouthOpenTest.addEventListener('input',()=>controls.manualMouthOpen.checked=true);updateLabels();
+$('pause').onclick=()=>{if(captureMotion){setCapturePlayback(!capturePlaying);return}if(running){pausedAt=(performance.now()-start)/1000;running=false;$('pause').textContent='再生'}else{start=performance.now()-pausedAt*1000;running=true;$('pause').textContent='一時停止'}};
+$('reset').onclick=()=>{clearCaptureMotion();PROJECT.settings=structuredClone(initialSettings);PROJECT.groups=structuredClone(initialGroups);controls.neckYaw.value=PROJECT.settings?.neck_yaw_degrees??12;controls.neckPitch.value=PROJECT.settings?.neck_pitch_degrees??8;controls.neckSway.checked=PROJECT.settings?.neck_sway??true;controls.neckAmount.value=PROJECT.settings?.neck_sway_degrees??6;controls.headRandom.checked=PROJECT.settings?.head_random??false;controls.headAmount.value=PROJECT.settings?.head_motion_amount??1.5;controls.gazeAmount.value=PROJECT.settings?.gaze_motion_amount??1.5;resetRandomHead();controls.headCircle.checked=false;controls.headEdit.checked=false;controls.headX.value=0;controls.headY.value=0;$('gazeX').value=0;$('gazeY').value=0;PROJECT.parts=structuredClone(initialParts);controls.showSeams.checked=true;controls.duration.value=PROJECT.settings?.duration_seconds??4;controls.motionIntensity.value=PROJECT.settings?.motion_intensity??1;controls.motionSpeed.value=1;controls.expression.value=0;controls.autoBlink.checked=true;controls.autoExpression.checked=false;controls.showPivots.checked=false;controls.showMesh.checked=false;controls.showHeadMesh.checked=false;controls.showBaseOnly.checked=false;controls.eyeOpenTest.value=1;controls.manualEyeOpen.checked=false;controls.mouthOpenTest.value=1;controls.manualMouthOpen.checked=false;start=performance.now();pausedAt=0;running=true;$('pause').textContent='一時停止';updateLabels();syncSelected()};
 const editable=Object.keys(PROJECT.parts).filter(n=>PROJECT.parts[n].kind!=='static');for(const n of editable){const o=document.createElement('option');o.value=n;o.textContent=n;$('partSelect').appendChild(o)}
 function setPartControl(id,value){const c=$(id);c.min=Math.min(Number(c.min),value);c.max=Math.max(Number(c.max),value);c.step='any';c.value=value}
 function syncSelected(){const selected=PROJECT.parts[$('partSelect').value];if(!selected)return;const p=transformOwner(selected);setPartControl('partRot',p.motion?.rot_deg||0);setPartControl('partX',p.motion?.x_px||0);setPartControl('partY',p.motion?.y_px||0);setPartControl('partPhase',p.motion?.phase||0);updatePartLabels()}
@@ -297,6 +352,14 @@ __BUNDLE_JS__
 __BACKGROUND_JS__
 __HEAD_POSE_JS__
 __PROJECT_IO_JS__
-window.rigReady=loadAll().then(async()=>{$('reset').click();initHeadEditor();initMotionIO();await initBackground();await restoreBundleSnapshot();$('loadStatus').textContent='読み込み完了';requestAnimationFrame(frame)}).catch(e=>{$('loadStatus').textContent='画像の読み込みに失敗しました';throw e});
+__MOTION_CLIP_JS__
+__CAPTURE_PLAYER_JS__
+__EXPRESSION_UNDERPAINT_JS__
+__HAIR_DYNAMICS_JS__
+__HAIR_PLAYER_JS__
+__TRACKING_CORE_JS__
+__TRACKING_JS__
+__OUTPUT_JS__
+window.rigReady=loadAll().then(async()=>{prepareBrowUnderpaint();$('reset').click();initHeadEditor();initMotionIO();initCapturePlayer();initTracking();initOutput();$('hairPhysicsAmount').oninput=()=>$('hairPhysicsOut').textContent=Number($('hairPhysicsAmount').value).toFixed(2)+'×';await initBackground();await restoreBundleSnapshot();$('loadStatus').textContent='読み込み完了';requestAnimationFrame(frame)}).catch(e=>{$('loadStatus').textContent='画像の読み込みに失敗しました';throw e});
 </script>
 </aside></body></html>

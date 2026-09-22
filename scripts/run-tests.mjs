@@ -16,7 +16,7 @@ for(const suite of manifest.suites){
   if(suite.runner==='python-unittest'){command=python;args=['-m','unittest','discover','-s',suite.directory,'-p',suite.pattern,'-v']}
   else if(suite.runner==='node-test'){command=process.execPath;args=['--test',...fs.readdirSync(path.join(root,suite.directory)).filter(f=>f.endsWith(suite.suffix)).sort().map(f=>path.join(suite.directory,f))]}
   else throw Error(`Unknown runner: ${suite.runner}`);
-  const result=spawnSync(command,args,{cwd:root,stdio:'inherit'});
+  const result=spawnSync(command,args,{cwd:root,stdio:'inherit',env:{...process.env,CHIBIRIG_DIST_ROOT:path.join(root,'work/test-dist')}});
   results.push({suite:suite.id,status:result.status===0?'passed':'failed',exitCode:result.status});
   if(result.status!==0)break;
 }

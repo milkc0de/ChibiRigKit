@@ -7,6 +7,7 @@ import re
 import math
 from jsonschema import Draft202012Validator
 from pathlib import Path
+from player_output import preview_path
 
 KINDS = {'eye_sclera','eye_iris','eye_line','normal', 'static', 'eye_open', 'drawn_eye_closed', 'eye_closed',
          'mouth_open', 'mouth_closed', 'mouth_smile', 'blush', 'brow'}
@@ -62,6 +63,14 @@ def validate_plan(root, plan):
     order = plan.get('draw_order', [])
     if len(order) != len(ids) or set(order) != set(ids):
         raise ValueError('draw_order must contain every part exactly once')
+    if fill := plan.get('neck_fill'):
+        local_path(root,fill['file'])
+        for key in ('head_edge','body_edge'):
+            edge=fill.get(key)
+            if not isinstance(edge,list) or len(edge)!=2 or any(not isinstance(p,list) or len(p)!=2 or any(not isinstance(v,(int,float)) or not math.isfinite(v) for v in p) for p in edge):raise ValueError(f'neck_fill.{key}: two canvas points required')
+        rect=fill.get('skin_rect')
+        if not isinstance(rect,list) or len(rect)!=4 or any(not isinstance(v,(int,float)) or not math.isfinite(v) for v in rect) or min(rect[:2])<0 or min(rect[2:])<=0:raise ValueError('neck_fill.skin_rect: positive opaque source rectangle required')
+        if fill.get('body_part') not in ids:raise ValueError('neck_fill.body_part must reference the body attachment part')
     groups = plan.get('groups', {})
     parts = {p['id']: p for p in specs}
     for name, group in groups.items():
@@ -81,6 +90,12 @@ def validate_plan(root, plan):
             raise ValueError(f'{pid}: parent must name a group')
         if not 0 <= p.get('opacity', 1) <= 1 or not 0 <= p.get('pad', 8) <= 64:
             raise ValueError(f'{pid}: invalid opacity/pad')
+        if p.get('capture_side') not in (None,'left','right'):raise ValueError(f'{pid}: capture_side must be screen left/right')
+        if physics := p.get('physics'):
+            if physics.get('type')!='long_hair' or p['role']!='hair':raise ValueError(f'{pid}: long_hair physics requires a hair part')
+            for key,default,low,high in [('stiffness',16,1,100),('damping',7,.1,30)]:
+                value=physics.get(key,default)
+                if not isinstance(value,(int,float)) or isinstance(value,bool) or not low<=value<=high:raise ValueError(f'{pid}: invalid physics {key}')
         mesh = p.get('mesh', {})
         if mesh and mesh.get('type') not in MESHES:
             raise ValueError(f'{pid}: unsupported mesh type')
@@ -140,7 +155,7 @@ def validate_project(root, project):
     for role,file in project['sources'].items():
         if digest(local_path(root,file)) != digest(root/'work/aligned'/f'{role}.png'):
             raise ValueError(f'{role}: source copy is stale')
-    html = (root / 'index.html').read_text()
+    html = preview_path(root).read_text()
     match = re.search(r'<script id="projectData" type="application/json">(.*?)</script>', html, re.S)
     if match is None or json.loads(match[1]) != project:
         raise ValueError('Embedded projectData differs from rig.project.json')

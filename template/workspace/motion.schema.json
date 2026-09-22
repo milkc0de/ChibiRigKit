@@ -125,6 +125,31 @@
           "type": "number",
           "minimum": 0,
           "maximum": 20
+        },
+        "capture_yaw_gain": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "capture_pitch_gain": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "capture_roll_gain": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "capture_mouth_gain": {
+          "type": "number",
+          "minimum": 0.5,
+          "maximum": 8
+        },
+        "capture_brow_gain": {
+          "type": "number",
+          "minimum": 0.5,
+          "maximum": 4
         }
       }
     },

@@ -57,6 +57,7 @@ def build_head_pose(plan, parts, canvas):
             validate_setting(setting,count)
             if not valid_mesh(parts[pid]['head_bounds'],setting,cols,rows):raise ValueError(f'{name}/{pid}: folded head mesh')
     result={'version':1,'columns':cols,'rows':rows,'part_ids':members,'layout_signature':signature,'poses':poses}
+    if supplied.get('pose_space'):result['pose_space']=supplied['pose_space']
     # Check blends too. Runtime additionally rejects any folded mesh at the exact live angle.
     for y in np.linspace(-1,1,9):
         for x in np.linspace(-1,1,9):
@@ -157,10 +158,15 @@ def build_neck_sway(plan, parts, canvas):
     mesh_signature=hashlib.sha256(json.dumps(points,separators=(',',':')).encode()).hexdigest()
     saved_signature=plan.get('neck_sway',{}).get('mesh_signature')
     if saved_signature and saved_signature!=mesh_signature:raise ValueError('Neck reference mesh layout changed; re-layout its nine poses before rebuilding')
+    extent=plan.get('neck_sway',{});legacy=bool(extent.get('poses')) and 'yaw_extent' not in extent and 'pitch_extent' not in extent
+    yaw_extent=extent.get('yaw_extent',30 if legacy else 25);pitch_extent=extent.get('pitch_extent',20 if legacy else 25)
+    pitch_gain=extent.get('pitch_gain',.5)
+    if not isinstance(pitch_gain,(float,int)) or not 0<pitch_gain<=1:raise ValueError('Neck pitch gain must be in (0,1]')
+    if not all(isinstance(v,(int,float)) and not isinstance(v,bool) and 0<v<=45 for v in [yaw_extent,pitch_extent]):raise ValueError('Neck extents must be in (0,45] degrees')
     for name,(yaw,pitch) in DIRECTIONS.items():
-        vertices=poses[name].setdefault('vertices',[project_neck_point(point,pivot,volume,yaw*30,pitch*20) for point in points])
+        vertices=poses[name].setdefault('vertices',[project_neck_point(point,pivot,volume,yaw*yaw_extent,pitch*pitch_extent*pitch_gain) for point in points])
         if np.asarray(vertices).shape!=(len(points),2) or not np.isfinite(vertices).all():raise ValueError('Invalid neck pose vertices')
-    return {'pivot':pivot,'anchor_part':anchor,'part_ids':members,'poses':poses,'yaw_extent':30,'pitch_extent':20,'volume':volume,'mesh_signature':mesh_signature,'mesh':{'points':points,'triangles':triangles}}
+    return {'pivot':pivot,'anchor_part':anchor,'part_ids':members,'poses':poses,'yaw_extent':yaw_extent,'pitch_extent':pitch_extent,'layout_mode':extent.get('layout_mode','legacy'),'surface':extent.get('surface'),'volume':volume,'mesh_signature':mesh_signature,'mesh':{'points':points,'triangles':triangles}}
 
 
 

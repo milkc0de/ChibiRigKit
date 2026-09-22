@@ -12,6 +12,12 @@
       "runner": "node-test",
       "directory": "tests",
       "suffix": ".test.mjs"
+    },
+    {
+      "id": "player-contracts",
+      "runner": "node-test",
+      "directory": "tests/player",
+      "suffix": ".test.cjs"
     }
   ],
   "browser": {

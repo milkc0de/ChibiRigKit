@@ -7,8 +7,8 @@ const headFrameCache=new Map(),headBuffers=new Map();
 const initialHeadPose=PROJECT.head_pose?structuredClone(PROJECT.head_pose):null;
 let headRandomSeed=crypto.getRandomValues(new Uint32Array(1))[0],headRandomStart=0,headRandomFrom=[0,0];
 let headDirection='center',headDraft=null,headDirty=false,headDrag=null,headAngle=[0,0];
-const headKey=PROJECT.head_pose?`ChibiRigKit:headpose:1:${PROJECT.head_pose.layout_signature}`:null;
-function headWeights(x,y){return Object.fromEntries(Object.entries(HEAD_DIRECTIONS).map(([name,[dx,dy]])=>[name,Math.max(0,1-Math.abs(x-dx))*Math.max(0,1-Math.abs(y-dy))]))}
+const headKey=PROJECT.head_pose?`ChibiRigKit:headpose:1:${PROJECT.head_pose.layout_signature}:${PROJECT.head_pose.pose_space||"legacy"}`:null;
+function headWeights(x,y){x=Math.max(-1,Math.min(1,x));y=Math.max(-1,Math.min(1,y));return Object.fromEntries(Object.entries(HEAD_DIRECTIONS).map(([name,[dx,dy]])=>[name,Math.max(0,1-Math.abs(x-dx))*Math.max(0,1-Math.abs(y-dy))]))}
 function neutralHeadSetting(){return {x:0,y:0,rotation:0,scale_x:1,scale_y:1,vertices:Array.from({length:(PROJECT.head_pose.columns+1)*(PROJECT.head_pose.rows+1)},()=>[0,0])}}
 function headSetting(p,pose){
   const direct=pose.parts[p.name];
@@ -48,6 +48,7 @@ function validHeadMesh(p,setting){
 }
 function validateHeadConfig(config){
   const expected=PROJECT.head_pose;
+  if((config?.pose_space||'legacy')!==(expected.pose_space||'legacy'))throw Error('この9方向は角度基準が異なります。現在の±25°用データを選んでください');
   if(!config||config.version!==1||config.layout_signature!==expected.layout_signature||config.columns!==expected.columns||config.rows!==expected.rows||JSON.stringify(config.part_ids)!==JSON.stringify(expected.part_ids))throw Error('このキャラのパーツ構成と保存データが一致しません');
   if(!config.poses||Object.keys(config.poses).length!==9)throw Error('正面＋8方向のデータが必要です');
   const count=(config.columns+1)*(config.rows+1);
@@ -73,6 +74,7 @@ function headBuffer(key,width=canvas.width,height=canvas.height){
 }
 function headPoseActive(p){return PROJECT.head_pose?.part_ids.includes(p.name)}
 function irisGazeOffset(owner){
+  if(captureHas('gazeX','gazeY'))return [captureValue('gazeX')*owner.w*(owner.mesh?.gaze_x_ratio??.10),-captureValue('gazeY')*owner.h*(owner.mesh?.gaze_y_ratio??.08)];
   const manual=[Number($('gazeX').value),Number($('gazeY').value)];
   const automatic=!controls.headEdit.checked&&(controls.headRandom.checked||controls.headCircle.checked);
   const amount=Number(controls.gazeAmount?.value??1),limit=automatic?Math.max(1,amount):1;
@@ -99,9 +101,9 @@ function amplifiedHeadSetting(p,setting,amount){
 }
 function currentHeadSetting(p){
   const setting=mixedHeadSetting(p,...headAngle);
-  const result=!controls.headEdit.checked&&(controls.headRandom.checked||controls.headCircle.checked)?amplifiedHeadSetting(p,setting,Number(controls.headAmount?.value??1)):setting;
+  const result=PROJECT.neck_sway?.layout_mode!=='coordinated-25-v1'&&!controls.headEdit.checked&&(controls.headRandom.checked||controls.headCircle.checked)?amplifiedHeadSetting(p,setting,Number(controls.headAmount?.value??1)):setting;
   const n=PROJECT.neck_sway;
-  if(n?.poses&&controls.neckSway?.checked&&!controls.headEdit.checked){
+  if(n?.poses&&n.layout_mode!=='coordinated-25-v1'&&controls.neckSway?.checked&&!controls.headEdit.checked){
     const weights=headWeights(neckCurrentAngles.yaw/n.yaw_extent,neckCurrentAngles.pitch/n.pitch_extent),owner=transformOwner(p);
     for(const [name,w] of Object.entries(weights)){
       const s=n.poses[name].parts[owner.name];if(!w||!s)continue;
@@ -120,13 +122,20 @@ function randomNeckAngle(t,seed){
   const u=Math.max(0,Math.min(1,(phase-hold)/(end-hold))),blend=u*u*u*(u*(u*6-15)+10);
   return target(index)+(target(index+1)-target(index))*blend;
 }
+function neckPoseExtent(){return {yaw:PROJECT.neck_sway?.yaw_extent??25,pitch:PROJECT.neck_sway?.pitch_extent??25}}
 function neckSwayAngles(t,intensity){
-  if(!controls.neckSway?.checked||controls.headEdit.checked)return {yaw:0,pitch:0,roll:0};
+  const extent=neckPoseExtent();
+  if(controls.headEdit.checked){const [x,y]=HEAD_DIRECTIONS[headDirection];return {yaw:x*extent.yaw,pitch:y*extent.pitch,roll:0}}
+  if(captureHas('headYaw','headPitch','headRoll')){const gain=captureClamp(intensity,0,5);return {yaw:captureClamp(captureValue('headYaw',0,-180,180)*gain*captureAxisGain('Yaw'),-extent.yaw,extent.yaw),pitch:captureClamp(-captureValue('headPitch',0,-180,180)*gain*captureAxisGain('Pitch'),-extent.pitch,extent.pitch),roll:captureClamp(captureValue('headRoll',0,-30,30)*gain*captureAxisGain('Roll'),-30,30)}}
   const time=Math.max(0,t)*Number(controls.motionSpeed.value),gain=Math.min(1,Math.max(0,intensity));
+  let direction=[Number(controls.headX.value),Number(controls.headY.value)];
+  if(controls.headRandom.checked)direction=randomHeadAngle(Math.max(0,t-headRandomStart)*Number(controls.motionSpeed.value),headRandomSeed,headRandomFrom).map(v=>v*Number(controls.headAmount.value)*gain);
+  else if(controls.headCircle.checked){const a=time*2*Math.PI/4;direction=[Math.sin(a),-Math.cos(a)]}
+  const sway=controls.neckSway?.checked;
   return {
-    yaw:randomNeckAngle(time*.83,headRandomSeed^0x13a9f27b)*Number(controls.neckYaw?.value??0)*gain,
-    pitch:randomNeckAngle(time*.71,headRandomSeed^0x37b1e5a9)*Number(controls.neckPitch?.value??0)*gain,
-    roll:randomNeckAngle(time,headRandomSeed^0x51a7c3d9)*Number(controls.neckAmount.value)*gain
+    yaw:captureClamp(direction[0]*extent.yaw+(sway?randomNeckAngle(time*.83,headRandomSeed^0x13a9f27b)*Number(controls.neckYaw.value)*gain:0),-extent.yaw,extent.yaw),
+    pitch:captureClamp(direction[1]*extent.pitch+(sway?randomNeckAngle(time*.71,headRandomSeed^0x37b1e5a9)*Number(controls.neckPitch.value)*gain:0),-extent.pitch,extent.pitch),
+    roll:sway?randomNeckAngle(time,headRandomSeed^0x51a7c3d9)*Number(controls.neckAmount.value)*gain:0
   };
 }
 function neckSwayAngle(t,intensity){return neckSwayAngles(t,intensity).roll}
@@ -181,10 +190,10 @@ function neckEyeMatrix(owner,t,intensity,mesh){
 }
 function drawNeckVolume(target,source,p,t,intensity){
   const n=PROJECT.neck_sway,a=neckSwayAngles(t,intensity);
-  if(!n?.part_ids.includes(p.name)||(!a.yaw&&!a.pitch&&!a.roll)){target.drawImage(source,0,0);return}
+  if(!n?.part_ids.includes(p.name)||(!a.yaw&&!a.pitch&&!a.roll&&!(hairFrame.get(p.name)))){target.drawImage(source,0,0);return}
   if(!n.mesh){target.save();target.setTransform(...neckSwayMatrix(p,t,intensity));target.drawImage(source,0,0);target.restore();return}
   const mesh=neckMasterMesh(t,intensity),owner=transformOwner(p);
-  if(owner.role==='eye'){target.save();target.setTransform(...neckEyeMatrix(owner,t,intensity,mesh));target.drawImage(source,0,0);target.restore();return}
+  if(owner.role==='eye'&&n.layout_mode!=='coordinated-25-v1'){target.save();target.setTransform(...neckEyeMatrix(owner,t,intensity,mesh));target.drawImage(source,0,0);target.restore();return}
   const b=owner.head_bounds||{x:owner.x,y:owner.y,w:owner.w,h:owner.h},matrix=partMatrix(p,t,intensity,false);
   const points=[[b.x,b.y],[b.x+b.w,b.y],[b.x+b.w,b.y+b.h],[b.x,b.y+b.h]];
   if(headPoseActive(p))points.push(...headDest(p,currentHeadSetting(p)));
@@ -192,7 +201,7 @@ function drawNeckVolume(target,source,p,t,intensity){
   const left=Math.min(...world.map(v=>v[0]))-pad,right=Math.max(...world.map(v=>v[0]))+pad,top=Math.min(...world.map(v=>v[1]))-pad,bottom=Math.max(...world.map(v=>v[1]))+pad;
   for(const ids of mesh.triangles){
     const src=ids.map(i=>mesh.source[i]);if(Math.max(...src.map(v=>v[0]))<left||Math.min(...src.map(v=>v[0]))>right||Math.max(...src.map(v=>v[1]))<top||Math.min(...src.map(v=>v[1]))>bottom)continue;
-    drawEyeTriangle(target,source,src,ids.map(i=>mesh.dest[i]));
+    drawEyeTriangle(target,source,src,ids.map(i=>hairDeformedPoint(p,mesh.source[i],mesh.dest[i])));
   }
 }
 function drawNeckMasterOverlay(t,intensity){
@@ -233,20 +242,26 @@ function renderHeadSurface(p,t,intensity,eyeOpen,variant="part"){
 function beginHeadFrame(t){
   headFrameCache.clear();neckMasterFrame=null;neckCurrentAngles=neckSwayAngles(t,Number(controls.motionIntensity.value));
   if(!PROJECT.head_pose)return;
-  if(controls.headEdit.checked)headAngle=HEAD_DIRECTIONS[headDirection];
-  else if(controls.headRandom.checked){
-    const speed=Number(controls.motionSpeed.value),amount=Math.min(1,Math.max(0,Number(controls.motionIntensity.value)));
-    headAngle=randomHeadAngle(Math.max(0,t-headRandomStart)*speed,headRandomSeed,headRandomFrom).map(v=>v*amount);
-  }
-  else if(controls.headCircle.checked){const a=t*Number(controls.motionSpeed.value)*2*Math.PI/4;headAngle=[Math.sin(a),-Math.cos(a)]}
-  else headAngle=[Number(controls.headX.value),Number(controls.headY.value)];
-  if(!controls.headEdit.checked&&controls.neckSway?.checked){const angles=neckSwayAngles(t,Number(controls.motionIntensity.value));headAngle=[headAngle[0]+angles.yaw/30,headAngle[1]+angles.pitch/20].map(v=>Math.max(-1,Math.min(1,v)))}
-  $('headXOut').textContent=headAngle[0].toFixed(2);$('headYOut').textContent=headAngle[1].toFixed(2);
+  const extent=neckPoseExtent();
+  headAngle=[neckCurrentAngles.yaw/extent.yaw,neckCurrentAngles.pitch/extent.pitch];
+  $('headXOut').textContent=neckCurrentAngles.yaw.toFixed(1)+'°';$('headYOut').textContent=neckCurrentAngles.pitch.toFixed(1)+'°';
+}
+function headDisplayPoint(p,point){
+  if(!PROJECT.neck_sway?.mesh||!PROJECT.neck_sway.part_ids.includes(p.name))return point;
+  return mapNeckMasterPoint(point,neckMasterMesh(0,0));
+}
+function headEditorDest(p,s){return headDest(p,s).map(point=>headDisplayPoint(p,point))}
+function headEditorDelta(p,s,index,dx,dy){
+  const point=headDest(p,s)[index],q=headDisplayPoint(p,point),qx=headDisplayPoint(p,[point[0]+.1,point[1]]),qy=headDisplayPoint(p,[point[0],point[1]+.1]);
+  const a=(qx[0]-q[0])/.1,b=(qy[0]-q[0])/.1,c=(qx[1]-q[1])/.1,d=(qy[1]-q[1])/.1,det=a*d-b*c;
+  if(Math.abs(det)<1e-6)return [0,0];
+  const x=(d*dx-b*dy)/det,y=(-c*dx+a*dy)/det,r=s.rotation*Math.PI/180;
+  return [(Math.cos(r)*x+Math.sin(r)*y)/s.scale_x,(-Math.sin(r)*x+Math.cos(r)*y)/s.scale_y];
 }
 function drawHeadOverlay(){
   if(!PROJECT.head_pose||!controls.headEdit.checked)return;
   const p=PROJECT.parts[$('headPart').value];if(!p)return;
-  const setting=headSetting(p,headDraft),grid=headGrid(p),dest=headDest(p,setting),selected=Number($('headVertex').value);
+  const setting=headSetting(p,headDraft),grid=headGrid(p),dest=headEditorDest(p,setting),selected=Number($('headVertex').value);
   ctx.save();ctx.strokeStyle='#00d9ff';ctx.lineWidth=.7;
   for(const tri of grid.triangles){ctx.beginPath();tri.forEach((i,k)=>k?ctx.lineTo(...dest[i]):ctx.moveTo(...dest[i]));ctx.closePath();ctx.stroke()}
   dest.forEach(([x,y],i)=>{ctx.beginPath();ctx.arc(x,y,i===selected?4:2.5,0,Math.PI*2);ctx.fillStyle=i===selected?'#ffff40':'#00d9ff';ctx.fill()});ctx.restore();
@@ -289,7 +304,7 @@ function selectHeadDirection(name){
   // Keep unsaved work in the session when switching directions.
   if(headDraft)flushHeadDraft();
   headDirection=name;headDraft=structuredClone(PROJECT.head_pose.poses[name]);
-  controls.headRandom.checked=false;controls.headCircle.checked=false;[controls.headX.value,controls.headY.value]=HEAD_DIRECTIONS[name];
+  controls.headRandom.checked=false;controls.headCircle.checked=false;controls.neckSway.checked=false;neckMasterFrame=null;[controls.headX.value,controls.headY.value]=HEAD_DIRECTIONS[name];
   document.querySelectorAll('[data-head-direction]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.headDirection===name)));
   headMessage(`${HEAD_LABELS[name]}：${headDraft.status==='authored'?'保存済み':'たたき台'}。編集をONにして調整できます`);syncHeadEditor();
 }
@@ -324,20 +339,21 @@ function initHeadEditor(){
   $('importHeadPose').onchange=async e=>{const file=e.target.files[0];if(!file)return;try{
     const data=JSON.parse(await file.text());validateHeadConfig(data);PROJECT.head_pose=data;headDraft=null;selectHeadDirection('center');saveHeadPoses();
   }catch(error){headMessage(`読み込めません：${error.message}`)}finally{e.target.value=''}};
-  const autoplay=controls.headRandom.checked;selectHeadDirection('center');controls.headRandom.checked=autoplay;
-  canvas.addEventListener('pointerdown',e=>{
+  const autoplay=controls.headRandom.checked,sway=controls.neckSway.checked;selectHeadDirection('center');controls.headRandom.checked=autoplay;controls.neckSway.checked=sway;
+  displayCanvas.addEventListener('pointerdown',e=>{
     if(!controls.headEdit.checked)return;
-    const rect=canvas.getBoundingClientRect(),x=(e.clientX-rect.left)*canvas.width/rect.width,y=(e.clientY-rect.top)*canvas.height/rect.height;
-    const p=PROJECT.parts[$('headPart').value],dest=headDest(p,headSetting(p,headDraft));let best=-1,distance=12*canvas.width/rect.width;
+    const rect=displayCanvas.getBoundingClientRect(),x=(e.clientX-rect.left)*canvas.width/rect.width,y=(e.clientY-rect.top)*canvas.height/rect.height;
+    const p=PROJECT.parts[$('headPart').value],dest=headEditorDest(p,headSetting(p,headDraft));let best=-1,distance=12*canvas.width/rect.width;
     dest.forEach(([px,py],i)=>{const d=Math.hypot(px-x,py-y);if(d<distance){best=i;distance=d}});
-    if(best<0)return;$('headVertex').value=best;headDrag={x,y};canvas.setPointerCapture(e.pointerId);syncHeadEditor();e.preventDefault();
+    if(best<0)return;$('headVertex').value=best;headDrag={x,y};displayCanvas.setPointerCapture(e.pointerId);syncHeadEditor();e.preventDefault();
   });
-  canvas.addEventListener('pointermove',e=>{
+  displayCanvas.addEventListener('pointermove',e=>{
     if(!headDrag)return;
-    const rect=canvas.getBoundingClientRect(),x=(e.clientX-rect.left)*canvas.width/rect.width,y=(e.clientY-rect.top)*canvas.height/rect.height,dx=x-headDrag.x,dy=y-headDrag.y;
-    editHeadSetting(s=>{const a=s.rotation*Math.PI/180,c=Math.cos(a),sn=Math.sin(a),v=s.vertices[Number($('headVertex').value)];v[0]+=(c*dx+sn*dy)/s.scale_x;v[1]+=(-sn*dx+c*dy)/s.scale_y});headDrag={x,y};
+    const rect=displayCanvas.getBoundingClientRect(),x=(e.clientX-rect.left)*canvas.width/rect.width,y=(e.clientY-rect.top)*canvas.height/rect.height,dx=x-headDrag.x,dy=y-headDrag.y;
+    const p=PROJECT.parts[$('headPart').value];
+    editHeadSetting(s=>{const i=Number($('headVertex').value),delta=headEditorDelta(p,s,i,dx,dy);s.vertices[i][0]+=delta[0];s.vertices[i][1]+=delta[1]});headDrag={x,y};
   });
-  for(const event of ['pointerup','pointercancel','lostpointercapture'])canvas.addEventListener(event,()=>headDrag=null);
+  for(const event of ['pointerup','pointercancel','lostpointercapture'])displayCanvas.addEventListener(event,()=>headDrag=null);
 }
 
 function headMapPoint(p,point,setting){
@@ -368,3 +384,27 @@ function randomHeadAngle(t,seed,initial=[0,0]){
   return a.map((v,i)=>v+(b[i]-v)*mix);
 }
 function resetRandomHead(from=[0,0],time=0){headRandomFrom=[...from];headRandomStart=time;}
+
+// Bridge the moving chin to the body. Sample only opaque skin, so the source
+// patch's curved transparent edge can never expose a straight crack at the join.
+function neckFillGeometry(t,intensity){
+  const fill=PROJECT.neck_fill,n=PROJECT.neck_sway;
+  if(!fill||!n||neckCurrentAngles.pitch>=0||!fill.head_edge||!fill.body_edge||!fill.skin_rect)return null;
+  const face=PROJECT.parts[n.anchor_part],body=PROJECT.parts[fill.body_part];
+  const setting=currentHeadSetting(face),headMatrix=partMatrix(face,t,intensity,false);
+  const bodyMatrix=body?partMatrix(body,t,intensity,false):groupMatrix(fill.body_group,t,intensity);
+  const map=(point,m)=>[m[0]*point[0]+m[2]*point[1]+m[4],m[1]*point[0]+m[3]*point[1]+m[5]];
+  const mesh=neckMasterMesh(t,intensity);
+  // Hidden overlap extends above the chin and below the original collar/bow.
+  const top=fill.head_edge.map(point=>mapNeckMasterPoint(map(headMapPoint(face,point,setting),headMatrix),mesh));
+  const bottom=fill.body_edge.map(point=>map(point,bodyMatrix));
+  const [x,y,w,h]=fill.skin_rect;
+  return {src:[[x,y],[x+w,y],[x+w,y+h],[x,y+h]],dest:[top[0],top[1],bottom[1],bottom[0]],triangles:[[0,1,2],[0,2,3]]};
+}
+function drawNeckFill(t,intensity){
+  const fill=PROJECT.neck_fill;if(!fill||!images[fill.file])return;
+  const geometry=neckFillGeometry(t,intensity);if(!geometry)return;
+  ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.globalAlpha=1;
+  for(const ids of geometry.triangles)drawEyeTriangle(ctx,images[fill.file],ids.map(i=>geometry.src[i]),ids.map(i=>geometry.dest[i]));
+  ctx.restore();
+}

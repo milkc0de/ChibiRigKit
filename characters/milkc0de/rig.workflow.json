@@ -134,7 +134,14 @@
         "iris_center",
         "outline",
         "mouth_position",
-        "hair_coverage"
+        "hair_coverage",
+        "far_eye_outline_gap",
+        "diagonal_back_head_volume",
+        "chin_direction",
+        "neck_join_upper_three",
+        "moving_brows",
+        "mouth_yaw_pitch_direction",
+        "hair_head_continuity"
       ],
       "require_nonfolding_mesh": true,
       "initial_status": "suggested",
@@ -146,7 +153,26 @@
         "save_authored_part_placements",
         "attach_shared_head_parent_mesh",
         "interpolate_saved_reference_meshes"
-      ]
+      ],
+      "reference_yaw_degrees": [
+        -25,
+        0,
+        25
+      ],
+      "reference_pitch_degrees": [
+        -25,
+        0,
+        25
+      ],
+      "suggested_pitch_deformation_gain": 0.5,
+      "legacy_authored_angles": "preserve_until_explicit_relayout",
+      "art_direction": "prioritize_appealing_silhouette_over_rigid_proportions",
+      "allow_directional_size_changes": true,
+      "mouth_direction": "screen_right_for_positive_yaw_screen_up_for_upward_pitch",
+      "far_eye": "inset_from_face_outline_and_hair_at_side_views",
+      "chin": "follows_head_no_isolated_stationary_vertex",
+      "neck_join": "continuous_in_upper_three_directions",
+      "long_hair": "head_attached_roots_gravity_spring_damping_at_tips"
     },
     "seams": {
       "mask": "explicit_joint_region",
@@ -165,6 +191,53 @@
       "inspect_existing_outputs_first": true,
       "preserve_correct_work": true,
       "restart_from_scratch": false
+    },
+    "player_handoff": {
+      "format": "self_contained_html_and_zip",
+      "embedded_data": [
+        "projectData",
+        "bundleSnapshot"
+      ],
+      "keep_images_embedded": true,
+      "keep_source_images_immutable": true,
+      "consumer": "ChibiRigKit_browser_player",
+      "motion_format": "ChibiRigMotion/v1",
+      "playback_axis_gains": [
+        "yaw",
+        "pitch",
+        "roll"
+      ],
+      "popup": false,
+      "rebuild_for_character_change": false,
+      "virtual_camera": false,
+      "network_broadcast": false,
+      "generated_zip": "gitignored_do_not_commit",
+      "license": "MIT_original_code_preserve_third_party_notices",
+      "output_directory": "kit_root/dist/character",
+      "zip_output": "kit_root/dist/character.zip",
+      "authoring_preview": "work/player/index.html",
+      "tracking_input_lock": [
+        "trackingInput",
+        "cameraDevice",
+        "microphoneDevice"
+      ],
+      "tracking_opt_out": [
+        "eyes_and_gaze",
+        "mouth",
+        "head"
+      ],
+      "head_opt_out_with_camera": true,
+      "microphone_only_mouth_opt_out": false,
+      "untracked_region_priority": [
+        "playing_motion_file",
+        "ordinary_animation"
+      ],
+      "camera_and_motion_playback": "coexist_without_unloading_clip",
+      "electron": false,
+      "player_file_import": false,
+      "character_source": "selected_character_workspace/rig.project.json",
+      "camera_microphone": "explicit_user_start_only",
+      "html_title": "character_name - ChibiRigKit"
     }
   },
   "phases": {
@@ -194,8 +267,9 @@
       "required_outputs": [
         "rig.plan.json",
         "rig.project.json",
-        "index.html",
-        "checks/report.json"
+        "checks/report.json",
+        "work/player/index.html",
+        "work/player-output.json"
       ]
     },
     "review": {
@@ -210,8 +284,9 @@
       "required_outputs": [
         "rig.plan.json",
         "rig.project.json",
-        "index.html",
-        "checks/report.json"
+        "checks/report.json",
+        "work/player/index.html",
+        "work/player-output.json"
       ],
       "preserve_correct_parts": true
     }

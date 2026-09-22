@@ -15,7 +15,7 @@ const wantsResume=process.argv.includes('--resume'),explicitResume=arg('resume-t
 const saved=wantsResume&&fs.existsSync(checkpointPath)?JSON.parse(fs.readFileSync(checkpointPath,'utf8')):null;
 const resumeId=explicitResume||(wantsResume?saved?.threadId:null);
 if(wantsResume&&!resumeId)throw new Error('No saved thread. Use --resume-thread THREAD_ID for an older interrupted run.');
-if(!fs.existsSync(path.join(workspace,'rig.workflow.json'))||!fs.existsSync(path.join(workspace,'templates/results/rigging.json')))run(py,[path.join(ROOT,'scripts/update-character.py'),'--character',workspace]);
+if(!fs.existsSync(path.join(workspace,'toolbox/player_output.py'))||!fs.existsSync(path.join(workspace,'rig.workflow.json'))||!fs.existsSync(path.join(workspace,'templates/results/rigging.json')))run(py,[path.join(ROOT,'scripts/update-character.py'),'--character',workspace]);
 run(py,['toolbox/validate_workflow.py']);
 const workflow=JSON.parse(fs.readFileSync(path.join(workspace,'rig.workflow.json'),'utf8'));
 const resultSchema=JSON.parse(fs.readFileSync(path.join(workspace,'rig.result.schema.json'),'utf8'));
@@ -51,7 +51,7 @@ function saveCheckpoint(update){
   fs.renameSync(checkpointPath+'.tmp',checkpointPath);
 }
 function taskInput(phase,images,context={}){
-  return [{type:'text',text:JSON.stringify({protocol:'chibirigkit.task/v1',phase,contract:workflow,phase_spec:workflow.phases[phase],result_template:JSON.parse(fs.readFileSync(path.join(workspace,`templates/results/${phase}.json`),'utf8')),artifact_contract:{paths:'workspace_relative',kinds:['file','directory'],must_exist:true,required_outputs:'files_only'},workspace,python:py,resume:Boolean(resumeId),context,schemas:['rig.plan.schema.json','reference.plan.schema.json','rig.result.schema.json']})},...images];
+  return [{type:'text',text:JSON.stringify({protocol:'chibirigkit.task/v1',phase,contract:workflow,phase_spec:workflow.phases[phase],result_template:JSON.parse(fs.readFileSync(path.join(workspace,`templates/results/${phase}.json`),'utf8')),artifact_contract:{paths:'workspace_relative',kinds:['file','directory'],must_exist:true,required_outputs:'files_only'},workspace,python:py,resume:Boolean(resumeId),execution:{writable_root:workspace,network_access:false,environment:{CHIBIRIG_DIST_ROOT:path.join(workspace,'work/agent-output'),TMPDIR:path.join(workspace,'work/agent-tmp'),TMP:path.join(workspace,'work/agent-tmp'),TEMP:path.join(workspace,'work/agent-tmp')},final_export:'The parent orchestrator writes kit dist after validation. Agent builds stay in work/agent-output; do not request broader permissions.'},context,schemas:['rig.plan.schema.json','reference.plan.schema.json','rig.result.schema.json']})},...images];
 }
 async function runPhase(phase,options){
   saveCheckpoint({phase,status:'starting',error:null});
@@ -103,7 +103,7 @@ try{
     verify();
   }
   saveCheckpoint({status:'completed',phase:'done'});
-  console.log(`\nBuilt and checked (visual quality still requires review): ${workspace}`);console.log(`Open ${path.join(workspace,'index.html')}`);
+  console.log(`\nBuilt and checked (visual quality still requires review): ${workspace}`);const output=JSON.parse(fs.readFileSync(path.join(workspace,'work/player-output.json'),'utf8'));console.log(`Open ${output.html}\nZIP ${output.zip}`);
 }catch(error){
   if(checkpoint.threadId)saveCheckpoint({status:'failed',error:error.message});
   throw error;

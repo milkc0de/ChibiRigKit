@@ -10,4 +10,5 @@ command -v npm >/dev/null 2>&1 || { echo 'Node.jsをインストールしてく�
 "$setup_python" -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
 npm install
+npm run setup:tracking
 echo 'セットアップ完了。次に sh AUTO_RIG.sh "画像のパス" を実行してください。'
