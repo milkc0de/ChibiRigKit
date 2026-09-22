@@ -12,7 +12,7 @@ test('camera and audio start only on request, motion take replays, and stop rele
  const videoTrack={kind:'video',stop(){stopped++}},audioTrack={kind:'audio',stop(){stopped++}},stream={getTracks:()=>[videoTrack,audioTrack],getVideoTracks:()=>[videoTrack]};
  c.navigator.mediaDevices.getUserMedia=async()=>{requests++;return stream};
  c.Worker=class{postMessage(data){if(data.type==='init')queueMicrotask(()=>this.onmessage({data:{type:'ready'}}))}terminate(){terminated++}};
- c.AudioContext=class{async resume(){}createAnalyser(){return {fftSize:1024,getFloatTimeDomainData:a=>a.fill(.2)}}createMediaStreamSource(){return {connect(){}}}async close(){closed++}};
+ c.AudioContext=class{async resume(){}createAnalyser(){return {connect(){},fftSize:1024,getFloatTimeDomainData:a=>a.fill(.2)}}createChannelSplitter(){return {connect(){}}}createGain(){return {gain:{value:1},connect(){}}}createMediaStreamSource(){return {connect(){}}}async close(){closed++}};
  elements.get('trackingInput').value='both';assert.equal(requests,0);await vm.runInContext('startTracking()',c);assert.equal(requests,1);assert.equal(vm.runInContext('trackingState.active',c),true);
  vm.runInContext('trackingTick(1100);startMotionTake();trackingTick(1200);trackingTick(1300)',c);c.performance.now=()=>1500;vm.runInContext('stopMotionTake()',c);
  const take=vm.runInContext('trackingState.take',c);assert.equal(take.format,'ChibiRigMotion');assert.ok(take.frames.length>=3);assert.ok(take.frames.at(-1)[take.channels.indexOf('mouthOpen')+1]>0);
@@ -21,7 +21,7 @@ test('camera and audio start only on request, motion take replays, and stop rele
 });
 test('permission denial and cancellation do not leave media active',async()=>{
  const {context:c,elements}=browserHarness();await c.rigReady;c.navigator.mediaDevices.getUserMedia=async()=>{throw Error('NotAllowedError')};await vm.runInContext('startTracking()',c);assert.equal(vm.runInContext('trackingState.active',c),false);assert.equal(elements.get('cameraStart').disabled,false);
- let finish,stopped=0;c.navigator.mediaDevices.getUserMedia=()=>new Promise(resolve=>finish=resolve);const pending=vm.runInContext('startTracking()',c);vm.runInContext('stopTracking()',c);finish({getTracks:()=>[{stop(){stopped++}}]});await pending;assert.equal(stopped,1);assert.equal(vm.runInContext('trackingState.active',c),false);
+ let finish,stopped=0,requested;const requestStarted=new Promise(resolve=>requested=resolve);c.navigator.mediaDevices.getUserMedia=()=>new Promise(resolve=>{finish=resolve;requested()});const pending=vm.runInContext('startTracking()',c);await requestStarted;vm.runInContext('stopTracking()',c);finish({getTracks:()=>[{stop(){stopped++}}]});await pending;assert.equal(stopped,1);assert.equal(vm.runInContext('trackingState.active',c),false);
 });
 
 test('specified parent character boots with its saved settings',async()=>{

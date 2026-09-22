@@ -13,26 +13,51 @@ function trackingUI(){
  for(const id of ['takeSave','takePlay'])$(id).disabled=!s.take||!!s.recording;
  $('cameraPreview').hidden=!s.stream?.getVideoTracks().length;
 }
+function createTrackingAudio(context,stream){
+ const source=context.createMediaStreamSource(stream),channels=Math.max(1,Math.min(8,stream.getAudioTracks?.()[0]?.getSettings?.().channelCount||2)),splitter=context.createChannelSplitter(channels),silent=context.createGain();
+ // Keep the graph processing without playing the captured sound through speakers.
+ silent.gain.value=0;source.connect(splitter);
+ const analysers=Array.from({length:channels},(_,channel)=>{const analyser=context.createAnalyser();analyser.fftSize=1024;splitter.connect(analyser,channel);analyser.connect(silent);return {analyser,samples:new Float32Array(analyser.fftSize)}});
+ silent.connect(context.destination);return {context,source,splitter,silent,analysers,started:performance.now(),heard:false};
+}
+function readTrackingAudio(audio,options){
+ // Measure channels before mixing: opposite-phase stereo must not cancel to silence.
+ const levels=audio.analysers.map(({analyser,samples})=>{analyser.getFloatTimeDomainData(samples);return TrackingCore.audioLevel(samples,options)});
+ return {rms:Math.max(...levels.map(x=>x.rms)),value:Math.max(...levels.map(x=>x.value))};
+}
 async function startTracking(){
  const s=trackingState;if(s.active||s.starting)return;
  if(!navigator.mediaDevices?.getUserMedia){trackingMessage('localhostまたはHTTPSで開いてください。');return}
- if(location.protocol==='file:'){trackingMessage('カメラを使うには npm run player で起動してください。');return}
+ if(location.protocol==='file:'){trackingMessage('カメラ・音声は完成品の START_SERVER で起動し、操作用URLをブラウザで開いてください。');return}
  const useCamera=$('trackingInput').value!=='audio',useAudio=$('trackingInput').value!=='camera',generation=++s.generation;
  s.inputMode=$('trackingInput').value;s.starting=true;trackingUI();trackingMessage('カメラ・マイクの準備中…');
  let stream=null,worker=null,context=null;
  try{
-  stream=await navigator.mediaDevices.getUserMedia({video:useCamera?{deviceId:$('cameraDevice').value?{exact:$('cameraDevice').value}:undefined,width:{ideal:640},height:{ideal:480},frameRate:{ideal:30,max:30}}:false,audio:useAudio?{deviceId:$('microphoneDevice').value?{exact:$('microphoneDevice').value}:undefined,echoCancellation:true,noiseSuppression:true,autoGainControl:false}:false});
-  if(generation!==s.generation){stream.getTracks().forEach(t=>t.stop());return}
+  // Create/resume during the user's click, before awaiting device permission.
+  if(useAudio){context=new AudioContext();await context.resume();if(context.state==='suspended')throw Error('音声処理が一時停止中です。操作画面で追従開始を押し直してください')}
+  if(useCamera){
+   let capabilities;try{const response=await fetch('/api/tracking');if(response.ok)capabilities=await response.json()}catch{}
+   if(!capabilities)throw Error('追跡に対応したサーバーではありません。最新の完成品ZIPをすべて展開してSTART_SERVERを起動してください');
+   if(!capabilities.camera){
+    if(generation!==s.generation)throw Error('入力の開始を取り消しました');
+    trackingMessage('不足している追跡ファイルをダウンロードしています…（初回はインターネット接続が必要です）');
+    let response;try{response=await fetch('/api/tracking/setup',{method:'POST',headers:{'X-ChibiRig-Token':capabilities.setupToken}})}catch{throw Error('追跡ファイルを取得できません。インターネット接続を確認して再度開始してください')}
+    const result=await response.json();if(!response.ok||!result.camera)throw Error(result.error||'追跡ファイルを準備できませんでした');
+   }
+  }
+  if(generation!==s.generation)throw Error('入力の開始を取り消しました');
+  stream=await navigator.mediaDevices.getUserMedia({video:useCamera?{deviceId:$('cameraDevice').value?{exact:$('cameraDevice').value}:undefined,width:{ideal:640},height:{ideal:480},frameRate:{ideal:30,max:30}}:false,audio:useAudio?{deviceId:$('microphoneDevice').value?{exact:$('microphoneDevice').value}:undefined,echoCancellation:false,noiseSuppression:false,autoGainControl:false}:false});
+  if(generation!==s.generation){stream.getTracks().forEach(t=>t.stop());await context?.close().catch(()=>{});return}
   s.stream=stream;
-  if(useAudio){context=new AudioContext();await context.resume();if(generation!==s.generation)throw Error('入力の開始を取り消しました');const analyser=context.createAnalyser();analyser.fftSize=1024;context.createMediaStreamSource(stream).connect(analyser);s.audio={context,analyser,samples:new Float32Array(analyser.fftSize)}}
+  if(useAudio)s.audio=createTrackingAudio(context,stream);
   if(useCamera){
    const video=$('cameraVideo');video.srcObject=stream;await video.play();if(generation!==s.generation)throw Error('入力の開始を取り消しました');
    worker=new Worker('runtime/tracking_worker.js');s.worker=worker;
-   await new Promise((resolve,reject)=>{const finish=error=>{clearTimeout(timer);if(s.cancelStart===cancel)s.cancelStart=null;error?reject(error):resolve()},cancel=()=>finish(Error('入力の開始を取り消しました')),timer=setTimeout(()=>finish(Error('追跡モデルの読み込みがタイムアウトしました')),45000);s.cancelStart=cancel;worker.onerror=()=>finish(Error('追跡Workerを起動できません'));worker.onmessage=({data})=>{if(data.type==='ready')finish();else if(data.type==='error')finish(Error(data.message))};worker.postMessage({type:'init'})});
+   await new Promise((resolve,reject)=>{const finish=error=>{clearTimeout(timer);if(s.cancelStart===cancel)s.cancelStart=null;error?reject(error):resolve()},cancel=()=>finish(Error('入力の開始を取り消しました')),timer=setTimeout(()=>finish(Error('追跡モデルの読み込みがタイムアウトしました')),45000);s.cancelStart=cancel;worker.onerror=()=>finish(Error('追跡Workerを起動できません。完成品ZIP全体を展開し、START_SERVERで起動し直してください'));worker.onmessage=({data})=>{if(data.type==='ready')finish();else if(data.type==='error')finish(Error(data.message))};worker.postMessage({type:'init'})});
    worker.onmessage=({data})=>{if(generation!==s.generation)return;s.busy=false;if(data.type==='result'){s.latest=data.result;s.lastResult=performance.now()}else if(data.type==='error'){trackingMessage('追跡を停止しました：'+data.message);stopTracking()}};
    worker.onerror=()=>{trackingMessage('追跡Workerが停止しました');stopTracking()};
   }
-  if(generation!==s.generation){worker?.terminate();stream.getTracks().forEach(t=>t.stop());await context?.close();return}
+  if(generation!==s.generation){worker?.terminate();stream.getTracks().forEach(t=>t.stop());await context?.close().catch(()=>{});return}
   // Input starts only on user action; the loopback relay shares solved values only.
   captureFrame=null;s.active=true;s.starting=false;s.values=MotionClip.neutral();s.neutral={};s.latest=null;s.lastResult=0;s.lastTick=performance.now();s.lastVideo=-1;s.history=[];s.audioValue=0;s.busy=false;
   controls.headEdit.checked=false;controls.showBaseOnly.checked=false;if(!running){start=performance.now()-pausedAt*1000;if(!captureMotion)running=true;}
@@ -41,14 +66,17 @@ async function startTracking(){
  }catch(error){worker?.terminate();stream?.getTracks().forEach(t=>t.stop());await context?.close().catch(()=>{});if(generation===s.generation){s.active=false;s.starting=false;s.stream=null;s.worker=null;s.audio=null;trackingMessage('開始できません：'+error.message);trackingUI()}}
 }
 function stopTracking(){
- const s=trackingState;if(recordingActive)cancelRecording?.();if(s.recording)stopMotionTake();s.generation++;s.cancelStart?.();s.cancelStart=null;s.active=false;s.starting=false;s.worker?.terminate();s.worker=null;s.stream?.getTracks().forEach(t=>{t.onended=null;t.stop()});s.stream=null;s.audio?.context.close().catch(()=>{});s.audio=null;s.latest=null;s.values=null;s.busy=false;$('cameraVideo').srcObject=null;trackingUI();requestRender();if(typeof publishPlayerSyncLive==='function')void publishPlayerSyncLive(true);
+ const s=trackingState;if(recordingActive)cancelRecording?.();if(s.recording)stopMotionTake();s.generation++;s.cancelStart?.();s.cancelStart=null;s.active=false;s.starting=false;s.worker?.terminate();s.worker=null;s.stream?.getTracks().forEach(t=>{t.onended=null;t.stop()});s.stream=null;s.audio?.context.close().catch(()=>{});s.audio=null;s.audioValue=0;$('audioMeter').value=0;if($('audioStatus'))$('audioStatus').textContent='入力を停止しました';s.latest=null;s.values=null;s.busy=false;$('cameraVideo').srcObject=null;trackingUI();requestRender();if(typeof publishPlayerSyncLive==='function')void publishPlayerSyncLive(true);
 }
 function trackingTick(now){
  const s=trackingState;if(!s.active)return;
  const dt=Math.max(.001,Math.min(.1,(now-s.lastTick)/1000));s.lastTick=now;
  const solved=now-s.lastResult<350?TrackingCore.solve(s.latest,{mirror:$('cameraMirror').checked,neutral:s.neutral}):null;
  const next=MotionClip.normalize(solved||{});
- if(s.audio){s.audio.analyser.getFloatTimeDomainData(s.audio.samples);const level=TrackingCore.audioLevel(s.audio.samples,{floor:Number($('audioFloor').value),gain:Number($('audioGain').value),previous:s.audioValue,dt});s.audioValue=level.value;$('audioMeter').value=level.rms;next.mouthOpen=Math.max(next.mouthOpen,s.audioValue)}
+ if(s.audio){const level=readTrackingAudio(s.audio,{floor:Number($('audioFloor').value),gain:Number($('audioGain').value),previous:s.audioValue,dt});s.audioValue=level.value;$('audioMeter').value=level.rms;next.mouthOpen=Math.max(next.mouthOpen,s.audioValue);
+  if(level.rms>.0001)s.audio.heard=true;
+  const status=$('audioStatus');if(status){const db=level.rms>0?Math.max(-96,20*Math.log10(level.rms)).toFixed(1)+' dBFS':'無音';status.textContent=s.audio.context.state==='suspended'?'音声処理が一時停止中です。停止して追従開始を押し直してください。':(!s.audio.heard&&now-s.audio.started>2500?'入力音量が届いていません。再生アプリの出力先と、選択したマイクを確認してください。':'入力音量：'+db+(level.rms>0&&level.rms<=Number($('audioFloor').value)?'（無音とみなす音量以下）':''))}}
+
  s.values=TrackingCore.smooth(s.values,next,dt,solved ? .06 : .2);
  s.history.push({time:(now-start)/1000,values:{...s.values}});while(s.history.length&&s.history[0].time<(now-start)/1000-4)s.history.shift();
  const video=$('cameraVideo');

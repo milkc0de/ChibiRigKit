@@ -33,3 +33,19 @@ function parsePlayer(bytes){
  return {project,snapshot:snapshot||{motion:project,background:{version:1,mode:'original',color:'#e9dfd3',fit:'cover',image:null,name:''}}};
 }
 module.exports={parsePlayer,zipHTML,zipTextFile,LIMIT};
+
+// Repack validated export files with local tracking dependencies; preserve executable launchers.
+function createZip(files){
+ const chunks=[],directory=[];let offset=0;
+ for(const [name,value] of Object.entries(files)){
+  if(!name||name.startsWith('/')||name.includes('\\')||name.split('/').some(x=>!x||x==='..'||x==='.'))throw Error('Unsafe ZIP path');
+  const filename=Buffer.from(name),bytes=Buffer.isBuffer(value)?value:Buffer.from(value),packed=zlib.deflateRawSync(bytes);let crc=0xffffffff;
+  for(const value of bytes){crc^=value;for(let i=0;i<8;i++)crc=(crc>>>1)^((crc&1)?0xedb88320:0)}crc=(crc^0xffffffff)>>>0;
+  const local=Buffer.alloc(30+filename.length);local.writeUInt32LE(0x04034b50);local.writeUInt16LE(20,4);local.writeUInt16LE(0x800,6);local.writeUInt16LE(8,8);local.writeUInt16LE(33,12);local.writeUInt32LE(crc,14);local.writeUInt32LE(packed.length,18);local.writeUInt32LE(bytes.length,22);local.writeUInt16LE(filename.length,26);filename.copy(local,30);
+  const central=Buffer.alloc(46+filename.length);central.writeUInt32LE(0x02014b50);central.writeUInt16LE(0x314,4);central.writeUInt16LE(20,6);central.writeUInt16LE(0x800,8);central.writeUInt16LE(8,10);central.writeUInt16LE(33,14);central.writeUInt32LE(crc,16);central.writeUInt32LE(packed.length,20);central.writeUInt32LE(bytes.length,24);central.writeUInt16LE(filename.length,28);central.writeUInt32LE(((/\.(sh|command)$/.test(name)?0o100755:0o100644)<<16)>>>0,38);central.writeUInt32LE(offset,42);filename.copy(central,46);
+  chunks.push(local,packed);directory.push(central);offset+=local.length+packed.length;
+ }
+ const end=Buffer.alloc(22);end.writeUInt32LE(0x06054b50);end.writeUInt16LE(directory.length,8);end.writeUInt16LE(directory.length,10);end.writeUInt32LE(directory.reduce((n,b)=>n+b.length,0),12);end.writeUInt32LE(offset,16);
+ return Buffer.concat([...chunks,...directory,end]);
+}
+module.exports.createZip=createZip;

@@ -20,7 +20,7 @@ WebM動画はドラッグで指定した範囲を1280×720で保存します。�
 
 ## 完成品と制作契約
 
-完成品HTMLのタブのタイトルは「キャラクター名 - ChibiRigKit」です。完成品は `dist/<キャラ名>/index.html`、ZIPは `dist/<キャラ名>.zip`。どちらもGit対象外です。Web画面の「完成品をdistに保存」、または `npm run export -- --character characters/<キャラ名>` を使います。出力フォルダとZIPには `index.html`、`LICENSE.txt` と、`START_SERVER.ps1`・`.cmd`・`.command`・`.sh` の4種類の起動ファイル、`PLAYER_SERVER.py` の合計7ファイルを含めます。画像・設定・選択した録画モーションはHTML内に保存し、外部の `assets/` やJSONは同梱しません。制作データは元のキャラフォルダに残します。HTML単体はブラウザで再生できます。カメラ収録はローカルサーバーから行います。
+完成品HTMLのタブのタイトルは「キャラクター名 - ChibiRigKit」です。完成品は `dist/<キャラ名>/index.html`、ZIPは `dist/<キャラ名>.zip`。どちらもGit対象外です。Web画面の「完成品をdistに保存」、または `npm run export -- --character characters/<キャラ名>` を使います。出力フォルダとZIPには `index.html`、`LICENSE.txt` と、`START_SERVER.ps1`・`.cmd`・`.command`・`.sh` の4種類の起動ファイル、`PLAYER_SERVER.py` に加えて、`runtime/tracking_worker.js`、`vendor/mediapipe/` の追跡SDK・WASM・顔モデル、`licenses/` のライセンス表記を含めます。画像・設定・選択した録画モーションはHTML内に保存し、外部の `assets/` やJSONは同梱しません。制作データは元のキャラフォルダに残します。HTML単体はブラウザで再生できます。カメラ収録はローカルサーバーから行います。
 
 `template/workspace/runtime/` が共通実装、`studio/` がChibiRigKitのローカルサーバーです。Codex制作契約は `rig.workflow.json`、説明は `AUTO_RIG_TASK.md`。`scripts/update-character.py --character <folder>` は古い実装をバックアップして更新します。画像やリグは再構築しません。
 
@@ -28,9 +28,9 @@ WebM動画はドラッグで指定した範囲を1280×720で保存します。�
 
 `neck_fill` は補完用の派生画像、`skin_rect`、`head_edge`、`body_edge`、`body_part` をキャラ側に指定します。長い髪は `physics: {type: "long_hair", stiffness: 16, damping: 7}` を使用できます。左右を明示する場合は `capture_side: "left"` または `"right"`（画面上の左右）を使用します。サンプル固有の座標を他キャラへ流用しません。
 
-元画像は保持します。オリジナルコードはMITです。依存ライブラリに付属するライセンス表記は保持します。セットアップ時にSDKとモデルのハッシュを `tracking-dependencies.json` に保存します。
+元画像は保持します。オリジナルコードはMITです。依存ライブラリに付属するライセンス表記は保持します。 MediaPipe Tasks Vision 1.0.1・WASM・顔モデルはApache-2.0です。完成品の `licenses/mediapipe-LICENSE.txt` と `licenses/mediapipe-NOTICES.txt` に原文・配布元・著作権を記載します。`TRACKING_DOWNLOADS.json` にも配布元・ハッシュ・ライセンスを記録し、ChibiRigKitのMITとは区別します。セットアップ時にSDKとモデルのハッシュを `tracking-dependencies.json` に保存します。
 
-完成品の `dist/<キャラ名>/index.html` 自体がプレイヤーです。別のプレイヤーアプリへ取り込む手順はありません。そのままブラウザで再生・調整・モーション読込ができます。カメラ・音声追従は付属モデルを使うため、指定キャラを `npm run player` でlocalhost経由で開いて利用します。
+完成品の `dist/<キャラ名>/index.html` 自体がプレイヤーです。別のプレイヤーアプリへ取り込む手順はありません。そのままブラウザで再生・調整・モーション読込ができます。カメラ・音声追従は完成品ZIPをすべて展開して `START_SERVER` で起動し、操作用URLで利用します。ChibiRigKitでは指定キャラを `npm run player` で開く方法も使えます。
 
 ## プライバシーとオフライン利用
 
@@ -54,7 +54,9 @@ OBS公式の説明：[クロマキー](https://obsproject.com/kb/chroma-key-filt
 
 操作画面で変えた背景・動きの倍率・顔配置・髪の設定・出力範囲と、読み込んだモーションの再生をOBS側へ反映します。OBSを後から開いても最新の状態を受け取ります。共有中の状態はサーバーのメモリだけに置き、サーバー終了時に消えます。設定を残したい場合は、動きのJSONや完成品として保存してください。
 
-カメラ・音声の追従も共有できます。この場合は追跡モデルを準備済みのChibiRigKitを `npm run player` で起動し、同じ操作URLとOBS用URLを使います。共有するのは顔の向きや口の開きなどの数値で、生のカメラ映像・音声・機器名・デバイスIDは送りません。完成品ZIPには追跡SDK・モデルを同梱していません。
+カメラ・音声の追従も、完成品の `START_SERVER` で起動して共有できます。完成品ZIPには追跡Worker・SDK・顔モデルと必要なライセンス表記を同梱します。SDK・モデルが不足している場合は「追従開始」でダウンロードし、ハッシュを検証して保存します。この取得時だけインターネット接続が必要で、準備後はオフラインで使えます。ChibiRigKitの `npm run player` でも同じ操作URLとOBS用URLを使えます。OBSへ共有するのは設定と動きの数値で、生のカメラ映像・音声・機器名・デバイスIDは送りません。
+
+**VB-CABLEで口パクするには：** 音を出すアプリの出力先を「CABLE Input」、ChibiRigKitの「入力」を「マイクで口パク」、マイクを「CABLE Output」にして「追従開始」を押します。入力音量メーターとdB表示で音が届いているか確認できます。エコー除去・ノイズ抑制・自動音量調整は使わず、左右のチャンネルを個別に解析します。入力音量が「無音とみなす音量」以下なら、その値を下げるか「音声の口パク感度」を調整してください。取り込んだ音をスピーカーへ再生する機能ではありません。
 
 カメラ・音声を使う操作画面は開いたままにしてください。OSの休止やブラウザによるページ凍結中は新しい追従値を取得できません。入力停止や通信切断で古くなった追従値は解除し、再生中のモーション、通常の動きの順で表示します。
 

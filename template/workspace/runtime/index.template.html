@@ -43,6 +43,8 @@ html[data-player-view] body{display:block;background:transparent}html[data-playe
 <div id="cameraPreview" hidden><video id="cameraVideo" autoplay playsinline muted></video></div>
 <label class="line" for="audioGain">音声の口パク感度</label><input id="audioGain" type="range" min="1" max="20" step=".5" value="6">
 <label class="line" for="audioFloor">無音とみなす音量</label><input id="audioFloor" type="range" min="0" max=".1" step=".001" value=".015"><meter id="audioMeter" min="0" max=".25" value="0" aria-label="マイク音量"></meter>
+<p id="audioStatus" class="note" role="status">入力音量は追従開始後に表示します。</p>
+<p class="note">VB-CABLEは、音を出すアプリの出力先を「CABLE Input」、ここでのマイクを「CABLE Output」にします。取り込んだ音はスピーカーへ再生しません。</p>
 <p id="trackingStatus" role="status">開始を押すまでカメラ・マイクは使いません。映像と音声はこの端末で処理します。</p>
 <h2>モーションを録画</h2><div class="row"><button id="takeRecord" disabled>モーション録画</button><button id="takeStop" disabled>録画を終了</button></div>
 <div class="row"><button id="takePlay" disabled>録画を再生</button><button id="takeSave" disabled>ファイルに保存</button></div>

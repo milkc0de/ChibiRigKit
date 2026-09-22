@@ -3,6 +3,7 @@
 const http=require('node:http'),fs=require('node:fs'),fsp=require('node:fs/promises'),path=require('node:path'),crypto=require('node:crypto');
 const {writeExport}=require('./export_player.cjs'),{renderProject}=require('./render_player.cjs');
 const {createPlayerSync}=require('./player_sync.cjs');
+const {trackingAvailable,ensureTracking}=require('./tracking_assets.cjs');
 const ROOT=path.resolve(__dirname,'..');
 const MIME={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.wasm':'application/wasm','.json':'application/json','.task':'application/octet-stream','.txt':'text/plain; charset=utf-8','.md':'text/plain; charset=utf-8','.pdf':'application/pdf'};
 function createStudio({port=5510,root=path.join(ROOT,'characters/milkc0de'),distRoot,indexFile}={}){
@@ -21,6 +22,8 @@ function createStudio({port=5510,root=path.join(ROOT,'characters/milkc0de'),dist
    res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','no-referrer');res.setHeader('Cross-Origin-Resource-Policy','same-origin');
    // SDK, models and inference stay local; external SDK metrics are blocked.
    res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; worker-src 'self' blob:; connect-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; style-src 'self' 'unsafe-inline'; object-src 'none'; frame-ancestors 'none'");
+   if(url.pathname==='/api/tracking'&&req.method==='GET')return json(res,200,{camera:trackingAvailable(),setupToken:token});
+   if(url.pathname==='/api/tracking/setup'&&req.method==='POST'){if(!equal(req.headers['x-chibirig-token']))return json(res,403,{error:'操作画面からのみ準備できます'});await ensureTracking();return json(res,200,{camera:true})}
    if(await playerSync.handle(req,res,url,body,json))return;
    if(url.pathname==='/api/session'&&req.method==='GET')return json(res,200,{token,port:server.address().port,format:'ChibiRigMotion',version:1});
    if(url.pathname.startsWith('/api/')){

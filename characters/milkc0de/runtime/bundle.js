@@ -33,7 +33,7 @@ function sanitizeExportPage(page){
     page.querySelector('#'+id).replaceChildren(option);
   }
   for(const id of ['headPart','headVertex','partSelect'])page.querySelector('#'+id).replaceChildren();
-  for(const id of ['trackingStatus','takeStatus','captureStatus','backgroundStatus','headStatus','motionIOStatus','loadStatus','recordStatus','bundleStatus']){const node=page.querySelector('#'+id);if(node)node.textContent='';}
+  for(const id of ['audioStatus','trackingStatus','takeStatus','captureStatus','backgroundStatus','headStatus','motionIOStatus','loadStatus','recordStatus','bundleStatus']){const node=page.querySelector('#'+id);if(node)node.textContent='';}
   page.querySelector('#trackingStatus').textContent='開始を押すまでカメラ・マイクは使いません。映像と音声はこの端末で処理します。';
   page.querySelector('#cameraPreview').hidden=true;
   page.querySelector('#cameraVideo').removeAttribute('src');

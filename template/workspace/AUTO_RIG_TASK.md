@@ -139,3 +139,5 @@ Use the task input's `execution.environment` for every build/validation command.
 Completed HTML playback, editing, and WebM recording require no Internet connection. Tracking works offline after the local SDK/model setup. Initial setup and Codex rig creation require Internet access. Do not add external fonts, analytics, CDNs, or automatic device startup. Exports must strip device identifiers/names, local paths, transient UI messages and capture metadata; captured motion is excluded unless explicitly selected for inclusion.
 
 完成品には `PLAYER_SERVER.py` も含める。ローカル起動時は127.0.0.1だけで待ち受け、`/` を操作画面、`/obs` を表示専用画面にする。設定と追従値の共有はサーバーのメモリ内だけで行い、生のカメラ映像・音声・機器名・デバイスIDは共有しない。画像と完成品の設定は引き続きHTML内に埋め込む。
+
+Camera-ready exports also include the exact files in `launchers/TRACKING_FILES.json`: the tracking worker, pinned MediaPipe SDK/WASM/model, and dependency license notices. Export tools prepare missing SDK/model files and verify their SHA-256 hashes; the player server can also retrieve missing SDK/model files on an explicit tracking-start request. Once prepared, tracking runs offline. Never include camera/audio recordings or device identities in these dependency files.

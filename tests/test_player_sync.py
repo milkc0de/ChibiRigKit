@@ -58,3 +58,17 @@ class PlayerSyncServerTests(unittest.TestCase):
         self.post()
         with server_module.PlayerServer(self.temp.name,0) as fresh:
             self.assertIsNone(fresh.state);self.assertNotEqual(fresh.token,self.server.token)
+
+    def test_tracking_assets_have_correct_mime_and_private_paths_stay_blocked(self):
+        root=Path(self.temp.name)
+        self.assertFalse(json.loads(self.request('GET','/api/tracking')[1])['camera'])
+        for name in server_module.TRACKING_FILES:
+            target=root/name;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(b'fixture')
+        self.assertTrue(json.loads(self.request('GET','/api/tracking')[1])['camera'])
+        with contextlib.closing(http.client.HTTPConnection('127.0.0.1',self.port)) as connection:
+            connection.request('GET','/vendor/mediapipe/wasm/vision_wasm_internal.wasm');response=connection.getresponse();self.assertEqual(response.status,200);self.assertEqual(response.getheader('Content-Type'),'application/wasm');self.assertEqual(response.read(),b'fixture')
+        (root/'vendor/mediapipe/private.txt').write_text('secret')
+        self.assertEqual(self.request('GET','/vendor/mediapipe/private.txt')[0],404)
+        self.assertEqual(self.request('POST','/api/tracking/setup')[0],403)
+        target=root/'runtime/tracking_worker.js';target.unlink();target.symlink_to(root/'private.txt')
+        self.assertEqual(self.request('GET','/runtime/tracking_worker.js')[0],403)

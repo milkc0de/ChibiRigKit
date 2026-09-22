@@ -9,6 +9,32 @@ def launcher_files(runtime_root=None):
     folder=Path(runtime_root or Path(__file__).resolve().parents[1])/'launchers'
     return {name:(folder/name).read_bytes().decode('utf-8') for name in LAUNCHER_NAMES}
 
+def tracking_files(root, runtime_root=None):
+    template=Path(runtime_root or Path(__file__).resolve().parents[1])
+    kit=None
+    for parent in [Path(root).resolve(),*Path(root).resolve().parents]:
+        try:
+            if json.loads((parent/'package.json').read_text()).get('name')=='chibirigkit':kit=parent;break
+        except (OSError,ValueError):pass
+    if kit is None or not (kit/'vendor/mediapipe').exists():
+        for parent in template.parents:
+            if (parent/'package.json').is_file():
+                try:
+                    if json.loads((parent/'package.json').read_text()).get('name')=='chibirigkit':kit=parent;break
+                except ValueError:pass
+    if kit is None:kit=Path(root).resolve()
+    import importlib.util
+    spec=importlib.util.spec_from_file_location('tracking_downloads',template/'launchers/PLAYER_SERVER.py')
+    downloads=importlib.util.module_from_spec(spec);spec.loader.exec_module(downloads)
+    downloads.ensure_tracking_files(kit)
+    names=json.loads((template/'launchers/TRACKING_FILES.json').read_text())
+    files={}
+    for name in names:
+        source=(kit if name.startswith('vendor/') else template)/name
+        if not source.is_file():raise ValueError('Tracking file missing: '+name+'; run npm run setup:tracking')
+        files[name]=source.read_bytes()
+    return files
+
 def preview_path(root):return Path(root)/'work/player/index.html'
 def output_paths(root,character_name=None):
     root=Path(root).resolve();kit=None
@@ -26,6 +52,7 @@ def export_player(root,rendered,project):
     if not embedded or json.loads(embedded[1])!=project:raise ValueError('Export HTML and project differ; rebuild the preview first')
     dist,name=output_paths(root,project.get('name'));folder=dist/name
     files={'index.html':rendered.encode(),'LICENSE.txt':(root/'LICENSE.txt').read_bytes(),**{name:source.encode() for name,source in launcher_files().items()}}
+    files.update(tracking_files(root))
     def image(url):
         if not re.fullmatch(r'data:image/(png|webp|jpeg);base64,[a-zA-Z0-9+/=]+',url):raise ValueError('Only embedded raster images can be exported')
         base64.b64decode(url.split(',',1)[1],validate=True)

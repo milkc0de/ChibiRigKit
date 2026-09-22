@@ -201,7 +201,16 @@
         "START_SERVER.cmd",
         "START_SERVER.command",
         "START_SERVER.sh",
-        "PLAYER_SERVER.py"
+        "PLAYER_SERVER.py",
+        "runtime/tracking_worker.js",
+        "vendor/mediapipe/vision_bundle.js",
+        "vendor/mediapipe/wasm/vision_wasm_internal.js",
+        "vendor/mediapipe/wasm/vision_wasm_internal.wasm",
+        "vendor/mediapipe/wasm/vision_wasm_nosimd_internal.js",
+        "vendor/mediapipe/wasm/vision_wasm_nosimd_internal.wasm",
+        "vendor/mediapipe/models/face_landmarker.task",
+        "licenses/mediapipe-LICENSE.txt",
+        "licenses/mediapipe-NOTICES.txt"
       ],
       "embedded_data": [
         "projectData",
