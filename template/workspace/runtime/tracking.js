@@ -33,15 +33,15 @@ async function startTracking(){
    worker.onerror=()=>{trackingMessage('追跡Workerが停止しました');stopTracking()};
   }
   if(generation!==s.generation){worker?.terminate();stream.getTracks().forEach(t=>t.stop());await context?.close();return}
-  // Starting an input is an explicit user action. It never starts network output.
+  // Input starts only on user action; the loopback relay shares solved values only.
   captureFrame=null;s.active=true;s.starting=false;s.values=MotionClip.neutral();s.neutral={};s.latest=null;s.lastResult=0;s.lastTick=performance.now();s.lastVideo=-1;s.history=[];s.audioValue=0;s.busy=false;
   controls.headEdit.checked=false;controls.showBaseOnly.checked=false;if(!running){start=performance.now()-pausedAt*1000;if(!captureMotion)running=true;}
   for(const track of stream.getTracks())track.onended=()=>{if(s.active){trackingMessage('入力デバイスが切断されました');stopTracking()}};
-  trackingMessage(useCamera?'追従中。正面を向いて「正面を合わせる」を押せます。':'マイクの音量で口パク中');trackingUI();syncCaptureUI();await enumerateTrackingDevices();
+  trackingMessage(useCamera?'追従中。正面を向いて「正面を合わせる」を押せます。':'マイクの音量で口パク中');trackingUI();syncCaptureUI();requestRender();await enumerateTrackingDevices();
  }catch(error){worker?.terminate();stream?.getTracks().forEach(t=>t.stop());await context?.close().catch(()=>{});if(generation===s.generation){s.active=false;s.starting=false;s.stream=null;s.worker=null;s.audio=null;trackingMessage('開始できません：'+error.message);trackingUI()}}
 }
 function stopTracking(){
- const s=trackingState;if(recordingActive)cancelRecording?.();if(s.recording)stopMotionTake();s.generation++;s.cancelStart?.();s.cancelStart=null;s.active=false;s.starting=false;s.worker?.terminate();s.worker=null;s.stream?.getTracks().forEach(t=>{t.onended=null;t.stop()});s.stream=null;s.audio?.context.close().catch(()=>{});s.audio=null;s.latest=null;s.values=null;s.busy=false;$('cameraVideo').srcObject=null;trackingUI();requestRender();
+ const s=trackingState;if(recordingActive)cancelRecording?.();if(s.recording)stopMotionTake();s.generation++;s.cancelStart?.();s.cancelStart=null;s.active=false;s.starting=false;s.worker?.terminate();s.worker=null;s.stream?.getTracks().forEach(t=>{t.onended=null;t.stop()});s.stream=null;s.audio?.context.close().catch(()=>{});s.audio=null;s.latest=null;s.values=null;s.busy=false;$('cameraVideo').srcObject=null;trackingUI();requestRender();if(typeof publishPlayerSyncLive==='function')void publishPlayerSyncLive(true);
 }
 function trackingTick(now){
  const s=trackingState;if(!s.active)return;
@@ -56,6 +56,7 @@ function trackingTick(now){
   s.busy=true;s.lastVideo=video.currentTime;const generation=s.generation;
   createImageBitmap(video).then(image=>{if(generation===s.generation&&s.worker)s.worker.postMessage({type:'frame',image,time:now},[image]);else image.close()}).catch(()=>{s.busy=false});
  }
+ if(typeof publishPlayerSyncLive==='function')void publishPlayerSyncLive();
  if(s.recording){const elapsed=(now-s.recording.start)/1000;if(elapsed-s.recording.last>=1/30){s.recording.samples.push({time:Math.round(elapsed*1e6)/1e6,values:{...s.values}});s.recording.last=elapsed;$('takeStatus').textContent=`モーション録画中 ${elapsed.toFixed(1)} 秒`;if(elapsed>=3599)stopMotionTake()}}
 }
 function liveCaptureFrame(values=trackingState.values){
@@ -82,4 +83,4 @@ function initTracking(){
  window.addEventListener('pagehide',stopTracking);navigator.mediaDevices?.addEventListener('devicechange',enumerateTrackingDevices);enumerateTrackingDevices();trackingUI();
 }
 
-function sampleLiveCapture(time){const history=trackingState.history;if(!history.length)return trackingState.values;let a=history[0];for(const b of history){if(b.time>=time){const u=b.time===a.time?0:Math.max(0,Math.min(1,(time-a.time)/(b.time-a.time)));return Object.fromEntries(Object.keys(a.values).map(k=>[k,a.values[k]+(b.values[k]-a.values[k])*u]))}a=b}return a.values}
+function sampleLiveCapture(time){if(typeof playerSyncLiveActive==='function'&&playerSyncLiveActive())return samplePlayerSyncLive(time);const history=trackingState.history;if(!history.length)return trackingState.values;let a=history[0];for(const b of history){if(b.time>=time){const u=b.time===a.time?0:Math.max(0,Math.min(1,(time-a.time)/(b.time-a.time)));return Object.fromEntries(Object.keys(a.values).map(k=>[k,a.values[k]+(b.values[k]-a.values[k])*u]))}a=b}return a.values}

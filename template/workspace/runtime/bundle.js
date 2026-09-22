@@ -26,6 +26,8 @@ function exportCapture(){
   return {source:{format:'ChibiRigMotion',version:1,timeUnit:'seconds',duration:clip.duration,loop:clip.loop,channels:clip.channels,frames:clip.frames},name:'同梱モーション',loop:$('captureLoop').checked};
 }
 function sanitizeExportPage(page){
+  page.querySelector('#playerSyncConfig')?.remove();page.removeAttribute?.('data-player-view');
+  if(page.querySelector('#playerSyncStatus'))page.querySelector('#playerSyncStatus').textContent='START_SERVERで起動すると、OBSと設定を共有できます。';
   for(const [id,label] of [['cameraDevice','カメラ'],['microphoneDevice','マイク']]){
     const option=document.createElement('option');option.value='';option.textContent='既定の'+label;
     page.querySelector('#'+id).replaceChildren(option);
@@ -51,7 +53,7 @@ function bundleFiles(){
   for(const control of page.querySelectorAll('input,button,select'))control.removeAttribute('disabled');
   page.querySelector('#recordCancel').hidden=true;page.querySelector('#record').textContent='WebM録画';page.querySelector('#bundle').textContent='完成品をdistに保存';page.querySelector('#recordStatus').textContent='';page.querySelector('#bundleStatus').textContent='';page.querySelector('#recordProgress').hidden=true;
   const launchers=JSON.parse(document.getElementById('playerLaunchers').textContent);
-  const launcherFiles=Object.fromEntries(['START_SERVER.ps1','START_SERVER.cmd','START_SERVER.command','START_SERVER.sh'].map(name=>{if(typeof launchers[name]!=='string')throw Error('起動ファイルがありません。画面を再読み込みしてください');return [name,launchers[name]]}));
+  const launcherFiles=Object.fromEntries(['START_SERVER.ps1','START_SERVER.cmd','START_SERVER.command','START_SERVER.sh','PLAYER_SERVER.py'].map(name=>{if(typeof launchers[name]!=='string')throw Error('起動ファイルがありません。画面を再読み込みしてください');return [name,launchers[name]]}));
   return {...launcherFiles,'index.html':'<!DOCTYPE html>\n'+page.outerHTML,
     'LICENSE.txt':document.getElementById('licenseData').textContent};
 }

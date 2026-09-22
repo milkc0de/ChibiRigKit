@@ -25,8 +25,8 @@ Write-Host "`nChibiRigKit - local player"
 Write-Host 'このPCの中だけで動く表示用サーバーです。'
 Write-Host 'インターネットには公開されず、同じWi-Fiの別の端末からもアクセスできません。'
 Write-Host '起動・表示にインターネット接続は不要です（Python 3の導入時を除く）。'
-Write-Host 'OBSの「ブラウザ」ソースに貼るURL：http://127.0.0.1:5510/'
+Write-Host 'OBSの「ブラウザ」ソースに貼るURL：http://127.0.0.1:5510/obs'
 Write-Host '使用中はこの画面を開いたままにしてください。終了はCtrl+Cです。'
 Write-Host "ポート5510が使用中の場合は、先に起動したサーバーを停止してください。`n"
-& $pythonCommand @pythonArguments -m http.server 5510 --bind 127.0.0.1 --directory $playerDirectory
+& $pythonCommand @pythonArguments (Join-Path $playerDirectory 'PLAYER_SERVER.py')
 exit $LASTEXITCODE

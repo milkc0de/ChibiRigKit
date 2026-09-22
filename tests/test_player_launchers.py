@@ -7,7 +7,8 @@ LAUNCHERS=ROOT/'template/workspace/launchers'
 class PlayerLauncherTests(unittest.TestCase):
     def fixture(self,base):
         player=base/'完成品 space & player';player.mkdir()
-        for file in LAUNCHERS.iterdir():shutil.copy2(file,player/file.name)
+        for file in LAUNCHERS.iterdir():
+            if file.is_file():shutil.copy2(file,player/file.name)
         (player/'index.html').write_text('<p>local player</p>')
         return player
 
@@ -22,7 +23,7 @@ class PlayerLauncherTests(unittest.TestCase):
                     env={**os.environ,'PATH':str(bindir)+':/usr/bin:/bin','CHIBIRIG_ARGS_LOG':str(log)}
                     result=subprocess.run(['/bin/sh',str(player/launcher)],cwd=base,env=env,capture_output=True,text=True,timeout=5)
                     self.assertEqual(result.returncode,0,result.stderr)
-                    self.assertEqual(log.read_text().splitlines(),['-m','http.server','5510','--bind','127.0.0.1','--directory',str(player)])
+                    self.assertEqual(log.read_text().splitlines(),[str(player/'PLAYER_SERVER.py')])
                     self.assertIn('インターネットには公開されず',result.stdout)
                     self.assertIn('同じWi-Fiの別の端末からもアクセスできません',result.stdout)
 
@@ -49,7 +50,7 @@ class PlayerLauncherTests(unittest.TestCase):
                         except OSError:time.sleep(.05)
                     log.flush();log.seek(0);output=log.read()
                     self.assertEqual(html,b'<p>local player</p>',output)
-                    self.assertIn('Serving HTTP on 127.0.0.1',output)
+                    self.assertIn('OBSのブラウザソース：http://127.0.0.1:5510/obs',output)
                     with self.assertRaises(urllib.error.HTTPError) as error:opener.open('http://127.0.0.1:5510/private.txt',timeout=1)
                     self.assertEqual(error.exception.code,404)
                 finally:

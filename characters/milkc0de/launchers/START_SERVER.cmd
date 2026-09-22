@@ -32,13 +32,13 @@ echo ChibiRigKit - local player
 echo このPCの中だけで動く表示用サーバーです。
 echo インターネットには公開されず、同じWi-Fiの別の端末からもアクセスできません。
 echo 起動・表示にインターネット接続は不要です（Python 3の導入時を除く）。
-echo OBSの「ブラウザ」ソースに貼るURL：http://127.0.0.1:5510/
+echo OBSの「ブラウザ」ソースに貼るURL：http://127.0.0.1:5510/obs
 echo 使用中はこの画面を開いたままにしてください。終了はCtrl+Cです。
 echo ポート5510が使用中の場合は、先に起動したサーバーを停止してください。
 echo.
 rem Use dot to avoid the quoted trailing backslash in the script directory.
 pushd "%~dp0" || exit /b 1
-%PLAYER_PYTHON% -m http.server 5510 --bind 127.0.0.1 --directory .
+%PLAYER_PYTHON% PLAYER_SERVER.py
 set "PLAYER_STATUS=%ERRORLEVEL%"
 popd
 if not "%PLAYER_STATUS%"=="0" pause

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 const outputCanvas=document.createElement('canvas');outputCanvas.width=1280;outputCanvas.height=720;
 const outputState={crop:{x:0,y:0,w:canvas.width,h:canvas.height},drag:null,selecting:false,session:null};
-async function studioSession(){if(outputState.session)return outputState.session;const r=await fetch('/api/session');if(!r.ok)throw Error('親フォルダで npm run player を実行して開いてください');return outputState.session=await r.json()}
+async function studioSession(){if(outputState.session)return outputState.session;const r=await fetch('/api/session');if(!r.ok)throw Error('ChibiRigKitフォルダで npm run player を実行して開いてください');return outputState.session=await r.json()}
 async function studioRequest(path,data){const session=await studioSession(),r=await fetch(path,{method:'POST',headers:{'Content-Type':'application/json','X-ChibiRig-Token':session.token},body:JSON.stringify(data||{})});const result=await r.json();if(!r.ok)throw Error(result.error||'操作に失敗しました');return result}
 function validOutputCrop(r){if(!r||!['x','y','w','h'].every(k=>Number.isFinite(r[k]))||r.w<32||r.h<32||r.x<0||r.y<0||r.x+r.w>canvas.width+.01||r.y+r.h>canvas.height+.01)throw Error('出力範囲が不正です');return {...r}}
 function cropPointer(e){const b=$('cropOverlay').getBoundingClientRect();return [Math.max(0,Math.min(canvas.width,(e.clientX-b.left)/b.width*canvas.width)),Math.max(0,Math.min(canvas.height,(e.clientY-b.top)/b.height*canvas.height))]}
@@ -14,7 +14,11 @@ function cropFromDrag(d,q){
 function drawCropOverlay(){const overlay=$('cropOverlay'),c=overlay.getContext('2d'),r=outputState.crop;c.clearRect(0,0,overlay.width,overlay.height);if(!outputState.selecting)return;c.fillStyle='#0008';c.beginPath();c.rect(0,0,canvas.width,canvas.height);c.rect(r.x,r.y,r.w,r.h);c.fill('evenodd');c.strokeStyle='#65e4fa';c.lineWidth=3;c.strokeRect(r.x,r.y,r.w,r.h);c.fillStyle='#65e4fa';for(const [x,y] of [[r.x,r.y],[r.x+r.w,r.y],[r.x,r.y+r.h],[r.x+r.w,r.y+r.h]])c.fillRect(x-7,y-7,14,14)}
 function updateOutputCrop(r){outputState.crop=validOutputCrop(r);$('cropInfo').textContent=`${Math.round(r.w)} × ${Math.round(r.h)} px`;drawCropOverlay();requestRender();try{localStorage.setItem('chibirig.output.v1',JSON.stringify(r))}catch{}}
 function renderOutput(){
- displayCanvas.getContext('2d').drawImage(canvas,0,0);
+ if(typeof playerSyncIsViewer==='function'&&playerSyncIsViewer()){
+  const r=outputState.crop,w=Math.max(1,Math.round(r.w)),h=Math.max(1,Math.round(r.h));
+  if(displayCanvas.width!==w)displayCanvas.width=w;if(displayCanvas.height!==h)displayCanvas.height=h;
+  const view=displayCanvas.getContext('2d');view.clearRect(0,0,w,h);view.drawImage(canvas,r.x,r.y,r.w,r.h,0,0,w,h);
+ }else displayCanvas.getContext('2d').drawImage(canvas,0,0);
  if(!recordingActive)return;
  const c=outputCanvas.getContext('2d'),r=outputState.crop;c.fillStyle=$('outputColor')?.value||'#202020';c.fillRect(0,0,outputCanvas.width,outputCanvas.height);
  const scale=Math.min(outputCanvas.width/r.w,outputCanvas.height/r.h),w=r.w*scale,h=r.h*scale;c.drawImage(canvas,r.x,r.y,r.w,r.h,(outputCanvas.width-w)/2,(outputCanvas.height-h)/2,w,h);

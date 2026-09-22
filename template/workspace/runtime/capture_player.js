@@ -5,7 +5,7 @@ let captureMotion=null,captureFrame=null,captureOffset=0,captureSpeed=1,captureL
 const captureClamp=(v,min,max)=>Math.max(min,Math.min(max,v));
 function captureValue(id,fallback=0,min=-1,max=1){return captureClamp(captureFrame?.[id]??fallback,min,max)}
 function captureAxisGain(axis){const el=document.getElementById('capture'+axis+'Gain');return el&&Number.isFinite(Number(el.value))?Number(el.value):1}
-function captureLiveActive(){return typeof trackingState!=='undefined'&&trackingState.active}
+function captureLiveActive(){return (typeof trackingState!=='undefined'&&trackingState.active)||(typeof playerSyncLiveActive==='function'&&playerSyncLiveActive())}
 function captureHas(...keys){return !!captureFrame&&keys.some(key=>Object.hasOwn(captureFrame,key))}
 function captureAffects(obj){
  if(!captureFrame)return false;
@@ -39,7 +39,8 @@ function fileCaptureFrame(t,{playingOnly=false}={}){
 }
 function mixedCaptureFrame(t,liveValues){
  const live=captureLiveActive(),file=fileCaptureFrame(t,{playingOnly:live});
- const input=live?liveCaptureFrame(liveValues):null,values={...(file||{}),...(input||{})};
+ const remote=typeof playerSyncLiveActive==='function'&&playerSyncLiveActive();
+ const input=remote?(liveValues||playerSyncLive.value.values):(live?liveCaptureFrame(liveValues):null),values={...(file||{}),...(input||{})};
  return Object.keys(values).length?values:null;
 }
 function beginCaptureFrame(t){

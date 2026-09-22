@@ -4,7 +4,7 @@
 import base64,json,re,zipfile,os,uuid
 from pathlib import Path
 
-LAUNCHER_NAMES=('START_SERVER.ps1','START_SERVER.cmd','START_SERVER.command','START_SERVER.sh')
+LAUNCHER_NAMES=('START_SERVER.ps1','START_SERVER.cmd','START_SERVER.command','START_SERVER.sh','PLAYER_SERVER.py')
 def launcher_files(runtime_root=None):
     folder=Path(runtime_root or Path(__file__).resolve().parents[1])/'launchers'
     return {name:(folder/name).read_bytes().decode('utf-8') for name in LAUNCHER_NAMES}

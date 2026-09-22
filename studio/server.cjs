@@ -2,10 +2,13 @@
 // SPDX-License-Identifier: MIT
 const http=require('node:http'),fs=require('node:fs'),fsp=require('node:fs/promises'),path=require('node:path'),crypto=require('node:crypto');
 const {writeExport}=require('./export_player.cjs'),{renderProject}=require('./render_player.cjs');
+const {createPlayerSync}=require('./player_sync.cjs');
 const ROOT=path.resolve(__dirname,'..');
 const MIME={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.wasm':'application/wasm','.json':'application/json','.task':'application/octet-stream','.txt':'text/plain; charset=utf-8','.md':'text/plain; charset=utf-8','.pdf':'application/pdf'};
 function createStudio({port=5510,root=path.join(ROOT,'characters/milkc0de'),distRoot,indexFile}={}){
- root=path.resolve(root);const token=crypto.randomBytes(32).toString('hex');
+ root=path.resolve(root);const identityFile=path.join(root,fs.existsSync(path.join(root,'rig.project.json'))?'rig.project.json':'index.html');
+ const playerSync=createPlayerSync({character:crypto.createHash('sha256').update(fs.existsSync(identityFile)?fs.readFileSync(identityFile):root).digest('hex')});
+ const token=crypto.randomBytes(32).toString('hex');
  const json=(res,code,value)=>{res.writeHead(code,{'Content-Type':'application/json','Cache-Control':'no-store'});res.end(JSON.stringify(value))};
  const equal=value=>typeof value==='string'&&Buffer.byteLength(value)===Buffer.byteLength(token)&&crypto.timingSafeEqual(Buffer.from(value),Buffer.from(token));
  const hosts=()=>new Set([`127.0.0.1:${server.address()?.port}`,`localhost:${server.address()?.port}`]);
@@ -18,6 +21,7 @@ function createStudio({port=5510,root=path.join(ROOT,'characters/milkc0de'),dist
    res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','no-referrer');res.setHeader('Cross-Origin-Resource-Policy','same-origin');
    // SDK, models and inference stay local; external SDK metrics are blocked.
    res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval'; worker-src 'self' blob:; connect-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; style-src 'self' 'unsafe-inline'; object-src 'none'; frame-ancestors 'none'");
+   if(await playerSync.handle(req,res,url,body,json))return;
    if(url.pathname==='/api/session'&&req.method==='GET')return json(res,200,{token,port:server.address().port,format:'ChibiRigMotion',version:1});
    if(url.pathname.startsWith('/api/')){
     if(!equal(req.headers['x-chibirig-token']))return json(res,403,{error:'操作トークンが不正です'});
@@ -26,9 +30,9 @@ function createStudio({port=5510,root=path.join(ROOT,'characters/milkc0de'),dist
    }
    if(!['GET','HEAD'].includes(req.method))return json(res,405,{error:'Method not allowed'});
    const relative=url.pathname==='/'?'index.html':decodeURIComponent(url.pathname).replace(/^\//,'');
-   if(relative==='index.html'){
+   if(relative==='index.html'||relative==='obs'){
     const html=indexFile?await fsp.readFile(indexFile,'utf8'):fs.existsSync(path.join(root,'rig.project.json'))?renderProject(root):await fsp.readFile(path.join(root,'index.html'),'utf8');
-    res.writeHead(200,{'Content-Type':MIME['.html'],'Cache-Control':'no-store'});return res.end(req.method==='HEAD'?undefined:html);
+    res.writeHead(200,{'Content-Type':MIME['.html'],'Cache-Control':'no-store'});return res.end(req.method==='HEAD'?undefined:playerSync.inject(html,relative==='obs'));
    }
    if(!/^(runtime|vendor|docs)\//.test(relative))return json(res,404,{error:'Not found'});
    const [folder,...segments]=relative.split('/'),staticRoot=folder==='runtime'?path.join(ROOT,'template/workspace/runtime'):path.join(ROOT,folder);
@@ -39,6 +43,6 @@ function createStudio({port=5510,root=path.join(ROOT,'characters/milkc0de'),dist
  });
  // No frame relay, popup, virtual camera or player-file upload endpoint.
  server.on('upgrade',(_req,socket)=>{socket.end('HTTP/1.1 404 Not Found\r\nConnection: close\r\n\r\n')});
- return {server,listen:()=>new Promise((resolve,reject)=>{server.once('error',reject);server.listen(port,'127.0.0.1',()=>{server.removeListener('error',reject);resolve()})}),close:()=>new Promise(resolve=>server.close(resolve))};
+ return {server,listen:()=>new Promise((resolve,reject)=>{server.once('error',reject);server.listen(port,'127.0.0.1',()=>{server.removeListener('error',reject);resolve()})}),close:()=>new Promise(resolve=>{playerSync.close();server.close(resolve)})};
 }
 module.exports={createStudio};

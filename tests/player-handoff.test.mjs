@@ -15,6 +15,6 @@ test('every shared runtime is included by the character updater; parent commands
  for(const file of fs.readdirSync(new URL('runtime/',template)))assert.ok(updater.includes('runtime/'+file),'missing update entry '+file);
  const pkg=JSON.parse(fs.readFileSync(new URL('../package.json',import.meta.url),'utf8'));assert.ok(!JSON.stringify(pkg).includes('ChibiRigPlayer'));assert.equal(pkg.dependencies.electron,undefined);
  const workflow=JSON.parse(fs.readFileSync(new URL('rig.workflow.json',template),'utf8'));
- assert.deepEqual(workflow.rules.player_handoff.output_files,['index.html','LICENSE.txt','START_SERVER.ps1','START_SERVER.cmd','START_SERVER.command','START_SERVER.sh']);
+ assert.deepEqual(workflow.rules.player_handoff.output_files,['index.html','LICENSE.txt','START_SERVER.ps1','START_SERVER.cmd','START_SERVER.command','START_SERVER.sh','PLAYER_SERVER.py']);
  assert.deepEqual(workflow.rules.head.reference_yaw_degrees,[-25,0,25]);assert.equal(workflow.rules.player_handoff.network_broadcast,false);assert.equal(workflow.rules.player_handoff.popup,false);assert.equal(workflow.rules.player_handoff.player_file_import,false);
 });

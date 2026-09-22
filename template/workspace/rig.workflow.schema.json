@@ -489,7 +489,8 @@
               "START_SERVER.ps1",
               "START_SERVER.cmd",
               "START_SERVER.command",
-              "START_SERVER.sh"
+              "START_SERVER.sh",
+              "PLAYER_SERVER.py"
             ],
             "embedded_data": [
               "projectData",

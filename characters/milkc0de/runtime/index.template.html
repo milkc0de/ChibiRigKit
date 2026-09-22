@@ -20,12 +20,15 @@ body{height:100vh;overflow:hidden}main,aside{min-height:0;height:100vh}aside{ove
 #headPanel:has(#headEdit:not(:checked)) .head-editor{display:none}
 @media(max-width:900px){body{grid-template-rows:44vh 56vh}main{height:44vh;padding:12px}.stage{height:calc(44vh - 24px);width:auto;max-width:95vw}aside{height:56vh}}
 .stage{position:relative}#cropOverlay{position:absolute;inset:0;width:100%;height:100%;cursor:crosshair}#cropOverlay[hidden]{display:none}#cameraVideo{width:100%;max-height:180px;object-fit:contain;transform:scaleX(-1);border-radius:9px;background:#222}input[type=password],input[type=text]{width:100%}button:disabled{opacity:.45;cursor:default}#audioMeter{width:100%}
+html[data-player-view] body{display:block;background:transparent}html[data-player-view] aside{display:none}html[data-player-view] main{height:100vh;width:100vw;padding:0;overflow:hidden}html[data-player-view] .stage{width:100%;height:100%;max-height:none;aspect-ratio:auto;border-radius:0;box-shadow:none;background:transparent}html[data-player-view] #c{width:100%;height:100%;object-fit:contain}html[data-player-view] #cropOverlay{display:none}
 </style>
 </head>
 <body>
 <main><div class="stage"><canvas id="c" width="__W__" height="__H__"></canvas><canvas id="cropOverlay" hidden aria-label="出力範囲のドラッグ指定"></canvas></div></main>
 <aside>
 <h1>__TITLE__</h1>
+<p id="playerSyncStatus" role="status">START_SERVERで起動すると、OBSと設定を共有できます。</p>
+<p class="note">設定の共有はこのPC内だけです。インターネットや同じWi-Fiの別の端末には公開されません。</p>
 <p>顔や視線、首振り、体の揺れを調整できます。できあがったら動画や完成品ZIPを保存してください。</p>
 <section id="trackingPanel"><h2>カメラ・音声で動かす</h2>
 <label for="trackingInput" class="check">入力</label><select id="trackingInput"><option value="camera">カメラ</option><option value="both">カメラ＋マイク</option><option value="audio">マイクで口パク</option></select>
@@ -338,9 +341,9 @@ function render(t){
   }
   drawNeckMasterOverlay(t,intensity);drawHeadOverlay();renderOutput();
 }
-function requestRender(){frameDirty=true}
+function requestRender(){frameDirty=true;if(typeof schedulePlayerSync==='function')schedulePlayerSync()}
 for(const event of ['input','change','click'])document.addEventListener(event,requestRender);
-function frame(now){trackingTick(now);if(running||frameDirty||trackingState.active){frameDirty=false;render(running||trackingState.active?(now-start)/1000:pausedAt)}requestAnimationFrame(frame)}
+function frame(now){trackingTick(now);expirePlayerSyncLive();if(running||frameDirty||captureLiveActive()){frameDirty=false;render(running||captureLiveActive()?(now-start)/1000:pausedAt)}requestAnimationFrame(frame)}
 function updateLabels(){for(const axis of ['Yaw','Pitch','Roll'])$('capture'+axis+'GainOut').textContent=Number($('capture'+axis+'Gain').value).toFixed(2)+'×';$('neckYawOut').textContent=Number(controls.neckYaw.value).toFixed(1)+'°';$('neckPitchOut').textContent=Number(controls.neckPitch.value).toFixed(1)+'°';$('neckAmountOut').textContent=Number(controls.neckAmount.value).toFixed(1)+'°';$('headAmountOut').textContent=Number(controls.headAmount.value).toFixed(2)+'×';$('gazeAmountOut').textContent=Number(controls.gazeAmount.value).toFixed(2)+'×';$('durationOut').textContent=parseFloat(controls.duration.value).toFixed(1)+' s';$('motionOut').textContent=parseFloat(controls.motionIntensity.value).toFixed(2);$('speedOut').textContent=parseFloat(controls.motionSpeed.value).toFixed(2)+'x';$('expressionOut').textContent=parseFloat(controls.expression.value).toFixed(2);$('eyeOpenOut').textContent=parseFloat(controls.eyeOpenTest.value).toFixed(2);$('mouthOpenOut').textContent=parseFloat(controls.mouthOpenTest.value).toFixed(2)}Object.values(controls).forEach(c=>c?.addEventListener('input',updateLabels));controls.eyeOpenTest.addEventListener('input',()=>controls.manualEyeOpen.checked=true);controls.mouthOpenTest.addEventListener('input',()=>controls.manualMouthOpen.checked=true);updateLabels();
 $('pause').onclick=()=>{if(captureMotion){setCapturePlayback(!capturePlaying);return}if(running){pausedAt=(performance.now()-start)/1000;running=false;$('pause').textContent='再生'}else{start=performance.now()-pausedAt*1000;running=true;$('pause').textContent='一時停止'}};
 $('reset').onclick=()=>{clearCaptureMotion();PROJECT.settings=structuredClone(initialSettings);PROJECT.groups=structuredClone(initialGroups);controls.neckYaw.value=PROJECT.settings?.neck_yaw_degrees??12;controls.neckPitch.value=PROJECT.settings?.neck_pitch_degrees??8;controls.neckSway.checked=PROJECT.settings?.neck_sway??true;controls.neckAmount.value=PROJECT.settings?.neck_sway_degrees??6;controls.headRandom.checked=PROJECT.settings?.head_random??false;controls.headAmount.value=PROJECT.settings?.head_motion_amount??1.5;controls.gazeAmount.value=PROJECT.settings?.gaze_motion_amount??1.5;resetRandomHead();controls.headCircle.checked=false;controls.headEdit.checked=false;controls.headX.value=0;controls.headY.value=0;$('gazeX').value=0;$('gazeY').value=0;PROJECT.parts=structuredClone(initialParts);controls.showSeams.checked=true;controls.duration.value=PROJECT.settings?.duration_seconds??4;controls.motionIntensity.value=PROJECT.settings?.motion_intensity??1;controls.motionSpeed.value=1;controls.expression.value=0;controls.autoBlink.checked=true;controls.autoExpression.checked=false;controls.showPivots.checked=false;controls.showMesh.checked=false;controls.showHeadMesh.checked=false;controls.showBaseOnly.checked=false;controls.eyeOpenTest.value=1;controls.manualEyeOpen.checked=false;controls.mouthOpenTest.value=1;controls.manualMouthOpen.checked=false;start=performance.now();pausedAt=0;running=true;$('pause').textContent='一時停止';updateLabels();syncSelected()};
@@ -361,6 +364,7 @@ __HAIR_PLAYER_JS__
 __TRACKING_CORE_JS__
 __TRACKING_JS__
 __OUTPUT_JS__
-window.rigReady=loadAll().then(async()=>{prepareBrowUnderpaint();$('reset').click();initHeadEditor();initMotionIO();initCapturePlayer();initTracking();initOutput();$('hairPhysicsAmount').oninput=()=>$('hairPhysicsOut').textContent=Number($('hairPhysicsAmount').value).toFixed(2)+'×';await initBackground();await restoreBundleSnapshot();$('loadStatus').textContent='読み込み完了';requestAnimationFrame(frame)}).catch(e=>{$('loadStatus').textContent='画像の読み込みに失敗しました';throw e});
+__PLAYER_SYNC_JS__
+window.rigReady=loadAll().then(async()=>{prepareBrowUnderpaint();$('reset').click();initHeadEditor();initMotionIO();initCapturePlayer();initTracking();initOutput();$('hairPhysicsAmount').oninput=()=>$('hairPhysicsOut').textContent=Number($('hairPhysicsAmount').value).toFixed(2)+'×';await initBackground();await restoreBundleSnapshot();$('loadStatus').textContent='読み込み完了';initPlayerSync();requestAnimationFrame(frame)}).catch(e=>{$('loadStatus').textContent='画像の読み込みに失敗しました';throw e});
 </script>
 </aside></body></html>

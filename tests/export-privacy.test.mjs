@@ -12,7 +12,7 @@ function snapshot(nodes){return JSON.parse(nodes.get('body').children.find(n=>n.
 function fixture(include=false){
  const nodes=new Map();
  const node=(id,text='')=>({id,textContent:text,children:[],attrs:{},replaceChildren(...c){this.children=c;this.textContent=''},append(n){this.children.push(n)},setAttribute(k,v){this.attrs[k]=v},removeAttribute(k){delete this.attrs[k]},remove(){nodes.delete(id)}});
- for(const id of ['projectData','headPart','headVertex','partSelect','recordCancel','record','bundle','recordStatus','bundleStatus','recordProgress','body','trackingStatus','takeStatus','captureStatus','backgroundStatus','headStatus','motionIOStatus','loadStatus','cameraPreview','cameraVideo','audioMeter','bundleIncludeMotion'])nodes.set(id,node(id,'PRIVATE_STATUS'));
+ for(const id of ['projectData','headPart','headVertex','partSelect','recordCancel','record','bundle','recordStatus','bundleStatus','recordProgress','body','playerSyncConfig','playerSyncStatus','trackingStatus','takeStatus','captureStatus','backgroundStatus','headStatus','motionIOStatus','loadStatus','cameraPreview','cameraVideo','audioMeter','bundleIncludeMotion'])nodes.set(id,node(id,'PRIVATE_STATUS'));
  nodes.set('cameraDevice',node('cameraDevice','PRIVATE_CAMERA_NAME_AND_ID'));nodes.set('microphoneDevice',node('microphoneDevice','PRIVATE_MIC_NAME_AND_ID'));
  const page={querySelector:s=>nodes.get(s.replace('#','')),querySelectorAll:()=>[],get outerHTML(){return [...nodes].map(([id,n])=>`<div id="${id}">${n.textContent}${n.children.map(x=>x.textContent).join('')}</div>`).join('')}};
  const source={format:'ChibiRigMotion',version:1,timeUnit:'seconds',duration:1,loop:false,channels:['mouthOpen'],frames:[[0,0],[1,.5]],metadata:{createdAt:'PRIVATE_DATE',name:'PRIVATE_TAKE'},unknown:'PRIVATE_EXTRA'};
@@ -23,6 +23,7 @@ test('export removes device data, transient messages, filenames and capture by d
  const {c,nodes}=fixture();const files=c.bundleFiles();
  assert.deepEqual(Object.keys(files).sort(),expectedFiles);
  assert.equal(snapshot(nodes).capture,null);
+ assert.equal(nodes.has('playerSyncConfig'),false);
  // Mock structural labels are ignored; actual private source data must be absent.
  for(const s of ['PRIVATE_CAMERA','PRIVATE_MIC','PRIVATE_TAKE','PRIVATE_DATE','PRIVATE_EXTRA','PRIVATE_FILENAME','PRIVATE_BACKGROUND_NAME'])assert.ok(!JSON.stringify(files).includes(s),s);
  assert.equal(nodes.get('trackingStatus').textContent.includes('この端末'),true);
