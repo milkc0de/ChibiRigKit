@@ -2,17 +2,19 @@
 // SPDX-License-Identifier: MIT
 const zlib=require('node:zlib');
 const LIMIT=64*1024*1024;
-function zipHTML(bytes){
+function zipHTML(bytes,expectedFiles){
  let end=-1;for(let i=bytes.length-22;i>=Math.max(0,bytes.length-65557);i--)if(bytes.readUInt32LE(i)===0x06054b50&&i+22+bytes.readUInt16LE(i+20)===bytes.length){end=i;break}
  if(end<0)throw Error('ZIPの末尾が不正です');
  if(bytes.readUInt16LE(end+4)||bytes.readUInt16LE(end+6))throw Error('分割ZIPには対応していません');
- const count=bytes.readUInt16LE(end+10),matches=[];let pos=bytes.readUInt32LE(end+16);
+ const count=bytes.readUInt16LE(end+10),matches=[],names=[];let pos=bytes.readUInt32LE(end+16);
  for(let i=0;i<count;i++){
   if(pos+46>end||bytes.readUInt32LE(pos)!==0x02014b50)throw Error('ZIPの一覧が不正です');
   const flags=bytes.readUInt16LE(pos+8),method=bytes.readUInt16LE(pos+10),packed=bytes.readUInt32LE(pos+20),size=bytes.readUInt32LE(pos+24),n=bytes.readUInt16LE(pos+28),extra=bytes.readUInt16LE(pos+30),comment=bytes.readUInt16LE(pos+32),offset=bytes.readUInt32LE(pos+42);
   const name=bytes.subarray(pos+46,pos+46+n).toString('utf8');pos+=46+n+extra+comment;if(pos>end)throw Error('ZIPの一覧が途切れています');
+  names.push(name);
   if((name==='index.html'||name.endsWith('/index.html'))&&!name.includes('__MACOSX/')&&!name.split('/').includes('..'))matches.push({flags,method,packed,size,offset});
  }
+ if(expectedFiles&&(names.length!==expectedFiles.length||new Set(names).size!==names.length||names.some(name=>!expectedFiles.includes(name))))throw Error('完成品ZIPはindex.htmlとLICENSE.txtだけにしてください。画面を再読み込みして保存してください');
  if(matches.length!==1)throw Error('index.htmlが1つ入った完成品ZIPを選んでください');
  const f=matches[0],p=f.offset;if(f.flags&1||![0,8].includes(f.method)||f.size>LIMIT||p+30>bytes.length||bytes.readUInt32LE(p)!==0x04034b50)throw Error('このZIPの圧縮形式・サイズには対応していません');
  const start=p+30+bytes.readUInt16LE(p+26)+bytes.readUInt16LE(p+28);if(start+f.packed>bytes.length)throw Error('ZIPの内容が途切れています');

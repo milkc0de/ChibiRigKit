@@ -6,6 +6,7 @@ import vm from 'node:vm';
 import {createRequire} from 'node:module';
 const require=createRequire(import.meta.url),MotionClip=require('../template/workspace/runtime/motion_clip.js');
 const bundle=fs.readFileSync(new URL('../template/workspace/runtime/bundle.js',import.meta.url),'utf8');
+function snapshot(nodes){return JSON.parse(nodes.get('body').children.find(n=>n.id==='bundleSnapshot').textContent)}
 function fixture(include=false){
  const nodes=new Map();
  const node=(id,text='')=>({id,textContent:text,children:[],attrs:{},replaceChildren(...c){this.children=c;this.textContent=''},append(n){this.children.push(n)},setAttribute(k,v){this.attrs[k]=v},removeAttribute(k){delete this.attrs[k]},remove(){nodes.delete(id)}});
@@ -18,20 +19,22 @@ function fixture(include=false){
 }
 test('export removes device data, transient messages, filenames and capture by default',()=>{
  const {c,nodes}=fixture();const files=c.bundleFiles();
- assert.equal(files['capture.chibimotion.json'],undefined);
+ assert.deepEqual(Object.keys(files).sort(),['LICENSE.txt','index.html']);
+ assert.equal(snapshot(nodes).capture,null);
  // Mock structural labels are ignored; actual private source data must be absent.
  for(const s of ['PRIVATE_CAMERA','PRIVATE_MIC','PRIVATE_TAKE','PRIVATE_DATE','PRIVATE_EXTRA','PRIVATE_FILENAME','PRIVATE_BACKGROUND_NAME'])assert.ok(!JSON.stringify(files).includes(s),s);
  assert.equal(nodes.get('trackingStatus').textContent.includes('この端末'),true);
  for(const id of ['takeStatus','captureStatus','backgroundStatus','headStatus','motionIOStatus','loadStatus'])assert.equal(nodes.get(id).textContent,'');
  assert.equal(nodes.get('cameraPreview').hidden,true);
- assert.ok(files['README.txt'].includes('インターネット接続は不要'));
+ assert.equal(files['LICENSE.txt'],'MIT');
 });
 test('explicit capture inclusion retains playback numbers but drops all metadata',()=>{
- const {c}=fixture(true),files=c.bundleFiles(),data=JSON.parse(files['capture.chibimotion.json']);
+ const {c,nodes}=fixture(true),files=c.bundleFiles(),data=snapshot(nodes).capture.source;
+ assert.deepEqual(Object.keys(files).sort(),['LICENSE.txt','index.html']);
  assert.equal(data.metadata,undefined);assert.equal(data.unknown,undefined);assert.deepEqual(data.frames,[[0,0],[1,.5]]);
  for(const s of ['PRIVATE_CAMERA','PRIVATE_MIC','PRIVATE_DATE','PRIVATE_TAKE','PRIVATE_EXTRA','PRIVATE_FILENAME','PRIVATE_BACKGROUND_NAME'])assert.ok(!JSON.stringify(files).includes(s),s);
  assert.doesNotThrow(()=>MotionClip.parse(data));
 });
 test('inactive background images are not leaked into exports',()=>{
- const {c}=fixture();c.backgroundState.mode='color';const files=c.bundleFiles();assert.equal(JSON.parse(files['background.json']).image,null);
+ const {c,nodes}=fixture();c.backgroundState.mode='color';c.bundleFiles();assert.equal(snapshot(nodes).background.image,null);
 });

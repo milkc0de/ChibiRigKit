@@ -15,7 +15,7 @@ class PlayerOutputTests(unittest.TestCase):
             self.assertEqual(Path(result['html']),kit/'dist/hero/index.html');self.assertEqual(Path(result['zip']),kit/'dist/hero.zip')
             self.assertEqual((root/'input/normal.png').read_bytes(),b'original');self.assertFalse((root/'index.html').exists())
             with zipfile.ZipFile(result['zip']) as z:
-                self.assertIsNone(z.testzip());self.assertEqual(z.read('index.html').decode(),html);self.assertEqual(z.read('assets/layers/face.png'),b'\1\2\3');self.assertFalse(any(p.startswith('input/') for p in z.namelist()))
+                self.assertIsNone(z.testzip());self.assertEqual(z.read('index.html').decode(),html);self.assertEqual(set(z.namelist()),{'index.html','LICENSE.txt'});self.assertEqual(z.read('LICENSE.txt'),b'MIT')
             self.assertEqual(json.loads((root/'work/player-output.json').read_text()),result)
 
     def test_reexport_removes_previous_private_artifacts_but_keeps_unrelated_files(self):
@@ -24,11 +24,11 @@ class PlayerOutputTests(unittest.TestCase):
             root=kit/'characters/hero';root.mkdir(parents=True);(root/'LICENSE.txt').write_text('MIT')
             folder=kit/'dist/hero';(folder/'assets').mkdir(parents=True)
             (folder/'rig.project.json').write_text(json.dumps({'parts':{'old':{'file':'assets/old.png'}}}))
-            (folder/'assets/old.png').write_bytes(b'private');(folder/'capture.chibimotion.json').write_text('private');(folder/'background.json').write_text('private');(folder/'my-note.txt').write_text('keep')
+            (folder/'assets/old.png').write_bytes(b'private');(folder/'capture.chibimotion.json').write_text('private');(folder/'background.json').write_text('private');(folder/'my-note.txt').write_text('keep');(folder/'README.txt').write_text('old instructions')
             project={'name':'hero','parts':{}};html='<script id="projectData" type="application/json">'+json.dumps(project)+'</script>'
             import os
             from unittest.mock import patch
             with patch.dict(os.environ,{'CHIBIRIG_DIST_ROOT':str(kit/'dist')}):out.export_player(root,html,project)
-            for f in ['assets/old.png','capture.chibimotion.json','background.json']:self.assertFalse((folder/f).exists())
+            for f in ['assets','rig.project.json','README.txt','capture.chibimotion.json','background.json']:self.assertFalse((folder/f).exists())
             self.assertEqual((folder/'my-note.txt').read_text(),'keep')
-            self.assertIn('インターネット接続は不要',(folder/'README.txt').read_text())
+            self.assertEqual({f.name for f in folder.iterdir()},{'index.html','LICENSE.txt','my-note.txt'})

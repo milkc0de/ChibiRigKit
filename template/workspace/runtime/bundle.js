@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 function downloadBlob(blob,name){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),10000)}
 function zipCRC32(bytes){let crc=0xffffffff;for(const value of bytes){crc^=value;for(let i=0;i<8;i++)crc=(crc>>>1)^((crc&1)?0xedb88320:0)}return (crc^0xffffffff)>>>0}
-// Store PNG/WebP bytes unchanged in a standard UTF-8 ZIP; no network or dependency.
+// Create a standard UTF-8 ZIP without network access or dependencies.
 function createZip(files){
   const encoder=new TextEncoder(),chunks=[],directory=[];let offset=0;
   for(const [name,content] of Object.entries(files)){
@@ -40,7 +40,7 @@ function sanitizeExportPage(page){
   for(const input of page.querySelectorAll('input[type="file"]'))input.removeAttribute('value');
 }
 function bundleFiles(){
-  const project=collectMotionProject(),preset=collectMotionPreset(),page=document.documentElement.cloneNode(true),json=value=>JSON.stringify(value,null,2)+'\n';
+  const project=collectMotionProject(),preset=collectMotionPreset(),page=document.documentElement.cloneNode(true);
   // Include live settings without altering the page being edited.
   page.querySelector('#projectData').textContent=JSON.stringify(project).replace(/</g,'\\u003c');
   const background={...backgroundState,image:backgroundState.mode==='image'?backgroundState.image:null,name:backgroundState.mode==='image'?'背景画像':''};
@@ -50,15 +50,8 @@ function bundleFiles(){
   sanitizeExportPage(page);
   for(const control of page.querySelectorAll('input,button,select'))control.removeAttribute('disabled');
   page.querySelector('#recordCancel').hidden=true;page.querySelector('#record').textContent='WebM録画';page.querySelector('#bundle').textContent='完成品をdistに保存';page.querySelector('#recordStatus').textContent='';page.querySelector('#bundleStatus').textContent='';page.querySelector('#recordProgress').hidden=true;
-  const files={'index.html':'<!DOCTYPE html>\n'+page.outerHTML,'rig.project.json':json(project),'motion.json':json(preset),'background.json':json(background),
-    'README.txt':'ChibiRigKit 再生用セット\n\n完成品の再生・調整・動画保存にインターネット接続は不要です。初回準備とCodexによるリグ制作にはインターネット接続が必要です。\n選択した背景画像は同梱されます。録画モーションは書き出し時に同梱を選んだ場合だけ含まれます。\n\nカメラ・音声で動かす場合はChibiRigKitの親フォルダで npm run player を実行してください。別のキャラは -- --character characters/<キャラ名> で指定します。\n\n1. distに保存されたZIPを展開します。\n2. index.htmlをChromeなどのブラウザで開きます。\n3. 保存時の動き・顔配置・背景が復元されます。\n\nmotion.jsonは同じキャラの「全体の動きJSONを読み込む」で再利用できます。\nassets/には描画用画像を保存しています。HTMLにも画像を内蔵しています。\n制作途中の入力・マスク・AI作業履歴・Pythonツールは含みません。再制作には元のキャラフォルダを保管してください。\n\nツール作者: milkc0de\n予定URL: https://github.com/milkc0de/ChibiRigKit\nツールのコード: MIT License（LICENSE.txt参照）\nキャラクター画像の権利は各権利者に帰属します。\n',
+  return {'index.html':'<!DOCTYPE html>\n'+page.outerHTML,
     'LICENSE.txt':document.getElementById('licenseData').textContent};
-  if(snapshot.capture)files['capture.chibimotion.json']=json(snapshot.capture.source);
-  if(project.head_pose)files['head-poses.json']=json(project.head_pose);
-  const addImage=(path,url)=>{if(!url?.startsWith('data:image/'))throw Error(`画像を同梱できません：${path}`);files[path]=Uint8Array.from(atob(url.split(',')[1]),ch=>ch.charCodeAt(0))};
-  if(project.neck_fill)addImage(project.neck_fill.file,project.neck_fill.data_url);
-  for(const part of Object.values(project.parts)){addImage(part.file,part.image_data_url);if(part.seam)addImage(part.seam.file,part.seam.data_url)}
-  return files;
 }
 async function restoreBundleSnapshot(){
   const element=$('bundleSnapshot');if(!element)return;

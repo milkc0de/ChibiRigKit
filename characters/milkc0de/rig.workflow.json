@@ -194,6 +194,7 @@
     },
     "player_handoff": {
       "format": "self_contained_html_and_zip",
+      "output_files": ["index.html", "LICENSE.txt"],
       "embedded_data": [
         "projectData",
         "bundleSnapshot"

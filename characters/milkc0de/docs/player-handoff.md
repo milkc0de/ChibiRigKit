@@ -20,7 +20,7 @@ WebM動画はドラッグで指定した範囲を1280×720で保存します。�
 
 ## 完成品と制作契約
 
-完成品HTMLのタブのタイトルは「キャラクター名 - ChibiRigKit」です。完成品は `dist/<キャラ名>/index.html`、ZIPは `dist/<キャラ名>.zip`。どちらもGit対象外です。Web画面の「完成品をdistに保存」、または `npm run export -- --character characters/<キャラ名>` を使います。HTML単体はブラウザで再生できます。カメラ収録はローカルサーバーから行います。
+完成品HTMLのタブのタイトルは「キャラクター名 - ChibiRigKit」です。完成品は `dist/<キャラ名>/index.html`、ZIPは `dist/<キャラ名>.zip`。どちらもGit対象外です。Web画面の「完成品をdistに保存」、または `npm run export -- --character characters/<キャラ名>` を使います。出力フォルダとZIPの内容は `index.html` と `LICENSE.txt` の2ファイルです。画像・設定・選択した録画モーションはHTML内に保存し、外部の `assets/` やJSONは同梱しません。制作データは元のキャラフォルダに残します。HTML単体はブラウザで再生できます。カメラ収録はローカルサーバーから行います。
 
 `template/workspace/runtime/` が共通実装、`studio/` が親のローカルサーバーです。Codex制作契約は `rig.workflow.json`、説明は `AUTO_RIG_TASK.md`。`scripts/update-character.py --character <folder>` は古い実装をバックアップして更新します。画像やリグは再構築しません。
 
