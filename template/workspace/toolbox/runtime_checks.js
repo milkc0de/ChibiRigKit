@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2026 milkc0de
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 /* Shared by automated Chrome validation and the inspectable browser harness. */
 window.runRigChecks=()=>{
       running=false;controls.headRandom.checked=false;controls.headCircle.checked=false;

@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: 2026 milkc0de
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Transfer observed stationary curl fragments to their existing moving locks.
 
 Only normal-source pixels inside explicitly traced correction masks are added.

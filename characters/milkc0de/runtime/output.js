@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2026 milkc0de
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 const outputCanvas=document.createElement('canvas');outputCanvas.width=1280;outputCanvas.height=720;
 const outputState={crop:{x:0,y:0,w:canvas.width,h:canvas.height},drag:null,selecting:false,session:null};
 async function studioSession(){if(outputState.session)return outputState.session;const r=await fetch('/api/session');if(!r.ok)throw Error('ChibiRigKitフォルダで npm run player を実行して開いてください');return outputState.session=await r.json()}

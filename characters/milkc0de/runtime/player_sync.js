@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2026 milkc0de
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 // Only the dedicated loopback server injects the opt-in bootstrap marker.
 const playerSyncClockOrigin=Date.now()-performance.now();
 const playerSync={role:null,active:false,applying:false,busy:false,dirty:false,timer:null,retry:null,session:null,events:null,revision:-1,received:-1,last:null,generation:0};

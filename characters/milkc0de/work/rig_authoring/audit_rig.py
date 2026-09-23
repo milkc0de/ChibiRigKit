@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: 2026 milkc0de
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Final artifact, source-color and immutable-input audit."""
 from pathlib import Path
 import json,hashlib,sys

@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: 2026 milkc0de
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Second review: source-colored strands incorrectly retained in the base.
 Run after review1_repair.py. Corrections are restricted to two reviewed regions.
 """

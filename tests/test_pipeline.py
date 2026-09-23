@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: 2026 milkc0de
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Synthetic art isolates regressions without shipping another character's assets."""
 import copy
 import json

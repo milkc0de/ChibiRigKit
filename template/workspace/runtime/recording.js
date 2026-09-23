@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2026 milkc0de
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 let recordingActive=false,cancelRecording=null;
 function recordingProgress(elapsed,duration){return `録画中 ${Math.min(duration,Math.max(0,elapsed)).toFixed(1)} / ${duration.toFixed(1)} 秒`}
 async function recordLoop(){

@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2026 milkc0de
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 // Executes the production geometry functions in Node. This is NOT a browser-renderer pass.
 const fs=require('fs'),vm=require('vm'),assert=require('node:assert/strict'),path=require('path');
 const root=path.resolve(__dirname,'../..');

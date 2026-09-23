@@ -7,7 +7,7 @@ server_module=importlib.util.module_from_spec(spec);spec.loader.exec_module(serv
 class PlayerSyncServerTests(unittest.TestCase):
     def setUp(self):
         self.temp=tempfile.TemporaryDirectory();root=Path(self.temp.name)
-        (root/'index.html').write_text('<html><head></head><body>player</body></html>');(root/'LICENSE.txt').write_text('MIT');(root/'private.txt').write_text('private')
+        (root/'index.html').write_text('<html><head></head><body>player</body></html>');(root/'LICENSE.txt').write_text('TEST-LICENSE');(root/'MEDIA_NOTICE.txt').write_text('TEST-MEDIA');(root/'private.txt').write_text('private')
         self.server=server_module.PlayerServer(root,0);self.thread=threading.Thread(target=self.server.serve_forever,daemon=True);self.thread.start()
         self.port=self.server.server_port
         self.state={'motion':{'format':'chibirigkit.motion'},'background':{},'extras':{},'playback':{},'capture':None}
@@ -46,7 +46,7 @@ class PlayerSyncServerTests(unittest.TestCase):
         with contextlib.closing(http.client.HTTPConnection('127.0.0.1',self.port,timeout=3)) as connection:
             connection.request('GET','/api/player-sync/events?token='+self.server.token);self.assertEqual(self.event(connection.getresponse())['state'],self.state)
         self.assertEqual(json.loads(self.request('GET','/api/player-sync/state')[1])['state'],self.state)
-        self.assertEqual({p.name for p in Path(self.temp.name).iterdir()},{'index.html','LICENSE.txt','private.txt'})
+        self.assertEqual({p.name for p in Path(self.temp.name).iterdir()},{'index.html','LICENSE.txt','MEDIA_NOTICE.txt','private.txt'})
     def test_unauthorized_and_invalid_updates_do_not_replace_state(self):
         self.assertEqual(self.post()[0],200)
         self.assertEqual(self.post(headers={'X-ChibiRig-Sync-Token':'wrong'})[0],403)

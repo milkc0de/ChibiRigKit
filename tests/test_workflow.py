@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: 2026 milkc0de
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 import importlib.util,json,subprocess,sys,tempfile,unittest,shutil
 from pathlib import Path
 from jsonschema import ValidationError,Draft202012Validator

@@ -8,5 +8,5 @@ Source: https://github.com/google-ai-edge/mediapipe
 Model: https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task
 Model documentation: https://ai.google.dev/edge/mediapipe/solutions/vision/face_landmarker
 
-ChibiRigKit's original code is MIT licensed. These dependency files retain
+ChibiRigKit's original code is licensed under Apache-2.0. These dependency files retain
 Apache-2.0 terms; the character artwork retains its own usage conditions.

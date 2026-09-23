@@ -1,0 +1,7 @@
+MEDIA NOTICE
+
+Copyright © 2026 milkc0de. All rights reserved.
+
+The character artwork and derived media in this workspace are not licensed under the Apache License 2.0. This includes the original input artwork, generated layers and masks, review images, rendered previews, and copies of the artwork embedded in generated HTML or video.
+
+ChibiRigKit source code in this workspace is licensed under Apache-2.0; see LICENSE.txt. Third-party components retain their own licenses and notices.

@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: 2026 milkc0de
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Validate actual request payloads against the installed Codex protocol, without inference."""
 import json
 import shutil

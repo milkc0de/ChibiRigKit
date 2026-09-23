@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2026 milkc0de
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 (function(root){
   'use strict';
   const channels={headYaw:[-90,90,0],headPitch:[-90,90,0],headRoll:[-90,90,0],eyeLeft:[0,1,1],eyeRight:[0,1,1],gazeX:[-1,1,0],gazeY:[-1,1,0],mouthOpen:[0,1,0],mouthShape:[-1,1,0],bodyYaw:[-90,90,0],bodyPitch:[-90,90,0],bodyRoll:[-90,90,0],breath:[0,1,0],browLeftX:[-1,1,0],browRightX:[-1,1,0],browLeftY:[-1,1,0],browRightY:[-1,1,0],browLeftAngle:[-1,1,0],browRightAngle:[-1,1,0],browLeftShape:[-1,1,0],browRightShape:[-1,1,0]};

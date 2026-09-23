@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 const {test}=require('node:test'),assert=require('node:assert/strict'),vm=require('node:vm');
 const {browserHarness}=require('./browser-harness.cjs');
 const run=(f,code)=>vm.runInContext(code,f.context);

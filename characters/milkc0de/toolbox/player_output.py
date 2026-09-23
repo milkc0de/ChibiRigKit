@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: 2026 milkc0de
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Final artifacts go to the kit's dist; authoring preview stays under work/."""
 import base64,json,re,zipfile,os,uuid
 from pathlib import Path
@@ -51,7 +51,7 @@ def export_player(root,rendered,project):
     embedded=re.search(r'<script id="projectData" type="application/json">(.*?)</script>',rendered,re.S)
     if not embedded or json.loads(embedded[1])!=project:raise ValueError('Export HTML and project differ; rebuild the preview first')
     dist,name=output_paths(root,project.get('name'));folder=dist/name
-    files={'index.html':rendered.encode(),'LICENSE.txt':(root/'LICENSE.txt').read_bytes(),**{name:source.encode() for name,source in launcher_files().items()}}
+    files={'index.html':rendered.encode(),'LICENSE.txt':(root/'LICENSE.txt').read_bytes(),'MEDIA_NOTICE.txt':(root/'MEDIA_NOTICE.txt').read_bytes(),**{name:source.encode() for name,source in launcher_files().items()}}
     files.update(tracking_files(root))
     def image(url):
         if not re.fullmatch(r'data:image/(png|webp|jpeg);base64,[a-zA-Z0-9+/=]+',url):raise ValueError('Only embedded raster images can be exported')

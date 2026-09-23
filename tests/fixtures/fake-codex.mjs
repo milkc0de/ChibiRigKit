@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // SPDX-FileCopyrightText: 2026 milkc0de
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 // Offline protocol fixture: never calls a model or runs browser rendering.
 import readline from 'node:readline';
 import fs from 'node:fs';

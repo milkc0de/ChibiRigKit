@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2026 milkc0de
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 const fs=require('node:fs'),path=require('node:path');
 const ROOT=path.resolve(__dirname,'..'),TEMPLATE=path.join(ROOT,'template/workspace');
 const TRACKING_FILES=JSON.parse(fs.readFileSync(path.join(TEMPLATE,'launchers/TRACKING_FILES.json'),'utf8'));

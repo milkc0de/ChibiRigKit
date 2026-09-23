@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: 2026 milkc0de
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 import json,shutil,subprocess,sys,tempfile,unittest
 from pathlib import Path
 import numpy as np

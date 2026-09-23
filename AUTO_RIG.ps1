@@ -1,5 +1,5 @@
 ﻿# SPDX-FileCopyrightText: 2026 milkc0de
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 # Pass the image/folder first; remaining arguments go directly to the rig command.
 $ErrorActionPreference = 'Stop'
 if ($args.Count -lt 1) { throw '使い方: .\AUTO_RIG.ps1 "画像のパス、またはキャラフォルダ" [追加オプション]' }

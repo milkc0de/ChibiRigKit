@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2026 milkc0de
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 const fs=require('node:fs/promises'),path=require('node:path');
 const {parsePlayer,zipHTML,zipTextFile,createZip}=require('./player_bundle.cjs');
 const {launcherFiles}=require('./player_launchers.cjs');
@@ -9,11 +9,11 @@ function outputName(name){let value=String(name||'character').replace(/[^\p{L}\p
 async function writeExport(root,data,distRoot){
  if(typeof data.html!=='string'||typeof data.zip!=='string'||data.html.length>64*1024*1024||data.zip.length>96*1024*1024)throw Error('完成品のサイズが大きすぎます');
  const launchers=launcherFiles();
- const zip=Buffer.from(data.zip,'base64');if(zipHTML(zip,['index.html','LICENSE.txt',...Object.keys(launchers)])!==data.html)throw Error('HTMLとZIPが一致しません');
+ const zip=Buffer.from(data.zip,'base64');if(zipHTML(zip,['index.html','LICENSE.txt','MEDIA_NOTICE.txt',...Object.keys(launchers)])!==data.html)throw Error('HTMLとZIPが一致しません');
  for(const [name,source] of Object.entries(launchers))if(zipTextFile(zip,name)!==source)throw Error('起動ファイルが現在の内容と一致しません。画面を再読み込みしてください');
  const {project}=parsePlayer(Buffer.from(data.html)),name=outputName(project.name),dist=path.resolve(distRoot||await defaultDist(root)),directory=path.join(dist,name);
  const assets=await ensureTracking();
- const files={...assets,...launchers,'index.html':data.html,'LICENSE.txt':await fs.readFile(path.join(root,'LICENSE.txt'))};
+ const files={...assets,...launchers,'index.html':data.html,'LICENSE.txt':await fs.readFile(path.join(root,'LICENSE.txt')),'MEDIA_NOTICE.txt':await fs.readFile(path.join(root,'MEDIA_NOTICE.txt'))};
  // Check every existing path component before writing generated artifacts.
  async function safeTarget(base,relative){const target=path.resolve(base,relative);if(!target.startsWith(base+path.sep))throw Error('出力先が不正です');let current=target;while(current!==path.dirname(base)){try{if((await fs.lstat(current)).isSymbolicLink())throw Error('出力先にシンボリックリンクは使えません')}catch(e){if(e.code!=='ENOENT')throw e}current=path.dirname(current)}return target}
  // Remove only artifacts managed by previous exports, never unrelated user files.

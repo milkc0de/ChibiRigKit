@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: 2026 milkc0de
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Small mask helpers for the Codex auto-rig agent.
 All masks are full-canvas L-mode PNGs. Sources remain unchanged.
 """

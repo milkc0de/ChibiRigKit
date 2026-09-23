@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2026 milkc0de
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 const http=require('node:http'),fs=require('node:fs'),fsp=require('node:fs/promises'),path=require('node:path'),crypto=require('node:crypto');
 const {writeExport}=require('./export_player.cjs'),{renderProject}=require('./render_player.cjs');
 const {createPlayerSync}=require('./player_sync.cjs');

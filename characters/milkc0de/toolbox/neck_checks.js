@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2026 milkc0de
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 window.runNeckChecks=()=>{
   if(!PROJECT.neck_sway)return {enabled:false};
   const assert=(ok,msg)=>{if(!ok)throw Error(msg)},original=collectMotionProject(),oldSeed=headRandomSeed;

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-FileCopyrightText: 2026 milkc0de
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Generate original geometric sample art; no private character assets required."""
 import argparse,json,shutil,subprocess,sys
 from pathlib import Path

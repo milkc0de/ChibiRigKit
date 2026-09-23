@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: 2026 milkc0de
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Nine authored head directions and split-eye preparation (canvas coordinates)."""
 import copy
 import hashlib

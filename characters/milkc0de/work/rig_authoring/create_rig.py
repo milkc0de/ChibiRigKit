@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: 2026 milkc0de
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Rebuild the vision-authored milkc0de masks and plan. Source images are immutable.
 All coordinates are in normal.png; left/right names are viewer-relative.
 """

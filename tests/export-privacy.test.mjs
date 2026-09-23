@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -6,7 +6,7 @@ import vm from 'node:vm';
 import {createRequire} from 'node:module';
 const require=createRequire(import.meta.url),MotionClip=require('../template/workspace/runtime/motion_clip.js');
 const {launcherFiles}=require('../studio/player_launchers.cjs');
-const launchers=launcherFiles(),expectedFiles=['LICENSE.txt','index.html',...Object.keys(launchers)].sort();
+const launchers=launcherFiles(),expectedFiles=['LICENSE.txt','MEDIA_NOTICE.txt','index.html',...Object.keys(launchers)].sort();
 const bundle=fs.readFileSync(new URL('../template/workspace/runtime/bundle.js',import.meta.url),'utf8');
 function snapshot(nodes){return JSON.parse(nodes.get('body').children.find(n=>n.id==='bundleSnapshot').textContent)}
 function fixture(include=false){
@@ -16,7 +16,7 @@ function fixture(include=false){
  nodes.set('cameraDevice',node('cameraDevice','PRIVATE_CAMERA_NAME_AND_ID'));nodes.set('microphoneDevice',node('microphoneDevice','PRIVATE_MIC_NAME_AND_ID'));
  const page={querySelector:s=>nodes.get(s.replace('#','')),querySelectorAll:()=>[],get outerHTML(){return [...nodes].map(([id,n])=>`<div id="${id}">${n.textContent}${n.children.map(x=>x.textContent).join('')}</div>`).join('')}};
  const source={format:'ChibiRigMotion',version:1,timeUnit:'seconds',duration:1,loop:false,channels:['mouthOpen'],frames:[[0,0],[1,.5]],metadata:{createdAt:'PRIVATE_DATE',name:'PRIVATE_TAKE'},unknown:'PRIVATE_EXTRA'};
- const c=vm.createContext({MotionClip,document:{documentElement:{cloneNode:()=>page},createElement:()=>node(''),getElementById:id=>({textContent:id==='playerLaunchers'?JSON.stringify(launchers):'MIT'})},collectMotionProject:()=>({parts:{}}),collectMotionPreset:()=>({}),backgroundState:{mode:'image',image:'data:image/png;base64,AQID',name:'PRIVATE_BACKGROUND_NAME'},headRandomSeed:1,outputState:{crop:{}},captureMotion:{source,name:'PRIVATE_FILENAME'},$:id=>({checked:id==='bundleIncludeMotion'?include:false,value:'#ffffff'}),Blob,TextEncoder,atob});
+ const c=vm.createContext({MotionClip,document:{documentElement:{cloneNode:()=>page},createElement:()=>node(''),getElementById:id=>({textContent:id==='playerLaunchers'?JSON.stringify(launchers):id==='licenseData'?'TEST-LICENSE':id==='mediaNoticeData'?'TEST-MEDIA-NOTICE':''})},collectMotionProject:()=>({parts:{}}),collectMotionPreset:()=>({}),backgroundState:{mode:'image',image:'data:image/png;base64,AQID',name:'PRIVATE_BACKGROUND_NAME'},headRandomSeed:1,outputState:{crop:{}},captureMotion:{source,name:'PRIVATE_FILENAME'},$:id=>({checked:id==='bundleIncludeMotion'?include:false,value:'#ffffff'}),Blob,TextEncoder,atob});
  vm.runInContext(bundle,c);return {c,nodes};
 }
 test('export removes device data, transient messages, filenames and capture by default',()=>{
@@ -29,7 +29,8 @@ test('export removes device data, transient messages, filenames and capture by d
  assert.equal(nodes.get('trackingStatus').textContent.includes('この端末'),true);
  for(const id of ['takeStatus','captureStatus','backgroundStatus','headStatus','motionIOStatus','loadStatus'])assert.equal(nodes.get(id).textContent,'');
  assert.equal(nodes.get('cameraPreview').hidden,true);
- assert.equal(files['LICENSE.txt'],'MIT');
+ assert.equal(files['LICENSE.txt'],'TEST-LICENSE');
+ assert.equal(files['MEDIA_NOTICE.txt'],'TEST-MEDIA-NOTICE');
 });
 test('explicit capture inclusion retains playback numbers but drops all metadata',()=>{
  const {c,nodes}=fixture(true),files=c.bundleFiles(),data=snapshot(nodes).capture.source;

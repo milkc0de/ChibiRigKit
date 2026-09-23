@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2026 milkc0de
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 const zlib=require('node:zlib');
 const LIMIT=64*1024*1024;
 function zipTextFile(bytes,wanted='index.html',expectedFiles){

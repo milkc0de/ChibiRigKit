@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: 2026 milkc0de
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Local color-assisted edge refinement; all semantic ownership is vision authored."""
 import cv2,numpy as np
 from PIL import Image

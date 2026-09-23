@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 import hashlib,importlib.util,io,json,tempfile,unittest
 from pathlib import Path
 from unittest.mock import patch

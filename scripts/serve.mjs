@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // SPDX-FileCopyrightText: 2026 milkc0de
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 import fs from 'node:fs';import path from 'node:path';import {fileURLToPath} from 'node:url';import {createRequire} from 'node:module';
 const require=createRequire(import.meta.url),{createStudio}=require('../studio/server.cjs');
 const kit=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');

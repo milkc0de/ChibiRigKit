@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2026 milkc0de
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 window.runHeadChecks=()=>{
   if(!PROJECT.head_pose)return {enabled:false};
   const assert=(ok,message)=>{if(!ok)throw Error(message)};

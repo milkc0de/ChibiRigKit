@@ -5,7 +5,7 @@ test('copied parent runtime starts without the old player directory or Electron 
  try{
   for(const folder of ['studio','template/workspace/runtime','template/workspace/launchers'])await fs.cp(path.join(ROOT,folder),path.join(isolated,folder),{recursive:true});
   const character=path.join(isolated,'characters/example');await fs.mkdir(character,{recursive:true});
-  for(const file of ['rig.project.json','LICENSE.txt'])await fs.copyFile(path.join(CHARACTER,file),path.join(character,file));
+  for(const file of ['rig.project.json','LICENSE.txt','MEDIA_NOTICE.txt'])await fs.copyFile(path.join(CHARACTER,file),path.join(character,file));
   const {createStudio}=require(path.join(isolated,'studio/server.cjs'));app=createStudio({root:character,port:0});await app.listen();
   const origin=`http://127.0.0.1:${app.server.address().port}`,response=await fetch(origin);assert.equal(response.status,200);const html=await response.text(),fixture=browserHarness(html);await fixture.context.rigReady;
   assert.equal(fixture.elements.get('loadStatus').textContent,'読み込み完了');assert.ok(fixture.elements.get('cameraStart'));assert.ok(fixture.elements.get('captureLoad'));assert.equal(fixture.elements.get('playerImport'),undefined);

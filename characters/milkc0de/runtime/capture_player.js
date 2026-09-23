@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2026 milkc0de
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 const captureParameters=new Set(['headYaw','headPitch','headRoll','eyeLeft','eyeRight','gazeX','gazeY','mouthOpen','bodyYaw','bodyPitch','bodyRoll','breath','browLeftX','browRightX','browLeftY','browRightY','browLeftAngle','browRightAngle','browLeftShape','browRightShape','mouthShape']);
 let captureMotion=null,captureFrame=null,captureOffset=0,captureSpeed=1,captureLoadSerial=0,capturePlaying=false,captureHold=0;
 const captureClamp=(v,min,max)=>Math.max(min,Math.min(max,v));

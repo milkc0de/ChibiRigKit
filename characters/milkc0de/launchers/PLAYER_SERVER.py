@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-FileCopyrightText: 2026 milkc0de
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Loopback-only player and in-memory settings relay. Python standard library only."""
 import argparse, hashlib, json, secrets, threading, math, time, os
 from urllib.request import urlopen
@@ -129,6 +129,8 @@ class PlayerHandler(BaseHTTPRequestHandler):
                 return self.send(404, {'error':'追跡ファイルがありません。完成品ZIPをすべて展開してください'})
         if url.path == '/LICENSE.txt':
             return self.send(200, (self.server.root/'LICENSE.txt').read_bytes(), 'text/plain; charset=utf-8')
+        if url.path == '/MEDIA_NOTICE.txt':
+            return self.send(200, (self.server.root/'MEDIA_NOTICE.txt').read_bytes(), 'text/plain; charset=utf-8')
         if url.path == '/api/player-sync/session':
             return self.send(200, {'token':self.server.token, 'character':self.server.character})
         if url.path == '/api/player-sync/state':

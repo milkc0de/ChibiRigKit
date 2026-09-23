@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2026 milkc0de
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 function downloadBlob(blob,name){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),10000)}
 function zipCRC32(bytes){let crc=0xffffffff;for(const value of bytes){crc^=value;for(let i=0;i<8;i++)crc=(crc>>>1)^((crc&1)?0xedb88320:0)}return (crc^0xffffffff)>>>0}
 // Create a standard UTF-8 ZIP without network access or dependencies.
@@ -55,7 +55,8 @@ function bundleFiles(){
   const launchers=JSON.parse(document.getElementById('playerLaunchers').textContent);
   const launcherFiles=Object.fromEntries(['START_SERVER.ps1','START_SERVER.cmd','START_SERVER.command','START_SERVER.sh','PLAYER_SERVER.py'].map(name=>{if(typeof launchers[name]!=='string')throw Error('起動ファイルがありません。画面を再読み込みしてください');return [name,launchers[name]]}));
   return {...launcherFiles,'index.html':'<!DOCTYPE html>\n'+page.outerHTML,
-    'LICENSE.txt':document.getElementById('licenseData').textContent};
+    'LICENSE.txt':document.getElementById('licenseData').textContent,
+    'MEDIA_NOTICE.txt':document.getElementById('mediaNoticeData').textContent};
 }
 async function restoreBundleSnapshot(){
   const element=$('bundleSnapshot');if(!element)return;

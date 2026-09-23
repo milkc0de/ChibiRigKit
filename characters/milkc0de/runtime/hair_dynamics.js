@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2026 milkc0de
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 // Fixed-step damped spring in the accelerating head frame. Gravity restores the
 // strand to its authored hanging shape; bounded history makes seeking reproducible.
 (function(root){

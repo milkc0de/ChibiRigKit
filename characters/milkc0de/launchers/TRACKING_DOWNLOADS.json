@@ -1,7 +1,7 @@
 {
   "format": "ChibiRigKitTrackingDownloads",
   "version": 1,
-  "manifest_license": "MIT",
+  "manifest_license": "Apache-2.0",
   "dependency": {
     "name": "MediaPipe Tasks Vision and Face Landmarker models",
     "sdk_version": "1.0.1",

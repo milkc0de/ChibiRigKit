@@ -28,7 +28,7 @@ WebM動画はドラッグで指定した範囲を1280×720で保存します。�
 
 `neck_fill` は補完用の派生画像、`skin_rect`、`head_edge`、`body_edge`、`body_part` をキャラ側に指定します。長い髪は `physics: {type: "long_hair", stiffness: 16, damping: 7}` を使用できます。左右を明示する場合は `capture_side: "left"` または `"right"`（画面上の左右）を使用します。サンプル固有の座標を他キャラへ流用しません。
 
-元画像は保持します。オリジナルコードはMITです。依存ライブラリに付属するライセンス表記は保持します。 MediaPipe Tasks Vision 1.0.1・WASM・顔モデルはApache-2.0です。完成品の `licenses/mediapipe-LICENSE.txt` と `licenses/mediapipe-NOTICES.txt` に原文・配布元・著作権を記載します。`TRACKING_DOWNLOADS.json` にも配布元・ハッシュ・ライセンスを記録し、ChibiRigKitのMITとは区別します。セットアップ時にSDKとモデルのハッシュを `tracking-dependencies.json` に保存します。
+元画像は保持します。オリジナルコードはApache-2.0です。依存ライブラリに付属するライセンス表記は保持します。 MediaPipe Tasks Vision 1.0.1・WASM・顔モデルはApache-2.0です。完成品の `licenses/mediapipe-LICENSE.txt` と `licenses/mediapipe-NOTICES.txt` に原文・配布元・著作権を記載します。`TRACKING_DOWNLOADS.json` にも配布元・ハッシュ・ライセンスを記録し、ChibiRigKit本体のApache-2.0とは別の配布物としてライセンス表記を保持します。セットアップ時にSDKとモデルのハッシュを `tracking-dependencies.json` に保存します。
 
 完成品の `dist/<キャラ名>/index.html` 自体がプレイヤーです。別のプレイヤーアプリへ取り込む手順はありません。そのままブラウザで再生・調整・モーション読込ができます。カメラ・音声追従は完成品ZIPをすべて展開して `START_SERVER` で起動し、操作用URLで利用します。ChibiRigKitでは指定キャラを `npm run player` で開く方法も使えます。
 

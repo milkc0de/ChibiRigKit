@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2026 milkc0de
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 const trackingState={active:false,starting:false,inputMode:null,generation:0,stream:null,worker:null,busy:false,cancelStart:null,lastResult:0,lastTick:0,lastVideo:-1,history:[],neutral:{},latest:null,values:null,audio:null,audioValue:0,take:null,recording:null};
 function trackingMessage(text){$('trackingStatus').textContent=text}
 function trackingInputMode(){return (trackingState.active||trackingState.starting)?trackingState.inputMode:$('trackingInput').value}

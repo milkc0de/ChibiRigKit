@@ -197,6 +197,7 @@
       "output_files": [
         "index.html",
         "LICENSE.txt",
+        "MEDIA_NOTICE.txt",
         "START_SERVER.ps1",
         "START_SERVER.cmd",
         "START_SERVER.command",
@@ -230,7 +231,7 @@
       "virtual_camera": false,
       "network_broadcast": false,
       "generated_zip": "gitignored_do_not_commit",
-      "license": "MIT_original_code_preserve_third_party_notices",
+      "license": "Apache-2.0_original_code_preserve_third_party_notices",
       "output_directory": "kit_root/dist/character",
       "zip_output": "kit_root/dist/character.zip",
       "authoring_preview": "work/player/index.html",

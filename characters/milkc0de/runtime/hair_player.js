@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2026 milkc0de
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 let hairFrame=new Map();
 function longHairPart(p){return p.role==='hair'&&(p.physics?.type==='long_hair'||p.name.startsWith('hair_back_'))}
 function beginHairFrame(t){

@@ -1,6 +1,6 @@
 #!/bin/sh
 # SPDX-FileCopyrightText: 2026 milkc0de
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 PLAYER_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd) || exit 1
 /bin/sh "$PLAYER_DIR/START_SERVER.sh"
 PLAYER_STATUS=$?

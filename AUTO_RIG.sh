@@ -1,6 +1,6 @@
 #!/bin/sh
 # SPDX-FileCopyrightText: 2026 milkc0de
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 set -eu
 if [ "$#" -lt 1 ]; then echo '使い方: sh AUTO_RIG.sh "画像のパス、またはキャラフォルダ" [追加オプション]'; exit 2; fi
 case "$1" in /*) rig_input=$1;; *) rig_input="$PWD/$1";; esac

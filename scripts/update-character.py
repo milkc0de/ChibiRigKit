@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-FileCopyrightText: 2026 milkc0de
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Update the shared runtime/validation contract, retaining a backup of replaced files."""
 import argparse,shutil,json
 from pathlib import Path
@@ -11,6 +11,11 @@ def update(folder):
     folder=Path(folder).resolve()
     if not (folder/'character.config.json').is_file():raise ValueError('Not a character workspace')
     backup=folder/'work/template-backups'/datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ');changed=[]
+    # MEDIA_NOTICE.txt may be character-specific. Preserve an existing one,
+    # but seed the generic notice for workspaces created before it existed.
+    media_notice=folder/'MEDIA_NOTICE.txt'
+    if not media_notice.exists():
+        shutil.copy2(ROOT/'template/workspace/MEDIA_NOTICE.txt',media_notice);changed.append('MEDIA_NOTICE.txt')
     files=FILES
     for name in files:
         source=ROOT/'template/workspace'/name;target=folder/name

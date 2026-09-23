@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 'use strict';
 const demo=document.getElementById('character-demo'),toggle=document.getElementById('motion-toggle');
 let paused=window.matchMedia('(prefers-reduced-motion: reduce)').matches;

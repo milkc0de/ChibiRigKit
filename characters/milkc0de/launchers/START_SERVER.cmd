@@ -1,7 +1,7 @@
 @echo off
 chcp 65001 >nul
 rem SPDX-FileCopyrightText: 2026 milkc0de
-rem SPDX-License-Identifier: MIT
+rem SPDX-License-Identifier: Apache-2.0
 setlocal DisableDelayedExpansion
 if not exist "%~dp0index.html" (
   echo index.htmlが見つかりません。ZIPをすべて展開してから起動してください。

@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2026 milkc0de
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 // Background selection is local to this browser; source layers remain immutable.
 const backgroundDefaults={version:1,mode:'original',color:'#e9dfd3',fit:'cover',image:null,name:''};
 let backgroundState={...backgroundDefaults},backgroundImage=null,backgroundRevision=0;

@@ -1,6 +1,6 @@
 #!/bin/sh
 # SPDX-FileCopyrightText: 2026 milkc0de
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 # Serve only the completed player's directory; no packages or internet needed.
 set -u
 PLAYER_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd) || exit 1

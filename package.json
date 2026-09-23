@@ -1,6 +1,6 @@
 {
   "name": "chibirigkit",
-  "version": "1.0.0-beta.6",
+  "version": "1.0.0-beta.7",
   "private": true,
   "type": "module",
   "description": "Create 2D character animations from a single image.",
@@ -21,7 +21,7 @@
     "@mediapipe/tasks-vision": "1.0.1"
   },
   "author": "milkc0de",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "engines": {
     "node": ">=22"
   }

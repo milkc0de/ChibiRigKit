@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-FileCopyrightText: 2026 milkc0de
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """Build missing reference images from one image and a vision-authored face plan.
 The original is immutable. All new artwork is labelled as estimated reference art.
 """

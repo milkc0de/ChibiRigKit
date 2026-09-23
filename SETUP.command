@@ -1,4 +1,4 @@
 #!/bin/sh
 # SPDX-FileCopyrightText: 2026 milkc0de
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 exec sh "$(dirname "$0")/SETUP.sh" "$@"

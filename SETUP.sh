@@ -1,6 +1,6 @@
 #!/bin/sh
 # SPDX-FileCopyrightText: 2026 milkc0de
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 set -eu
 cd "$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 setup_python=${PYTHON:-python3.12}

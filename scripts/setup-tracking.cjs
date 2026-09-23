@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2026 milkc0de
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 const fs=require('node:fs/promises'),path=require('node:path'),crypto=require('node:crypto');
 const {ensureTracking}=require('../studio/tracking_assets.cjs');
 const root=path.resolve(__dirname,'..');

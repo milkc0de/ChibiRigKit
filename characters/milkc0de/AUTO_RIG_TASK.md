@@ -15,7 +15,7 @@ The original files under `input/` and `work/aligned/` are immutable. Never edit 
 You must create:
 1. `rig.plan.json` conforming to `rig.plan.schema.json`.
 2. Full-canvas PNG masks under `work/masks/` for every part.
-3. Run `python3 toolbox/build_project.py` to create `rig.project.json`, `work/player/index.html`, `assets/layers`, and `assets/masks`; the builder also writes the final HTML and ZIP under the kit root `dist/` and records paths in `work/player-output.json`. The final output folder and ZIP contain `index.html`, `LICENSE.txt`, the four `START_SERVER` launchers (`.ps1`, `.cmd`, `.command`, `.sh`), and `PLAYER_SERVER.py`; the launchers locate Python 3 and serve the completed folder only on `127.0.0.1:5510`, never on LAN or the public internet; embed images and settings in HTML, and keep external assets and authoring JSON in the character workspace.
+3. Run `python3 toolbox/build_project.py` to create `rig.project.json`, `work/player/index.html`, `assets/layers`, and `assets/masks`; the builder also writes the final HTML and ZIP under the kit root `dist/` and records paths in `work/player-output.json`. The final output folder and ZIP contain `index.html`, `LICENSE.txt`, `MEDIA_NOTICE.txt`, the four `START_SERVER` launchers (`.ps1`, `.cmd`, `.command`, `.sh`), and `PLAYER_SERVER.py`; the launchers locate Python 3 and serve the completed folder only on `127.0.0.1:5510`, never on LAN or the public internet; embed images and settings in HTML, and keep external assets and authoring JSON in the character workspace.
 4. Run `python3 toolbox/validate_character.py` and inspect `checks/validation_sheet.png` plus the source images.
 5. Correct masks/plan and rebuild until the rig is coherent.
 
@@ -122,7 +122,7 @@ Follow `rig.workflow.json` rules.head and rules.player_handoff and `docs/player-
 - Export the normal self-contained HTML/ZIP with projectData and bundleSnapshot. The parent browser player opens the selected character workspace directly. Do not add player-file import or Electron. ZIPs and character outputs are ignored generated artifacts, not the implementation source.
 - Use the existing camera/audio/motion/output runtime. Do not create OBS, virtual camera drivers, native Swift windows, executable packaging, automatic device startup, or network broadcast. Camera and microphone require an explicit Start action. Desktop popup output and Electron have been removed. Keep drag-to-select cropping for WebM recording.
 - Independent yaw/pitch/roll playback gains must include zero. Record the original channels; gains affect display, not the saved motion. ChibiRigMotion v1 is separate from the rig-settings motion preset.
-- Preserve MIT notices and third-party component licenses. Do not initiate commits or publication unless separately requested.
+- Preserve Apache-2.0 notices and third-party component licenses. Do not initiate commits or publication unless separately requested.
 
 Final exported HTML/assets belong in the kit root `dist/<character>/`; ZIP belongs in `dist/<character>.zip`. Do not put new completed exports beside the character workspace. The intermediate preview is `work/player/index.html`. Preserve existing older exports unless the user asks to remove them.
 

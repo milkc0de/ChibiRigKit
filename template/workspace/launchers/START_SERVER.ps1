@@ -1,5 +1,5 @@
 ﻿# SPDX-FileCopyrightText: 2026 milkc0de
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 $ErrorActionPreference = 'Stop'
 $playerDirectory = $PSScriptRoot
 if (-not (Test-Path -LiteralPath (Join-Path $playerDirectory 'index.html') -PathType Leaf)) {

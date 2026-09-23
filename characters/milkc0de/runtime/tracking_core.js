@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2026 milkc0de
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 (function(root){
  'use strict';
  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),degrees=180/Math.PI;

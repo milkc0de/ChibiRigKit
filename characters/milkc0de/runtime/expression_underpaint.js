@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2026 milkc0de
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 // Remove the stationary eyebrow strokes from underlying head layers at load time.
 // Only the duplicate stroke pixels are filled; original image bytes stay untouched.
 function prepareBrowUnderpaint(){

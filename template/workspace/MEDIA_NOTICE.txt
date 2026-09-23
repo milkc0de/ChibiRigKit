@@ -1,0 +1,5 @@
+MEDIA NOTICE
+
+Character artwork and other media in this workspace are not licensed under the Apache License 2.0 by ChibiRigKit.
+
+Rights in user-supplied and generated media remain with their respective rights holders unless a separate license explicitly says otherwise. ChibiRigKit source code is licensed under Apache-2.0; see LICENSE.txt. Third-party components retain their own licenses and notices.

@@ -16,24 +16,24 @@ test('parent server serves current runtime and has no popup, frame or player imp
 });
 test('completed HTML and ZIP save only under dist through the authenticated export action',async()=>{
  const vm=require('node:vm'),root=await fs.mkdtemp(path.join(os.tmpdir(),'chibi-export-')),distRoot=path.join(root,'dist');
- await fs.writeFile(path.join(root,'index.html'),'player');await fs.writeFile(path.join(root,'LICENSE.txt'),'MIT');
+ await fs.writeFile(path.join(root,'index.html'),'player');await fs.writeFile(path.join(root,'LICENSE.txt'),'TEST-LICENSE');await fs.writeFile(path.join(root,'MEDIA_NOTICE.txt'),'TEST-MEDIA');
  const app=createStudio({root,distRoot,port:0});await app.listen();
  try{
   const origin=`http://127.0.0.1:${app.server.address().port}`,{token}=await(await fetch(origin+'/api/session')).json();
   const project={name:'hero',canvas:{width:100,height:100},parts:{face:{file:'assets/layers/face.png',image_data_url:'data:image/png;base64,AQID'}},draw_order:['face']};
   const html='<script id="projectData" type="application/json">'+JSON.stringify(project)+'</script>',c=vm.createContext({TextEncoder,Blob,$:()=>({})});vm.runInContext(await fs.readFile(RUNTIME+'/bundle.js','utf8'),c);
-  const zip=Buffer.from(await c.createZip({...launchers,'index.html':html,'LICENSE.txt':'MIT'}).arrayBuffer()).toString('base64');
+  const zip=Buffer.from(await c.createZip({...launchers,'index.html':html,'LICENSE.txt':'TEST-LICENSE','MEDIA_NOTICE.txt':'TEST-MEDIA'}).arrayBuffer()).toString('base64');
   await fs.mkdir(path.join(distRoot,'hero/assets'),{recursive:true});await fs.writeFile(path.join(distRoot,'hero/capture.chibimotion.json'),'private');await fs.writeFile(path.join(distRoot,'hero/assets/old.png'),'private');await fs.writeFile(path.join(distRoot,'hero/rig.project.json'),JSON.stringify({parts:{old:{file:'assets/old.png'}}}));await fs.writeFile(path.join(distRoot,'hero/user-note.txt'),'keep');
   const response=await fetch(origin+'/api/player/export',{method:'POST',headers:{'X-ChibiRig-Token':token,'Content-Type':'application/json'},body:JSON.stringify({html,zip})});assert.equal(response.status,200);const saved=await response.json();
   assert.equal(saved.html,path.join(distRoot,'hero/index.html'));assert.equal(saved.zip,path.join(distRoot,'hero.zip'));assert.equal(await fs.readFile(saved.html,'utf8'),html);assert.equal(await fs.readFile(path.join(root,'index.html'),'utf8'),'player');assert.equal(require('../../studio/player_bundle.cjs').zipHTML(await fs.readFile(saved.zip)),html);
   await assert.rejects(fs.stat(path.join(distRoot,'hero/capture.chibimotion.json')),{code:'ENOENT'});await assert.rejects(fs.stat(path.join(distRoot,'hero/assets/old.png')),{code:'ENOENT'});assert.equal(await fs.readFile(path.join(distRoot,'hero/user-note.txt'),'utf8'),'keep');
   const {writeExport}=require('../../studio/export_player.cjs');await assert.rejects(writeExport(root,{html:html+'bad',zip},distRoot));
-  assert.deepEqual((await fs.readdir(path.join(distRoot,'hero'))).sort(),['LICENSE.txt','index.html','user-note.txt','runtime','vendor','licenses',...Object.keys(launchers)].sort());
+  assert.deepEqual((await fs.readdir(path.join(distRoot,'hero'))).sort(),['LICENSE.txt','MEDIA_NOTICE.txt','index.html','user-note.txt','runtime','vendor','licenses',...Object.keys(launchers)].sort());
   for(const extra of [{'assets/face.png':'duplicate'},{'rig.project.json':'duplicate'},{'notes.txt':'private'}]){
-   const legacyZip=Buffer.from(await c.createZip({...launchers,'index.html':html,'LICENSE.txt':'MIT',...extra}).arrayBuffer()).toString('base64');
+   const legacyZip=Buffer.from(await c.createZip({...launchers,'index.html':html,'LICENSE.txt':'TEST-LICENSE','MEDIA_NOTICE.txt':'TEST-MEDIA',...extra}).arrayBuffer()).toString('base64');
    await assert.rejects(writeExport(root,{html,zip:legacyZip},distRoot),/現在の形式と一致/);
   }
-  const altered=Buffer.from(await c.createZip({...launchers,'index.html':html,'LICENSE.txt':'MIT','START_SERVER.sh':'bad'}).arrayBuffer()).toString('base64');
+  const altered=Buffer.from(await c.createZip({...launchers,'index.html':html,'LICENSE.txt':'TEST-LICENSE','MEDIA_NOTICE.txt':'TEST-MEDIA','START_SERVER.sh':'bad'}).arrayBuffer()).toString('base64');
   await assert.rejects(writeExport(root,{html,zip:altered},distRoot),/起動ファイル/);
   for(const [name,bytes] of Object.entries(require('../../studio/tracking_assets.cjs').trackingFiles()))assert.deepEqual(await fs.readFile(path.join(distRoot,'hero',name)),bytes);
   for(const name of ['START_SERVER.sh','START_SERVER.command'])assert.equal((await fs.stat(path.join(distRoot,'hero',name))).mode&0o777,0o755);

@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: 2026 milkc0de
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: Apache-2.0
 """CPU previews using exported production geometry. Not browser/Canvas validation."""
 from pathlib import Path
 import json,math

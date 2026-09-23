@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2026 milkc0de
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
 // Nine authored directions; all coordinates are in the registered canvas.
 const HEAD_DIRECTIONS={up_left:[-1,-1],up:[0,-1],up_right:[1,-1],left:[-1,0],center:[0,0],right:[1,0],down_left:[-1,1],down:[0,1],down_right:[1,1]};
 const HEAD_LABELS={center:'正面',left:'左',right:'右',up:'上',down:'下',up_left:'左上',up_right:'右上',down_left:'左下',down_right:'右下'};
