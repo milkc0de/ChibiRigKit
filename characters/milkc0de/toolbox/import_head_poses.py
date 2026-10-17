@@ -11,6 +11,8 @@ project=json.loads((ROOT/'rig.project.json').read_text())
 data=json.loads(Path(args.file).expanduser().read_text())
 if data.get('layout_signature')!=project.get('head_pose',{}).get('layout_signature') or data.get('version')!=1:
     raise SystemExit('Saved poses do not match this character layout')
+if data.get('pose_space','legacy')!=project.get('head_pose',{}).get('pose_space','legacy'):
+    raise SystemExit('Saved poses use a different authored head layout; export the current directions first')
 validated=build_head_pose({'head_pose':data},project['parts'],project['canvas'])
 plan=json.loads((ROOT/'rig.plan.json').read_text());plan['head_pose']=validated
 pending=ROOT/'rig.plan.json.tmp';pending.write_text(json.dumps(plan,ensure_ascii=False,indent=2)+'\n');pending.replace(ROOT/'rig.plan.json')

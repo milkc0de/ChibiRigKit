@@ -3,7 +3,15 @@
 window.runMotionIOChecks=()=>{
   const assert=(ok,message)=>{if(!ok)throw Error(message)};
   const original=collectMotionProject(),selection=$('partSelect').value;
-  const fingerprint=()=>{running=false;render(.37);return canvas.toDataURL()};
+  const fingerprint=()=>{
+    running=false;
+    // Readback can change Chromium's GPU canvas backing during a long check.
+    // Warm the same frame on both sides before comparing exact RGBA bytes.
+    // Production rendering keeps its normal GPU context and frame cadence.
+    for(let i=0;i<3;i++){render(.37);ctx.getImageData(0,0,canvas.width,canvas.height)}
+    render(.37);return ctx.getImageData(0,0,canvas.width,canvas.height).data;
+  };
+  const sameFrame=(a,b)=>a.length===b.length&&a.every((v,i)=>v===b[i]);
   try{
     const owner=transformOwner(Object.values(PROJECT.parts).find(p=>p.kind!=='static'));
     owner.motion.rot_deg=2.75;owner.motion.x_px=3.5;
@@ -17,8 +25,8 @@ window.runMotionIOChecks=()=>{
     assert(!JSON.stringify(compact).includes('data:image/'),'Motion preset includes image bytes');
     const expected=fingerprint();
     $('reset').click();applyMotionProject(saved);
-    assert(fingerprint()===expected,'Full motion JSON changed the rendered frame');
-    $('reset').click();applyMotionProject(compact);assert(fingerprint()===expected,'Compact motion JSON changed the rendered frame');
+    assert(sameFrame(fingerprint(),expected),'Full motion JSON changed the rendered frame');
+    $('reset').click();applyMotionProject(compact);assert(sameFrame(fingerprint(),expected),'Compact motion JSON changed the rendered frame');
     const poses=JSON.stringify(PROJECT.head_pose);delete compact.head_pose;applyMotionProject(compact);assert(JSON.stringify(PROJECT.head_pose)===poses,'Motion-only preset changed head poses');
     assert(Number(controls.motionSpeed.value)===1.3&&Number(controls.motionIntensity.value)===1.65,'Global motion settings were not restored');
     assert(PROJECT.parts[owner.name].motion.rot_deg===2.75,'Per-part rotation was not restored');
@@ -28,7 +36,7 @@ window.runMotionIOChecks=()=>{
       const invalid=structuredClone(saved);mutate(invalid);let rejected=false;
       try{applyMotionProject(invalid)}catch{rejected=true}
       assert(rejected,'Invalid motion JSON was accepted');
-      assert(JSON.stringify(collectMotionProject())===stable&&fingerprint()===before,'Rejected import changed live state');
+      assert(JSON.stringify(collectMotionProject())===stable&&sameFrame(fingerprint(),before),'Rejected import changed live state');
     }
     const legacy=structuredClone(saved);delete legacy.settings.motion_speed;delete legacy.settings.manual_eye_open;
     applyMotionProject(legacy);assert(Number(controls.motionSpeed.value)===1&&!controls.manualEyeOpen.checked,'Legacy JSON defaults were not restored');

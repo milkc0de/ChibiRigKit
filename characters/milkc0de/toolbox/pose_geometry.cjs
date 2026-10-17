@@ -27,7 +27,7 @@ if(require.main===module){
    neckSwayAngles=()=>({yaw:x*PROJECT.neck_sway.yaw_extent,pitch:y*PROJECT.neck_sway.pitch_extent,roll:0});beginHeadFrame(0);
    const master=neckMasterMesh(0,0),parts={};
    for(const p of Object.values(PROJECT.parts)){
-    const owner=transformOwner(p),head=PROJECT.neck_sway.part_ids.includes(p.name),eye=owner.role==='eye'&&PROJECT.neck_sway.layout_mode!=='coordinated-25-v1';
+    const owner=transformOwner(p),head=PROJECT.neck_sway.part_ids.includes(p.name),eye=owner.role==='eye'&&!sharedHeadLayout();
     const setting=headPoseActive(p)?currentHeadSetting(p):null,eyeMatrix=head&&eye?neckEyeMatrix(owner,0,0,master):null;
     const columns=head?16:1,rows=head?16:1,src=[],dest=[];
     for(let r=0;r<=rows;r++)for(let col=0;col<=columns;col++){

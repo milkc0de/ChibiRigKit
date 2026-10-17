@@ -61,6 +61,15 @@
     "nine_yaw_pitch_reference_meshes",
     "recording_60_seconds_progress_and_cancel",
     "portable_zip_crc_and_files",
-    "windows_command_launcher"
+    "windows_command_launcher",
+    "electron_minimized_capture",
+    "capture_audio_context_resume",
+    "independent_media_reconnect",
+    "capture_stop_cancels_recovery",
+    "camera_worker_timeout_recovery",
+    "gpu_context_loss_cpu_fallback",
+    "adaptive_motion_smoothing",
+    "head_blend_continuity",
+    "body_follow_motion_roundtrip"
   ]
 }

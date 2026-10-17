@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2026 milkc0de
 // SPDX-License-Identifier: Apache-2.0
 // Background selection is local to this browser; source layers remain immutable.
-const backgroundDefaults={version:1,mode:'original',color:'#e9dfd3',fit:'cover',image:null,name:''};
+const backgroundDefaults={version:1,mode:globalThis.chibiDesktop?'transparent':'original',color:'#e9dfd3',fit:'cover',image:null,name:''};
 let backgroundState={...backgroundDefaults},backgroundImage=null,backgroundRevision=0;
 const backgroundKey=`ChibiRigKit:background:1:${PROJECT.name}:${canvas.width}x${canvas.height}`;
 function isBackgroundPart(p){return p.role==='background'||(p.name==='background'&&p.kind==='static')}
@@ -49,7 +49,7 @@ async function initBackground(){
   $('backgroundColor').oninput=()=>{backgroundRevision++;setBackground({...backgroundState,mode:'color',color:$('backgroundColor').value})};
   $('backgroundFit').onchange=()=>{backgroundRevision++;setBackground({...backgroundState,fit:$('backgroundFit').value})};
   $('backgroundFile').onchange=e=>{const file=e.target.files[0];e.target.value='';if(file)chooseBackgroundFile(file)};
-  $('resetBackground').onclick=()=>{backgroundRevision++;backgroundState={...backgroundDefaults};backgroundImage=null;syncBackground();try{localStorage.removeItem(backgroundKey);backgroundMessage('元の背景に戻しました')}catch(e){persistBackground()}};
+  $('resetBackground').onclick=()=>{backgroundRevision++;backgroundState={...backgroundDefaults,mode:'original'};backgroundImage=null;syncBackground();try{if(globalThis.chibiDesktop)persistBackground();else localStorage.removeItem(backgroundKey);backgroundMessage('元の背景に戻しました')}catch(e){persistBackground()}};
   const revision=++backgroundRevision;
   try{
     const saved=localStorage.getItem(backgroundKey);

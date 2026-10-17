@@ -1,0 +1,191 @@
+{
+  "reason": "Remove reproducible full-resolution offline preview intermediates while retaining their contact sheets, measured reports, sources and authored masks.",
+  "removed_count": 33,
+  "removed_bytes": 84820912,
+  "regenerate": {
+    "geometry": "node work/rig_authoring/check_geometry.cjs",
+    "images": "python work/rig_authoring/render_offline.py",
+    "scope": "Offline CPU previews; not browser validation."
+  },
+  "retained_contact_sheets": [
+    "checks/head-directions-offline.png",
+    "checks/runtime_sheet_offline.png",
+    "checks/random-sway-offline.png"
+  ],
+  "retained_reports": [
+    "checks/offline-render-report.json",
+    "checks/geometry-report.json",
+    "checks/runtime-report.json",
+    "checks/report.json",
+    "checks/review-pass-1.json",
+    "checks/review-pass-2.json"
+  ],
+  "protected_files_unchanged": 57,
+  "removed": [
+    {
+      "path": "checks/up_left_offline.png",
+      "bytes": 2618384,
+      "sha256": "21b58eec8ce48906bbcb40e7d8d54718395044b108ab67ce13c34d57430b85ec"
+    },
+    {
+      "path": "checks/up_offline.png",
+      "bytes": 2645655,
+      "sha256": "584baa41cbf403092f746a9b65ae1fbbabe8eb21f0f5bc536131614af2a7b846"
+    },
+    {
+      "path": "checks/up_right_offline.png",
+      "bytes": 2615075,
+      "sha256": "5b41c0cca4cd95c5c5c8ca1d9dce0d86bdb8b0bebcfa7aca9e6da636417a85ad"
+    },
+    {
+      "path": "checks/left_offline.png",
+      "bytes": 2641347,
+      "sha256": "d6808e79f642d4bb97acb0eb4af40a03daeccf47029caab4ac43e7eda5a8898e"
+    },
+    {
+      "path": "checks/center_offline.png",
+      "bytes": 2682497,
+      "sha256": "35b4982acd10f0aa21fa026d52daabe510805a2186a71a62dadd0b5d4facbbcb"
+    },
+    {
+      "path": "checks/right_offline.png",
+      "bytes": 2639537,
+      "sha256": "2dc7f445c00139a92bec7c0b1d56b0db5c8f36e9adc7841a9396996a0302176e"
+    },
+    {
+      "path": "checks/down_left_offline.png",
+      "bytes": 2617909,
+      "sha256": "22205403215e89c3efb736e895d49c9b74c4bf340b7cac5dc1791123e8d19af9"
+    },
+    {
+      "path": "checks/down_offline.png",
+      "bytes": 2648058,
+      "sha256": "511ebcb05db6d7f48f9cda45539776687413e9ff44591e69df146802cd3ed7ca"
+    },
+    {
+      "path": "checks/down_right_offline.png",
+      "bytes": 2616457,
+      "sha256": "20a7d5be4457d478cdc1a7fc853e9dde14b86bbc7bd4ce5c7eeb5b3680dcd620"
+    },
+    {
+      "path": "checks/motion_0_offline.png",
+      "bytes": 2562069,
+      "sha256": "8bac6fc3bf3ada2afe94e87a634ff4b84c5d8ebd620d06cecb28c09d280825be"
+    },
+    {
+      "path": "checks/motion_1_offline.png",
+      "bytes": 2539292,
+      "sha256": "90512f8edf7e6df935c0989494863ddda21732335115c21acbf92c3fb653c77d"
+    },
+    {
+      "path": "checks/motion_2_offline.png",
+      "bytes": 2512063,
+      "sha256": "692be463b23eae10bb2b366534a03ec9fe5b69c5382fe3cc74ad5f8b83be618f"
+    },
+    {
+      "path": "checks/motion_3_offline.png",
+      "bytes": 2524796,
+      "sha256": "081f0e10e3a1f9575b17a3d65664b302462d10f4333c1233194c47753eaca606"
+    },
+    {
+      "path": "checks/motion_4_offline.png",
+      "bytes": 2561991,
+      "sha256": "3721115f85a8b4e4c72c590d4d4edff4e46792552712f39f2b637ad408df570d"
+    },
+    {
+      "path": "checks/motion_5_offline.png",
+      "bytes": 2539526,
+      "sha256": "cb46118a56851bbac08ab20eaaa7013974fede5f800a6fbe1d7c68771ff72a49"
+    },
+    {
+      "path": "checks/motion_6_offline.png",
+      "bytes": 2513364,
+      "sha256": "eb7b67eddd129cbd821bc931fc5181d82f675a218600c56a2abc04ef61e43461"
+    },
+    {
+      "path": "checks/motion_7_offline.png",
+      "bytes": 2514940,
+      "sha256": "ac787d5d85202e5420cc6a9e47acbf6468f6b1827ec46c89e61ec93b41f8f586"
+    },
+    {
+      "path": "checks/motion_8_offline.png",
+      "bytes": 2562074,
+      "sha256": "487e56326152c3309e470774ffc0e7e4574213fd59ddd15129a9a3bb5f6895bd"
+    },
+    {
+      "path": "checks/motion_9_offline.png",
+      "bytes": 2538556,
+      "sha256": "9296e014b9abde3a3d7dccfbcfbfb4281b71b254d0a4f7c3f141efe4c3d2a281"
+    },
+    {
+      "path": "checks/motion_10_offline.png",
+      "bytes": 2510946,
+      "sha256": "4bf910ee8c1f5d64e7676e14d05b94b2da6ffba4387067827620204f33f682bb"
+    },
+    {
+      "path": "checks/motion_11_offline.png",
+      "bytes": 2521221,
+      "sha256": "5e53f748b77b5e656db3912fb5edcc483195bc1dd3be51cede6e3562c005f5d1"
+    },
+    {
+      "path": "checks/motion_12_offline.png",
+      "bytes": 2561167,
+      "sha256": "f869707befbe3dfc61ee35b18c383ee92d3158347adccb319eccf6736d698004"
+    },
+    {
+      "path": "checks/motion_13_offline.png",
+      "bytes": 2543334,
+      "sha256": "b3d83d052cbf833bb7a7f7844b98684c18bcf787bef3ba10578ff1ba8ef5d687"
+    },
+    {
+      "path": "checks/motion_14_offline.png",
+      "bytes": 2522037,
+      "sha256": "a8cf90b884180b3f258bf075a906429ba04fa73473ea1d23642b30f858c58d58"
+    },
+    {
+      "path": "checks/motion_15_offline.png",
+      "bytes": 2517998,
+      "sha256": "8c54da0d1e8f6d01903ddf91e5e4ef4b6818db7002a83f71dc92baf07dfe2979"
+    },
+    {
+      "path": "checks/random_sway_0_offline.png",
+      "bytes": 2598862,
+      "sha256": "136fa0a531c78332a5b063eac005350bcf37a616e8358d891f7b74498a70551b"
+    },
+    {
+      "path": "checks/random_sway_1_offline.png",
+      "bytes": 2559324,
+      "sha256": "24d80d9b8d2f53dc90554ac1c8aa59159250cb740278b4b1d92645b971219c21"
+    },
+    {
+      "path": "checks/random_sway_2_offline.png",
+      "bytes": 2548855,
+      "sha256": "29aa9a0f49e1135ee516a27d42f3d51363f70f0f1fbddfe7a85666d16f558a27"
+    },
+    {
+      "path": "checks/random_sway_3_offline.png",
+      "bytes": 2541638,
+      "sha256": "61a6b2593ec59a10a3378d074719c1cb2fed18f6ae84141eb9a144793b231ebe"
+    },
+    {
+      "path": "checks/random_sway_4_offline.png",
+      "bytes": 2559351,
+      "sha256": "28a95fd44dd9324dee9aba6b1ce34bcd187bca298686378a88683c07f5eefe9e"
+    },
+    {
+      "path": "checks/random_sway_5_offline.png",
+      "bytes": 2552035,
+      "sha256": "89ad6453d89895ac3346d22498b0a042017758e7d5b8f360722a34547bc7b6bc"
+    },
+    {
+      "path": "checks/random_sway_6_offline.png",
+      "bytes": 2613644,
+      "sha256": "9dd404f87f436598cb3e066e075767180a9ca407c951b2a5bec88e7397aeefd1"
+    },
+    {
+      "path": "checks/random_sway_7_offline.png",
+      "bytes": 2576910,
+      "sha256": "75d61eca65ee082b6301df4e80a3ed05081ba77c7e0c8d668c7c1d02bdf26582"
+    }
+  ]
+}

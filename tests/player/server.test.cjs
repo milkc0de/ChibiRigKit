@@ -50,8 +50,9 @@ test('parent camera player exposes a read-only OBS view and relays settings and 
   const response=await fetch(origin+'/api/player-sync/events?token='+session.token);reader=response.body.getReader();const decoder=new TextDecoder();let buffer='';
   async function event(name){for(;;){const split=buffer.indexOf('\n\n');if(split>=0){const block=buffer.slice(0,split);buffer=buffer.slice(split+2);if(block.startsWith('event: '+name+'\n'))return JSON.parse(block.split('\ndata: ')[1]);continue}const next=await reader.read();if(next.done)throw Error('Stream ended');buffer+=decoder.decode(next.value,{stream:true})}}
   assert.equal((await event('settings')).state,null);assert.equal((await event('live')).active,false);
-  const payload={character:session.character,live:{active:true,values:{headYaw:12,mouthOpen:.6}}};
-  assert.equal((await fetch(origin+'/api/player-sync/live',{method:'POST',headers,body:JSON.stringify(payload)})).status,200);const live=await event('live');assert.equal(live.values.headYaw,12);
+  const payload={character:session.character,live:{active:true,values:{headYaw:12,mouthOpen:.6,bodyYaw:2.88,bodyPitch:-1,bodyRoll:.8}}};
+  assert.equal((await fetch(origin+'/api/player-sync/live',{method:'POST',headers,body:JSON.stringify(payload)})).status,200);const live=await event('live');assert.deepEqual(live.values,payload.live.values);
+  assert.equal((await fetch(origin+'/api/player-sync/live',{method:'POST',headers,body:JSON.stringify({...payload,live:{active:true,values:{bodyYaw:NaN}}})})).status,400);
   assert.equal((await fetch(origin+'/api/player-sync/live',{method:'POST',headers:{...headers,Origin:'https://evil.example'},body:JSON.stringify(payload)})).status,403);
   payload.live={active:false,values:{}};await fetch(origin+'/api/player-sync/live',{method:'POST',headers,body:JSON.stringify(payload)});assert.equal((await event('live')).active,false);
  }finally{await reader?.cancel();await app.close()}

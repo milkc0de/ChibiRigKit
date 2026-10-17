@@ -5,11 +5,12 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 const source=fs.readFileSync(new URL('../template/workspace/runtime/background.js',import.meta.url),'utf8');
-function fixture(){
+function fixture({desktop=false}={}){
   const fields=Object.fromEntries(['backgroundMode','backgroundColor','backgroundFit','backgroundStatus','backgroundFile','resetBackground'].map(k=>[k,{value:''}]));
   const storage=new Map(),draws=[],PROJECT={name:'test',parts:{face:{name:'face',role:'base',kind:'static'}}};
   const controls={showBaseOnly:{checked:false}};
   const context=vm.createContext({PROJECT,canvas:{width:200,height:300},controls,$:id=>fields[id],ctx:{save(){},restore(){},fillRect(...args){draws.push(['fill',...args])},drawImage(...args){draws.push(['image',...args])}},localStorage:{getItem:k=>storage.get(k)??null,setItem:(k,v)=>storage.set(k,v),removeItem:k=>storage.delete(k)},loadImage:async()=>({width:100,height:100})});
+  if(desktop)context.chibiDesktop={};
   vm.runInContext(source,context);
   return {context,fields,storage,draws,controls,PROJECT,state:()=>JSON.parse(vm.runInContext('JSON.stringify(backgroundState)',context)),set:changes=>context.setBackground({...JSON.parse(vm.runInContext('JSON.stringify(backgroundDefaults)',context)),...changes})};
 }
@@ -46,4 +47,10 @@ test('a late persisted image load cannot override a newer transparent selection'
   f.fields.backgroundMode.value='transparent';f.fields.backgroundMode.onchange();
   release({width:100,height:100});await restoring;
   assert.equal(f.state().mode,'transparent');assert.equal(f.fields.backgroundMode.value,'transparent');
+});
+test('desktop starts transparent and keeps an explicit return to the original background',async()=>{
+  const f=fixture({desktop:true});await f.context.initBackground();
+  assert.equal(f.state().mode,'transparent');assert.equal(f.context.customBackgroundActive(),true);
+  f.fields.resetBackground.onclick();assert.equal(f.state().mode,'original');
+  await f.context.initBackground();assert.equal(f.state().mode,'original');
 });

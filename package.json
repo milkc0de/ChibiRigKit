@@ -1,6 +1,6 @@
 {
   "name": "chibirigkit",
-  "version": "1.0.0-beta.7",
+  "version": "1.0.0-beta.8",
   "private": true,
   "type": "module",
   "description": "Create 2D character animations from a single image.",
@@ -11,6 +11,9 @@
     "test": "node scripts/run-tests.mjs",
     "test:runtime": "node work/regression-character/toolbox/validate_runtime.cjs",
     "player": "node scripts/serve.mjs --port 5510",
+    "desktop": "node scripts/desktop.mjs",
+    "desktop:build": "node scripts/build-desktop.mjs",
+    "test:desktop": "node scripts/check-desktop.mjs",
     "player:setup": "npm ci && node scripts/setup-tracking.cjs",
     "export": "python3 scripts/export-player.py",
     "setup:tracking": "node scripts/setup-tracking.cjs"
@@ -20,9 +23,13 @@
     "playwright": "1.63.0",
     "@mediapipe/tasks-vision": "1.0.1"
   },
+  "devDependencies": {
+    "electron": "44.9.0",
+    "@electron/packager": "20.3.0"
+  },
   "author": "milkc0de",
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=22"
+    "node": ">=22.12.0"
   }
 }

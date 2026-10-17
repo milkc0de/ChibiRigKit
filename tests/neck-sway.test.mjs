@@ -59,19 +59,21 @@ test('yaw pitch and roll each deform the whole head around the same neck, withou
   }
 });
 
-test('shared parent lattice stays nonfolded while the upper chin lifts with adjacent vertices',()=>{
+test('shared parent lattice stays nonfolded and keeps the authored neck attachment fixed',()=>{
   const {c,PROJECT}=fixture(),n=PROJECT.neck_sway;
   assert.ok(n.mesh.points.length>300);assert.ok(n.mesh.triangles.length>600);
   n.mesh.points.forEach((point,i)=>close(n.poses.center.vertices[i],point));
   const pinned=n.mesh.points.findIndex(p=>p[0]===n.pivot.x&&p[1]===n.pivot.y);assert.ok(pinned>=0);
+  const band=n.surface.attachment_band;assert.ok(band.start_y<band.end_y);
+  const fixed=n.mesh.points.map((point,index)=>point[1]>=band.end_y?index:-1).filter(index=>index>=0);assert.ok(fixed.length>0);
   for(const [name,pose] of Object.entries(n.poses)){
     assert.equal(pose.vertices.length,n.mesh.points.length);
+    for(const index of fixed)close(pose.vertices[index],n.mesh.points[index]);
     if(name.startsWith('up')){
-      const lift=i=>n.mesh.points[i][1]-pose.vertices[i][1];assert.ok(lift(pinned)>10&&lift(pinned)<35,'upper chin lifts gently');
+      const lift=i=>n.mesh.points[i][1]-pose.vertices[i][1];assert.ok(n.mesh.points.some((p,i)=>p[1]<band.start_y&&lift(i)>5),'the head lifts above its attachment band');
       const left=pinned-1,right=pinned+1,fraction=(n.pivot.x-n.mesh.points[left][0])/(n.mesh.points[right][0]-n.mesh.points[left][0]);
-      assert.ok([left,pinned,right].every(i=>lift(i)>10),'the chin rises with both neighbors');
       if(name==='up')assert.ok(Math.abs(lift(pinned)-(lift(left)*(1-fraction)+lift(right)*fraction))<3,'no isolated chin spike');
-    }else close(pose.vertices[pinned],[n.pivot.x,n.pivot.y]);
+    }
     for(const [i,j,k] of n.mesh.triangles){const [a,b,d]=[i,j,k].map(x=>pose.vertices[x]);assert.ok((b[0]-a[0])*(d[1]-a[1])-(b[1]-a[1])*(d[0]-a[0])>0)}
   }
   for(const yaw of [-25,-12.5,0,12.5,25])for(const pitch of [-25,-12.5,0,12.5,25]){
@@ -88,7 +90,7 @@ test('legacy eye projection preserves size at authored extents; coordinated layo
       const m=c.neckEyeMatrix(PROJECT.parts[name],0,1,mesh);assert.ok(Math.abs(Math.hypot(m[0],m[1])-1)<1e-9);assert.ok(Math.abs(Math.hypot(m[2],m[3])-1)<1e-9);
     }
   }
-  assert.equal(n.layout_mode,'coordinated-25-v1');let resized=0;
+  assert.equal(c.sharedHeadLayout(),true);let resized=0;
   for(const direction of ['up_left','up_right','down_left','down_right'])for(const name of ['eye_left_sclera','eye_right_sclera']){
     const pose=PROJECT.head_pose.poses[direction].parts[name];for(const axis of ['scale_x','scale_y']){assert.ok(pose[axis]>=.3&&pose[axis]<=2);if(pose[axis]!==1)resized++;}
   }

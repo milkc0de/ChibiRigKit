@@ -112,7 +112,7 @@
       ],
       "x_positive": "screen_right",
       "y_positive": "screen_down",
-      "interpolation": "bilinear",
+      "interpolation": "rounded-bilinear",
       "include": [
         "face",
         "eyes",
@@ -141,7 +141,10 @@
         "neck_join_upper_three",
         "moving_brows",
         "mouth_yaw_pitch_direction",
-        "hair_head_continuity"
+        "hair_head_continuity",
+        "neck_shoulder_attachment",
+        "center_crossing_continuity",
+        "endpoint_and_midpoint_eye_shape"
       ],
       "require_nonfolding_mesh": true,
       "initial_status": "suggested",
@@ -172,7 +175,11 @@
       "far_eye": "inset_from_face_outline_and_hair_at_side_views",
       "chin": "follows_head_no_isolated_stationary_vertex",
       "neck_join": "continuous_in_upper_three_directions",
-      "long_hair": "head_attached_roots_gravity_spring_damping_at_tips"
+      "long_hair": "head_attached_roots_gravity_spring_damping_at_tips",
+      "endpoint_authoring": "edit_center_and_each_of_eight_directions_independently",
+      "shared_mesh_attachment": "preserve_fixed_neck_and_shoulder_band_without_isolated_chin_pin",
+      "interpolation_validation": "verify_all_nine_endpoints_and_intermediate_axis_diagonal_paths",
+      "source_profile": "character_local_json_keep_with_rebuildable_plan"
     },
     "seams": {
       "mask": "explicit_joint_region",
@@ -219,7 +226,7 @@
       ],
       "keep_images_embedded": true,
       "keep_source_images_immutable": true,
-      "consumer": "ChibiRigKit_browser_player",
+      "consumer": "ChibiRigKit_desktop_or_browser_player",
       "motion_format": "ChibiRigMotion/v1",
       "playback_axis_gains": [
         "yaw",
@@ -252,11 +259,14 @@
         "ordinary_animation"
       ],
       "camera_and_motion_playback": "coexist_without_unloading_clip",
-      "electron": false,
+      "electron": true,
       "player_file_import": false,
       "character_source": "selected_character_workspace/rig.project.json",
       "camera_microphone": "explicit_user_start_only",
-      "html_title": "character_name - ChibiRigKit"
+      "html_title": "character_name - ChibiRigKit",
+      "desktop_output": "kit_root/dist/desktop/platform_arch_application",
+      "desktop_background_throttling": false,
+      "desktop_idle_sleep": "prevent_app_suspension_during_capture"
     }
   },
   "phases": {
@@ -370,6 +380,68 @@
           "equals": true
         }
       }
+    ]
+  },
+  "authoring": {
+    "goal": "Finish the requested phase in the character workspace and return the structured result; preserve correct work when resuming.",
+    "read_first": [
+      "character.config.json defines input roles and target part-count ranges.",
+      "Use work/aligned/normal.png as the canonical canvas; flat is the supplied base reference, blink the supplied closed-eye reference, and mouth_closed the optional exact closed-mouth endpoint.",
+      "Read work/registration.json and inspect work/source_montage.png. Bounding-box alignment is only a fallback; register closed mouths using unchanged hair and eye features.",
+      "Follow this JSON contract, the selected phase specification, rig.plan.schema.json and reference.plan.schema.json. Human documentation is supplementary."
+    ],
+    "reference_planning": [
+      "This phase creates reference.plan.json and full-canvas grayscale masks in work/reference_masks/ only. Do not build the rig or modify sources, configuration, or the generator.",
+      "Inspect normal and identify visible eyes and mouth. Tight feature masks include whites, iris, lashes, or mouth interior/outline; exclude unrelated hair and skin. The generator adds a 2-pixel cleanup margin.",
+      "Author each closed eyelid as a smooth 12-24-point polyline preserving source tilt, asymmetry, corners and lash style. Curves and optional lash lines must stay inside the edit region; choose stroke_width in source pixels.",
+      "Use sampled dark source color unless it is unsuitable. Closed-eye curves are estimated artwork, not recovered hidden art; disclose ambiguity in the phase result.",
+      "Author a subtle closed-mouth curve preserving expression and tilt. Set already_closed for features already closed while retaining schema-required curves and width. Use null for a genuinely absent mouth and an empty eye list when no eyes exist.",
+      "flat_extra_masks may remove brows or blush only when these become separate parts. Preserve the outer silhouette, hair, body and clothing.",
+      "Inpaint only masked regions. Optional skin_color must be sampled from this character when a uniform-color fill avoids edge bleeding; never hard-code another character color or coordinates.",
+      "Provided reference roles take precedence. The parent generates only missing references, normalizes them by identity, checks source hashes and supplies a contact sheet before rigging."
+    ],
+    "rigging": [
+      "Create rig.plan.json and full-canvas PNG masks in work/masks/. Every independently moving part needs a mesh; a stationary base may remain unmeshed.",
+      "Choose semantic parts within configured target counts. Typical guidance: hair 3-7; arms 2-6; torso 2-6; skirt or coat 1-5; legs 2-6, plus visible face, brows, eye and mouth endpoints and substantial accessories. Do not invent anatomy or force symmetry.",
+      "Reconstruct normal-source parts at registered coordinates. Remove independently moving hair, ornaments, limbs, shoes and ribbons from the static base; missing hidden material does not justify duplicate moving parts.",
+      "Follow real silhouettes and preserve original source RGB. Keep joint overlaps around 3-12 source pixels; exclude opposite limbs, face-skin islands, unrelated frills and cheek blush from feature masks.",
+      "Preserve full lashes and the antialiased closed-eye line without rectangular skin patches. Use the supplied blink artwork, not solid black substitutes. Keep blush visible during blink and smile.",
+      "Open eyes use blink_eye_radial and the actual registered closed curve. Pair endpoints with closed_part so pivot, motion and parent remain shared. Fade the drawn closed endpoint over continuously deformed open art near closure.",
+      "Prefer eye_sclera, eye_iris and optional eye_line components. Sclera covers the aperture behind the iris; iris preserves pupil/highlights. Set iris_part and closed_part on sclera, and clip_to on iris and line. Closed art follows all open components in draw_order.",
+      "Underpaint only the iris-hidden sclera area in a derived layer; sample visible sclera or provide a character-specific sclera_fill for colored eyes. Never edit source images.",
+      "Use mouth_open_close and closed_part for open mouths. Smile uses transform_from the ordinary mouth and shares its endpoint. Derive closed_slope from artwork and keep mouth controls independent of manual eye controls.",
+      "Use bend_vertical with 6-12 slices for flexible hair, ribbon and skirt, soft_body with 5-10 slices for subtle limbs/torso, and soft_strip for remaining mouth/brow/face parts where appropriate. Keep default motion subtle.",
+      "draw_order is back-to-front and includes each part exactly once. Respect source occlusion at front hair without accidentally hiding facial expressions.",
+      "texture_repair and seam inputs are derived full-canvas RGBA plus explicit grayscale region masks. Confine repairs to the requested part or joint, preserve shoe tips, and use at most 64 pixels of padding. The runtime shares current-frame mesh transforms; do not add runtime inference, global blur or stale-frame queues.",
+      "Split face skin into role face with head true and face_grid, without baked eyes, mouth or hair. Use head true for attached hair/accessories and false for stationary torso/clothes. Suggested head grids are drafts, not visual approval.",
+      "Finish center and all eight head directions as individually authored still layouts before animation. Individually adjust head width/height and mesh shape, eye width/height and near/far perspective, contour, mouth, brows, scalp, bangs, back hair and accessories per direction; do not derive diagonals by simply adding axis corrections. Save the editable character-local JSON profile and its rebuildable plan, inspect a face-to-shoulder contact sheet, then interpolate the saved layouts through the shared head-parent mesh.",
+      "Follow rules.head for coordinate signs, authored angles, far-eye inset, diagonal volume, moving chin/mouth/brows and neck continuity. Keep correct legacy authored angle metadata until an explicit relayout; do not relabel endpoints.",
+      "Browser-saved poses remain separate until imported with toolbox/import_head_poses.py --file. Reject layout mismatches and folded meshes. Full profile or rear views require more artwork.",
+      "Keep body/hair sway with random head idle motion; use circle playback only for inspection. Long hair has head-attached roots and damped gravity/spring tips. Avoid character-specific constants in reusable code.",
+      "Keep the shared neck/shoulder attachment band stationary with the body while the chin and adjacent face vertices move together. Round bilinear joins with convex weights that preserve exact nine endpoints, avoid extrapolation and keep every intermediate mesh nonfolding.",
+      "Identify screen-left and screen-right eyes from their registered canvas coordinates, not part names. For a head facing screen left, the screen-left eye is far and screen-right eye is near; reverse this for a head facing screen right. Keep each iris, lash and closed endpoint paired with its eye owner."
+    ],
+    "validation": [
+      "Run toolbox/build_project.py and toolbox/validate_character.py with the Python executable from task input. Inspect open_rebuild.png/open_diff.png, blink_rebuild.png/blink_diff.png, validation_sheet.png and base_only.png under checks/ against source art.",
+      "Run node toolbox/validate_runtime.cjs after static checks. Inspect checks/runtime_sheet.png, all nine head directions and random head plus body sway; runtime-check.html exposes the same assertions for diagnosis.",
+      "Inspect duplicated limbs, holes, eye drift, missing lashes, blush loss, contaminated masks, neck tears and seams during independent motion. Static error metrics are clues, not visual acceptance.",
+      "Require source/draw-order integrity, paired endpoints, valid nonfolding meshes and embedded projectData equality with rig.project.json. Fix observed defects with the smallest mask or plan edit and preserve correct parts.",
+      "Report actual browser checks separately from offline geometry checks and remaining visual uncertainty. Follow rules.browser_blocked_in_agent instead of bypassing a blocked browser.",
+      "Use required_outputs for the selected phase. Build the self-contained player through existing tooling; the parent writes final kit dist artifacts after validation, and work/player/index.html is the authoring preview.",
+      "Review all nine endpoints and intermediate poses across horizontal, vertical, diagonal and center-crossing paths at actual authored extents. Compare rendered head proportions and eye width/height after composing local part transforms with the shared master mesh, not local scale coefficients alone. Inspect enlarged face-to-shoulder renders for iris/sclera alignment, lash continuity, far-eye spacing, chin shape, neck/shoulder attachment and gaps; endpoint-only or positive-triangle checks do not prove visual quality."
+    ],
+    "execution": [
+      "Use local tools and installed dependencies within the character workspace. Do not request unrestricted execution, network permissions, session-wide approvals, publishing or commits.",
+      "Apply task input execution.environment to every build and validation command, including commands sent to an existing app server. CHIBIRIG_DIST_ROOT targets work/agent-output; temporary files belong in work/agent-tmp.",
+      "Use existing camera, audio, motion, cropping, recording and output implementations. Camera and microphone start only on an explicit user action. Follow rules.player_handoff for the selected desktop/browser delivery format.",
+      "Independent yaw/pitch/roll display gains include zero and never change recorded source channels. Keep ChibiRigMotion v1 separate from the rig-settings preset.",
+      "Preserve Apache-2.0 and third-party notices. The tracking dependency manifest specifies pinned SDK/WASM/model files and checksums; exports and setup prepare them for offline tracking."
+    ],
+    "privacy": [
+      "Playback, editing and WebM recording run offline; tracking runs offline after dependency setup. Do not add analytics, external fonts, CDNs or automatic device startup.",
+      "Strip device identities/names, local paths, transient messages and capture metadata from exports. Include captured motion only when explicitly selected.",
+      "Use a loopback-only player server. Share settings and tracking values in memory only; never share raw camera/audio, device names or device IDs.",
+      "Keep images and completed settings embedded in HTML. Title the generated player with the HTML-escaped character name followed by - ChibiRigKit."
     ]
   }
 }

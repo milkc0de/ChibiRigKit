@@ -12,7 +12,7 @@ def slugify(s):
     s=re.sub(r'[^A-Za-z0-9._-]+','-',s.strip()).strip('-')
     return s or 'character'
 
-ap=argparse.ArgumentParser(description='Create a generic ChibiRigKit character workspace')
+ap=argparse.ArgumentParser(description='Create a generic ChibiRigKit character workspace',epilog='Codex instructions and phase contracts are in rig.workflow.json.')
 ap.add_argument('--name')
 ap.add_argument('--normal',required=True)
 ap.add_argument('--flat')

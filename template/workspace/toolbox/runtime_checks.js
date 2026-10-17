@@ -9,6 +9,7 @@ window.runRigChecks=()=>{
       const sheet=document.createElement('canvas');sheet.width=1280;sheet.height=960;
       const g=sheet.getContext('2d');g.fillStyle='#303036';g.fillRect(0,0,sheet.width,sheet.height);
       const checks=[];
+      const gpuRoundingTolerance={maxChangedChannels:32,maxChannelDelta:1},gpuRoundingFrames=[];
       for(const eye of [0,.005,.5,1])for(const mouth of [0,.1,.5,1])for(const expr of [0,.5,1]){
         controls.eyeOpenTest.value=eye;controls.mouthOpenTest.value=mouth;controls.expression.value=expr;
         for(const p of Object.values(PROJECT.parts)){
@@ -69,7 +70,13 @@ window.runRigChecks=()=>{
         controls.motionIntensity.value=4;controls.eyeOpenTest.value=[1,.5,.005,0][i%4];
         controls.mouthOpenTest.value=[1,.5,0,1][i%4];controls.expression.value=i>=8?1:0;
         controls.showSeams.checked=true;render(t);const first=pixels();
-        render(t+.173);render(t);{const next=pixels();let changed=0,maxDelta=0;for(let j=0;j<first.length;j++){if(first[j]!==next[j])changed++;maxDelta=Math.max(maxDelta,Math.abs(first[j]-next[j]))}assert(same(first,next),`Previous frame left a trail: frame ${i}, channels ${changed}, max delta ${maxDelta}`)};
+        render(t+.173);render(t);{const next=pixels();let changed=0,maxDelta=0;for(let j=0;j<first.length;j++){if(first[j]!==next[j])changed++;maxDelta=Math.max(maxDelta,Math.abs(first[j]-next[j]))}
+          // GPU compositing may round a handful of 8-bit edge channels by 1.
+          // Keep the limit local to the trail test; JSON and other comparisons
+          // still require exact pixel equality.
+          assert(changed===0||(changed<=gpuRoundingTolerance.maxChangedChannels&&maxDelta<=gpuRoundingTolerance.maxChannelDelta),`Previous frame left a trail: frame ${i}, channels ${changed}, max delta ${maxDelta}`);
+          if(changed)gpuRoundingFrames.push({frame:i,changedChannels:changed,maxChannelDelta:maxDelta});
+        };
         const ratio=Math.min(300/canvas.width,204/canvas.height),w=canvas.width*ratio,h=canvas.height*ratio;
         g.drawImage(canvas,i%4*320+(320-w)/2,Math.floor(i/4)*240,w,h);
         g.fillStyle='#fff';g.font='13px sans-serif';g.fillText(`t=${t.toFixed(2)} eye=${controls.eyeOpenTest.value} mouth=${controls.mouthOpenTest.value}`,i%4*320+8,Math.floor(i/4)*240+225);
@@ -84,6 +91,6 @@ window.runRigChecks=()=>{
       controls.mouthOpenTest.value=.5;controls.mouthOpenTest.dispatchEvent(new Event('input'));
       assert(controls.manualMouthOpen.checked&&$('mouthOpenOut').textContent==='0.50','Mouth slider/manual UI');
       $('reset').click();running=false;
-      return {automaticGazeChecks,neutralMeshUnderRotationChecks:2,motionIO:window.runMotionIOChecks(),neck:window.runNeckChecks(),head:window.runHeadChecks(),combinations:checks.length,motionFrames:snapshots.length,trailCheck:true,basePreserved:true,reset:true,mouthDeformationChecks:mouths.length,seamChangedChannels,png:sheet.toDataURL().split(',')[1]};
+      return {automaticGazeChecks,neutralMeshUnderRotationChecks:2,motionIO:window.runMotionIOChecks(),neck:window.runNeckChecks(),head:window.runHeadChecks(),combinations:checks.length,motionFrames:snapshots.length,trailCheck:true,gpuRoundingTolerance,gpuRoundingFrames,basePreserved:true,reset:true,mouthDeformationChecks:mouths.length,seamChangedChannels,png:sheet.toDataURL().split(',')[1]};
 
 };

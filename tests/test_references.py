@@ -78,5 +78,8 @@ class ReferenceTests(unittest.TestCase):
             result=subprocess.run([sys.executable,str(ROOT/'scripts/new_character.py'),'--normal',str(source),'--output',str(output)],capture_output=True,text=True)
             self.assertEqual(result.returncode,0,result.stderr)
             cfg=json.loads((output/'character.config.json').read_text());self.assertEqual(cfg['name'],'one');self.assertIsNone(cfg['inputs']['flat']);self.assertTrue(cfg['auto_generate_references'])
+            self.assertIn('authoring',json.loads((output/'rig.workflow.json').read_text()))
+            self.assertFalse((output/'AUTO_RIG_TASK.md').exists())
+            self.assertFalse((output/'GENERATE_REFERENCES_TASK.md').exists())
 
 if __name__=='__main__':unittest.main()

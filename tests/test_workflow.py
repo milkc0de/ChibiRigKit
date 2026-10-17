@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2026 milkc0de
 # SPDX-License-Identifier: Apache-2.0
-import importlib.util,json,subprocess,sys,tempfile,unittest,shutil
+import importlib.util,json,subprocess,sys,tempfile,unittest,shutil,hashlib
+from unittest.mock import patch
 from pathlib import Path
 from jsonschema import ValidationError,Draft202012Validator
 ROOT=Path(__file__).resolve().parents[1]
@@ -11,6 +12,37 @@ class WorkflowTests(unittest.TestCase):
     def test_machine_contract_is_valid(self):
         contract=load_contract(ROOT/'template/workspace')
         self.assertEqual(contract['communication']['final'],'structured_json')
+        self.assertEqual(contract['rules']['head']['interpolation'],'rounded-bilinear')
+        self.assertEqual(contract['rules']['head']['endpoint_authoring'],'edit_center_and_each_of_eight_directions_independently')
+        self.assertIn('Do not build the rig', ' '.join(contract['authoring']['reference_planning']))
+        schema=json.loads((ROOT/'template/workspace/rig.workflow.schema.json').read_text())
+        without_authoring=dict(contract);without_authoring.pop('authoring')
+        with self.assertRaises(ValidationError):Draft202012Validator(schema).validate(without_authoring)
+    def test_update_removes_only_unmodified_legacy_instructions(self):
+        spec=importlib.util.spec_from_file_location('update_character',ROOT/'scripts/update-character.py')
+        updater=importlib.util.module_from_spec(spec);spec.loader.exec_module(updater)
+        with tempfile.TemporaryDirectory() as td:
+            root=Path(td)
+            shutil.copytree(ROOT/'template/workspace',root,dirs_exist_ok=True)
+            original=b'Unmodified shared instructions migrated to the workflow contract.\n'
+            custom=b'Character-specific instructions: preserve my existing masks.\n'
+            (root/'AUTO_RIG_TASK.md').write_bytes(original)
+            (root/'GENERATE_REFERENCES_TASK.md').write_bytes(custom)
+            profile=b'{"format":"ChibiRigHeadLayoutProfile","version":1}\n'
+            (root/'head-layout.profile.json').write_bytes(profile)
+            (root/'toolbox/author_head_layout.py').write_text('# Character-specific authoring tool\n')
+            plan=(root/'rig.plan.json').read_bytes() if (root/'rig.plan.json').is_file() else b'{"parts":[]}'
+            (root/'rig.plan.json').write_bytes(plan)
+            with patch.dict(updater.OBSOLETE_SHARED_FILES,{'AUTO_RIG_TASK.md':hashlib.sha256(original).hexdigest()}):
+                result=updater.update(root)
+            self.assertEqual(result['removed'],['AUTO_RIG_TASK.md'])
+            self.assertEqual(result['preserved_custom'],['GENERATE_REFERENCES_TASK.md'])
+            self.assertFalse((root/'AUTO_RIG_TASK.md').exists())
+            self.assertEqual((root/'GENERATE_REFERENCES_TASK.md').read_bytes(),custom)
+            self.assertEqual((root/'head-layout.profile.json').read_bytes(),profile)
+            self.assertEqual((root/'rig.plan.json').read_bytes(),plan)
+            self.assertEqual(result['head_layout']['regenerate'],'toolbox/author_head_layout.py --apply')
+            self.assertIn('authoring',load_contract(root))
     def test_measured_acceptance_fails_closed(self):
         rules=[{'path':'integrity','equals':'passed'},{'path':'checks','equals':1}]
         check_rules({'integrity':'passed','checks':1},rules)
@@ -59,6 +91,8 @@ class WorkflowTests(unittest.TestCase):
             for req in (r for r in requests if r['method']=='turn/start'):
                 task=json.loads(req['params']['input'][0]['text'])
                 self.assertEqual(task['contract']['version'],1);self.assertTrue(task['resume'])
+                self.assertEqual(task['instruction_source'],'rig.workflow.json#/authoring')
+                self.assertIn('reference_planning',task['contract']['authoring'])
                 self.assertEqual(req['params']['outputSchema']['required'],['status','artifacts','issues'])
                 self.assertEqual(task['result_template']['status'],'ready_for_validation')
                 self.assertIn('directory',task['artifact_contract']['kinds'])

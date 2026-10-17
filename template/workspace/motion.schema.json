@@ -150,6 +150,11 @@
           "type": "number",
           "minimum": 0.5,
           "maximum": 4
+        },
+        "capture_body_gain": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 3
         }
       }
     },

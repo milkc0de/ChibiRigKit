@@ -22,7 +22,7 @@ WebM動画はドラッグで指定した範囲を1280×720で保存します。�
 
 完成品HTMLのタブのタイトルは「キャラクター名 - ChibiRigKit」です。完成品は `dist/<キャラ名>/index.html`、ZIPは `dist/<キャラ名>.zip`。どちらもGit対象外です。Web画面の「完成品をdistに保存」、または `npm run export -- --character characters/<キャラ名>` を使います。出力フォルダとZIPには `index.html`、`LICENSE.txt`、`MEDIA_NOTICE.txt` と、`START_SERVER.ps1`・`.cmd`・`.command`・`.sh` の4種類の起動ファイル、`PLAYER_SERVER.py` に加えて、`runtime/tracking_worker.js`、`vendor/mediapipe/` の追跡SDK・WASM・顔モデル、`licenses/` のライセンス表記を含めます。画像・設定・選択した録画モーションはHTML内に保存し、外部の `assets/` やJSONは同梱しません。制作データは元のキャラフォルダに残します。HTML単体はブラウザで再生できます。カメラ収録はローカルサーバーから行います。
 
-`template/workspace/runtime/` が共通実装、`studio/` がChibiRigKitのローカルサーバーです。Codex制作契約は `rig.workflow.json`、説明は `AUTO_RIG_TASK.md`。`scripts/update-character.py --character <folder>` は古い実装をバックアップして更新します。画像やリグは再構築しません。
+`template/workspace/runtime/` が共通実装、`studio/` がChibiRigKitのローカルサーバーです。Codex制作契約と工程別の作業指示は `rig.workflow.json` にまとめています。`scripts/update-character.py --character <folder>` は古い実装をバックアップして更新します。画像やリグは再構築しません。
 
 新規制作はヨー・ピッチ -25/0/+25度の9方向で整え、上下の変形は約50%から調整します。見かけの大きさ、遠い目と髪・輪郭との余白、口と顎の方向、首の接続を優先します。既存の別角度のメッシュは勝手に再解釈しません。
 

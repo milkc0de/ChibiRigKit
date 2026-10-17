@@ -80,9 +80,10 @@ function captureEyeOpen(p,fallback){
 function captureTransform(obj,intensity){
   const e={rot:0,x:0,y:0,sx:1,sy:1},gain=captureClamp(intensity,0,5);
   if(obj===PROJECT.groups?.body_sway||obj===PROJECT.groups?.head_sway){
-    e.rot=captureValue('bodyRoll',0,-30,30)*gain;
-    e.x=captureValue('bodyYaw',0,-30,30)*.7*gain;
-    e.y=-captureValue('bodyPitch',0,-30,30)*.4*gain-captureValue('breath',0,0,1)*3*gain;
+    const input=Number($('captureBodyGain')?.value),body=Number.isFinite(input)?captureClamp(input,0,3):1;
+    e.rot=captureValue('bodyRoll',0,-30,30)*gain*body;
+    e.x=captureValue('bodyYaw',0,-30,30)*.7*gain*body;
+    e.y=-captureValue('bodyPitch',0,-30,30)*.4*gain*body-captureValue('breath',0,0,1)*3*gain;
   }else if(obj.kind==='brow'){
     const side=captureSide(obj)==='left'?'Left':'Right';
     const sensitivity=Number($('captureBrowGain')?.value)||2;
@@ -114,6 +115,6 @@ function initCapturePlayer(){
   controls.motionSpeed.addEventListener('input',()=>{
     const t=captureTime(),position=capturePosition(t);captureSpeed=Number(controls.motionSpeed.value);captureOffset=position-t*captureSpeed;
   });
-  for(const id of ['captureMouthGain','captureBrowGain'])$(id).addEventListener('input',()=>{$(id+'Out').textContent=Number($(id).value).toFixed(1)+'×';requestRender()});
+  for(const id of ['captureMouthGain','captureBrowGain','captureBodyGain'])$(id).addEventListener('input',()=>{$(id+'Out').textContent=Number($(id).value).toFixed(1)+'×';requestRender()});
   syncCaptureUI();
 }

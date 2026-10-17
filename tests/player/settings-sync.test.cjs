@@ -54,3 +54,27 @@ test('clearing a loaded motion also clears it in the display view',async()=>{
  control.context.clearCaptureMotion();await view.context.applyPlayerSync(plain(control.context.collectPlayerSync()),2);
  assert.equal(run(view,'captureMotion'),null);assert.equal(run(view,'capturePlaying'),false);
 });
+
+test('BFCache restore reconnects settings and the background clock while preserving control settings',async()=>{
+ const f=browserHarness();await f.context.rigReady;const events={},workers=[],sources=[];let sessions=0,devices=0;
+ f.context.addEventListener=(name,fn)=>(events[name]??=[]).push(fn);
+ f.context.Worker=class{constructor(){workers.push(this)}terminate(){this.terminated=true}};
+ f.context.EventSource=class{constructor(){sources.push(this)}addEventListener(){}close(){this.closed=true}};
+ f.context.navigator.mediaDevices.getUserMedia=()=>{devices++;throw Error('must not reopen devices')};
+ f.context.fetch=async(url,options)=>({ok:true,json:async()=>{if(url.endsWith('/session')){sessions++;return {token:'token',character:'hero'}}return {revision:1,state:null}}});
+ f.elements.set('playerSyncConfig',{textContent:JSON.stringify({role:'control'})});f.context.initPlayerSync();await new Promise(resolve=>setImmediate(resolve));
+ assert.equal(run(f,'playerSync.active'),true);assert.equal(workers.length,1);f.elements.get('headAmount').value='2.7';
+ for(const fn of events.pagehide)fn({persisted:true});assert.equal(run(f,'playerSync.active'),false);assert.equal(sources[0].closed,true);assert.equal(workers[0].terminated,true);assert.equal(run(f,'playerSync.timer'),null);assert.equal(run(f,'playerSync.retry'),null);
+ for(const fn of events.pageshow)fn({persisted:true});await new Promise(resolve=>setImmediate(resolve));
+ assert.equal(run(f,'playerSync.active'),true);assert.equal(sessions,2);assert.equal(workers.length,2);assert.equal(Number(f.elements.get('headAmount').value),2.7);assert.equal(devices,0);
+ for(const fn of events.pageshow)fn({persisted:true});await new Promise(resolve=>setImmediate(resolve));assert.equal(workers.length,2);assert.equal(sessions,2);
+ for(const fn of events.pagehide)fn({persisted:false});for(const fn of events.pageshow)fn({persisted:false});await new Promise(resolve=>setImmediate(resolve));assert.equal(run(f,'playerSync.active'),false);assert.equal(sessions,2);
+});
+
+test('late connection errors after pagehide cannot schedule a frozen-page retry',async()=>{
+ const f=browserHarness();await f.context.rigReady;const events={};let rejectSession;
+ f.context.addEventListener=(name,fn)=>(events[name]??=[]).push(fn);f.context.fetch=()=>new Promise((_resolve,reject)=>rejectSession=reject);
+ f.elements.set('playerSyncConfig',{textContent:JSON.stringify({role:'view'})});f.context.initPlayerSync();assert.ok(rejectSession);
+ for(const fn of events.pagehide)fn({persisted:true});rejectSession(Error('connection interrupted'));await new Promise(resolve=>setImmediate(resolve));
+ assert.equal(run(f,'playerSync.active'),false);assert.equal(run(f,'playerSync.retry'),null);assert.equal(run(f,'playerSync.events'),null);
+});

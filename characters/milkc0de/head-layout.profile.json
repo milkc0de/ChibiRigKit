@@ -1,0 +1,450 @@
+{
+  "format": "ChibiRigHeadLayoutProfile",
+  "version": 1,
+  "pose_space": "art-directed-25-v5",
+  "layout_mode": "authored-25-v1",
+  "yaw_extent": 25,
+  "pitch_extent": 25,
+  "center": [
+    545,
+    445
+  ],
+  "attachment_band": {
+    "start_y": 560,
+    "end_y": 635
+  },
+  "intent": "Eight explicit 2D endpoints with visible head width/height changes and correctly oriented near/far-eye foreshortening. Preserve source pixels and the body attachment; measure final rasterized sizes.",
+  "endpoints": {
+    "center": {
+      "surface": {
+        "shift": [
+          0,
+          0
+        ],
+        "width": 1,
+        "height": 1,
+        "cheek": [
+          0,
+          0
+        ],
+        "crown_lift": 0
+      },
+      "parts": {}
+    },
+    "left": {
+      "surface": {
+        "shift": [
+          -28,
+          0
+        ],
+        "width": 0.86,
+        "height": 1.01,
+        "cheek": [
+          -18,
+          -2
+        ],
+        "crown_lift": 0
+      },
+      "parts": {
+        "eye_left_sclera": {
+          "x": -6,
+          "y": -2,
+          "scale_x": 0.82,
+          "scale_y": 0.96
+        },
+        "eye_right_sclera": {
+          "x": -17,
+          "y": -3,
+          "scale_x": 1.18,
+          "scale_y": 1.02
+        },
+        "mouth_open": {
+          "x": -11,
+          "y": -12,
+          "scale_x": 0.99,
+          "scale_y": 1
+        },
+        "brow_left": {
+          "x": -8,
+          "y": -2,
+          "scale_x": 1.02,
+          "scale_y": 1
+        },
+        "brow_right": {
+          "x": -10,
+          "y": -3,
+          "scale_x": 0.98,
+          "scale_y": 1
+        }
+      },
+      "eye_depth": {
+        "far": "eye_left_sclera",
+        "near": "eye_right_sclera"
+      }
+    },
+    "right": {
+      "surface": {
+        "shift": [
+          30,
+          2
+        ],
+        "width": 0.92,
+        "height": 1.0,
+        "cheek": [
+          10,
+          -1
+        ],
+        "crown_lift": -2
+      },
+      "parts": {
+        "eye_left_sclera": {
+          "x": 14,
+          "y": 3,
+          "scale_x": 1.1,
+          "scale_y": 1.02,
+          "rotation": 0
+        },
+        "eye_right_sclera": {
+          "x": 4,
+          "y": 0,
+          "scale_x": 0.94,
+          "scale_y": 0.9,
+          "rotation": -1.5
+        },
+        "mouth_open": {
+          "x": 12,
+          "y": -7,
+          "scale_x": 0.985,
+          "scale_y": 1
+        },
+        "brow_left": {
+          "x": 10,
+          "y": 2,
+          "scale_x": 0.98,
+          "scale_y": 1
+        },
+        "brow_right": {
+          "x": 8,
+          "y": 2,
+          "scale_x": 1.02,
+          "scale_y": 1
+        }
+      },
+      "eye_depth": {
+        "far": "eye_right_sclera",
+        "near": "eye_left_sclera"
+      }
+    },
+    "up": {
+      "surface": {
+        "shift": [
+          0,
+          -10
+        ],
+        "width": 1.015,
+        "height": 0.82,
+        "cheek": [
+          0,
+          -10
+        ],
+        "crown_lift": -8
+      },
+      "parts": {
+        "eye_left_sclera": {
+          "x": 2,
+          "y": -10,
+          "scale_x": 1.01,
+          "scale_y": 1.0
+        },
+        "eye_right_sclera": {
+          "x": -2,
+          "y": -10,
+          "scale_x": 1.01,
+          "scale_y": 1.0
+        },
+        "mouth_open": {
+          "x": 0,
+          "y": 0,
+          "scale_x": 0.99,
+          "scale_y": 1.02
+        },
+        "brow_left": {
+          "x": 0,
+          "y": -7,
+          "scale_x": 1.01,
+          "scale_y": 1
+        },
+        "brow_right": {
+          "x": 0,
+          "y": -7,
+          "scale_x": 1.01,
+          "scale_y": 1
+        }
+      },
+      "eye_depth": {
+        "far": null,
+        "near": null
+      }
+    },
+    "down": {
+      "surface": {
+        "shift": [
+          0,
+          12
+        ],
+        "width": 1.04,
+        "height": 0.84,
+        "cheek": [
+          0,
+          8
+        ],
+        "crown_lift": 7
+      },
+      "parts": {
+        "eye_left_sclera": {
+          "x": 0,
+          "y": 0,
+          "scale_x": 1.0,
+          "scale_y": 1.05
+        },
+        "eye_right_sclera": {
+          "x": 0,
+          "y": 0,
+          "scale_x": 1.0,
+          "scale_y": 1.05
+        },
+        "mouth_open": {
+          "x": 0,
+          "y": -12,
+          "scale_x": 1.015,
+          "scale_y": 0.99
+        },
+        "brow_left": {
+          "x": 0,
+          "y": 5,
+          "scale_x": 1.02,
+          "scale_y": 1
+        },
+        "brow_right": {
+          "x": 0,
+          "y": 5,
+          "scale_x": 1.02,
+          "scale_y": 1
+        }
+      },
+      "eye_depth": {
+        "far": null,
+        "near": null
+      }
+    },
+    "up_left": {
+      "surface": {
+        "shift": [
+          -25,
+          -8
+        ],
+        "width": 0.86,
+        "height": 0.84,
+        "cheek": [
+          -16,
+          -8
+        ],
+        "crown_lift": -8
+      },
+      "parts": {
+        "eye_left_sclera": {
+          "x": -6,
+          "y": -10,
+          "scale_x": 0.84,
+          "scale_y": 0.98
+        },
+        "eye_right_sclera": {
+          "x": -21,
+          "y": -10,
+          "scale_x": 1.2,
+          "scale_y": 1.1
+        },
+        "mouth_open": {
+          "x": -10,
+          "y": -10,
+          "scale_x": 1,
+          "scale_y": 1.02
+        },
+        "brow_left": {
+          "x": -7,
+          "y": -9,
+          "scale_x": 1.025,
+          "scale_y": 1
+        },
+        "brow_right": {
+          "x": -10,
+          "y": -10,
+          "scale_x": 0.985,
+          "scale_y": 1
+        }
+      },
+      "eye_depth": {
+        "far": "eye_left_sclera",
+        "near": "eye_right_sclera"
+      }
+    },
+    "up_right": {
+      "surface": {
+        "shift": [
+          27,
+          -10
+        ],
+        "width": 0.91,
+        "height": 0.9,
+        "cheek": [
+          9,
+          -4
+        ],
+        "crown_lift": -8
+      },
+      "parts": {
+        "eye_left_sclera": {
+          "x": 17,
+          "y": -10,
+          "scale_x": 1.12,
+          "scale_y": 1.04,
+          "rotation": 0
+        },
+        "eye_right_sclera": {
+          "x": 2,
+          "y": -12,
+          "scale_x": 0.96,
+          "scale_y": 0.94,
+          "rotation": -1.5
+        },
+        "mouth_open": {
+          "x": 11,
+          "y": -16,
+          "scale_x": 1,
+          "scale_y": 1.025
+        },
+        "brow_left": {
+          "x": 10,
+          "y": -6,
+          "scale_x": 0.985,
+          "scale_y": 1
+        },
+        "brow_right": {
+          "x": 7,
+          "y": -5,
+          "scale_x": 1.025,
+          "scale_y": 1
+        }
+      },
+      "eye_depth": {
+        "far": "eye_right_sclera",
+        "near": "eye_left_sclera"
+      }
+    },
+    "down_left": {
+      "surface": {
+        "shift": [
+          -28,
+          14
+        ],
+        "width": 0.85,
+        "height": 0.82,
+        "cheek": [
+          -17,
+          8
+        ],
+        "crown_lift": 7
+      },
+      "parts": {
+        "eye_left_sclera": {
+          "x": -6,
+          "y": -1,
+          "scale_x": 0.82,
+          "scale_y": 0.98
+        },
+        "eye_right_sclera": {
+          "x": -19,
+          "y": -1,
+          "scale_x": 1.2,
+          "scale_y": 1.1
+        },
+        "mouth_open": {
+          "x": -9,
+          "y": -11,
+          "scale_x": 1.005,
+          "scale_y": 1
+        },
+        "brow_left": {
+          "x": -7,
+          "y": 4,
+          "scale_x": 1.02,
+          "scale_y": 1
+        },
+        "brow_right": {
+          "x": -9,
+          "y": 3,
+          "scale_x": 0.985,
+          "scale_y": 1
+        }
+      },
+      "eye_depth": {
+        "far": "eye_left_sclera",
+        "near": "eye_right_sclera"
+      }
+    },
+    "down_right": {
+      "surface": {
+        "shift": [
+          30,
+          16
+        ],
+        "width": 0.91,
+        "height": 0.9,
+        "cheek": [
+          10,
+          4
+        ],
+        "crown_lift": 8
+      },
+      "parts": {
+        "eye_left_sclera": {
+          "x": 16,
+          "y": 1,
+          "scale_x": 1.12,
+          "scale_y": 1.04,
+          "rotation": 0
+        },
+        "eye_right_sclera": {
+          "x": 4,
+          "y": -1,
+          "scale_x": 0.96,
+          "scale_y": 0.94,
+          "rotation": -2
+        },
+        "mouth_open": {
+          "x": 10,
+          "y": -10,
+          "scale_x": 1.01,
+          "scale_y": 1
+        },
+        "brow_left": {
+          "x": 9,
+          "y": 7,
+          "scale_x": 0.985,
+          "scale_y": 1
+        },
+        "brow_right": {
+          "x": 7,
+          "y": 6,
+          "scale_x": 1.025,
+          "scale_y": 1
+        }
+      },
+      "eye_depth": {
+        "far": "eye_right_sclera",
+        "near": "eye_left_sclera"
+      }
+    }
+  },
+  "strength": 0.75
+}

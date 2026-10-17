@@ -1,0 +1,52 @@
+{
+  "version": "1.0.1",
+  "registry": "https://registry.npmjs.org/@mediapipe/tasks-vision/1.0.1",
+  "license": "Apache-2.0",
+  "files": [
+    {
+      "path": "runtime/tracking_worker.js",
+      "bytes": 1834,
+      "sha256": "b67334b5a8784a79bfd5df37590b7c194b374395ae1c44aaa0062f53f3fcd6e1"
+    },
+    {
+      "path": "vendor/mediapipe/vision_bundle.js",
+      "bytes": 155465,
+      "sha256": "98db72469ffb176f5e9f2687be0f70783893aca681f7789c34b872b0a764371a"
+    },
+    {
+      "path": "vendor/mediapipe/wasm/vision_wasm_internal.js",
+      "bytes": 323377,
+      "sha256": "e170ee67dd4e16c1a6fcd8840a206687e5a59b22c20e4a902bc445b095454d73"
+    },
+    {
+      "path": "vendor/mediapipe/wasm/vision_wasm_internal.wasm",
+      "bytes": 11756954,
+      "sha256": "8da277a733926eacd0474b8704b36742d6ec3231c57a860c5b889dff8f1df886"
+    },
+    {
+      "path": "vendor/mediapipe/wasm/vision_wasm_nosimd_internal.js",
+      "bytes": 323180,
+      "sha256": "e81d715a3d42cc3373602eb2f7aff795d164934db680e32496b65dab537f9658"
+    },
+    {
+      "path": "vendor/mediapipe/wasm/vision_wasm_nosimd_internal.wasm",
+      "bytes": 10960242,
+      "sha256": "a28483cd42e74e855bf5ebdb6b40d9b66a5b49e35e95020bc97669e6822a3192"
+    },
+    {
+      "path": "vendor/mediapipe/models/face_landmarker.task",
+      "bytes": 3758596,
+      "sha256": "64184e229b263107bc2b804c6625db1341ff2bb731874b0bcc2fe6544e0bc9ff"
+    },
+    {
+      "path": "licenses/mediapipe-LICENSE.txt",
+      "bytes": 12331,
+      "sha256": "8707eef0533987efc5b155d64761eeb6e20793f50b9bd1a68dad1cf4719d0ed8"
+    },
+    {
+      "path": "licenses/mediapipe-NOTICES.txt",
+      "bytes": 733,
+      "sha256": "10116cadda78ebf4d6b63a27cee8a6d74f396f6d1bf9d6c93581cdd234f636df"
+    }
+  ]
+}

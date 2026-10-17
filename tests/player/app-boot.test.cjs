@@ -7,6 +7,12 @@ test('parent player boots with browser rendering and no removed controls',async(
  assert.equal(elements.get('captureYawGain').value,'1');vm.runInContext('render(0)',c);const display=contexts.find(x=>x.id==='c'),count=display.draws;assert.ok(count>0);vm.runInContext('renderOutput()',c);assert.equal(display.draws,count+1);
 });
 test('dragging can move and resize output region without changing aspect of source pixels',async()=>{const {context:c}=browserHarness();await c.rigReady;const value=vm.runInContext("cropFromDrag({mode:'move',start:[50,50],rect:{x:0,y:0,w:100,h:200}},[2000,-100])",c);assert.equal(value.x,1052);assert.equal(value.y,0);assert.throws(()=>vm.runInContext('validOutputCrop({x:0,y:0,w:0,h:0})',c));const shape=vm.runInContext("cropFromDrag({mode:'new',start:[200,300]},[50,100])",c);assert.equal(shape.x,50);assert.equal(shape.h,200)});
+test('preview removes the previous frame before drawing a transparent character',async()=>{
+ const {context:c,elements}=browserHarness();await c.rigReady;const calls=[],view=elements.get('c').getContext('2d');
+ view.clearRect=(...args)=>calls.push(['clear',...args]);view.drawImage=()=>calls.push(['draw']);
+ vm.runInContext("backgroundState={...backgroundState,mode:'transparent'};renderOutput()",c);
+ assert.deepEqual(calls,[['clear',0,0,elements.get('c').width,elements.get('c').height],['draw']]);
+});
 test('camera and audio start only on request, motion take replays, and stop releases devices',async()=>{
  const {context:c,elements}=browserHarness();await c.rigReady;let requests=0,stopped=0,terminated=0,closed=0;
  const videoTrack={kind:'video',stop(){stopped++}},audioTrack={kind:'audio',stop(){stopped++}},stream={getTracks:()=>[videoTrack,audioTrack],getVideoTracks:()=>[videoTrack]};

@@ -8,7 +8,15 @@ const initialHeadPose=PROJECT.head_pose?structuredClone(PROJECT.head_pose):null;
 let headRandomSeed=crypto.getRandomValues(new Uint32Array(1))[0],headRandomStart=0,headRandomFrom=[0,0];
 let headDirection='center',headDraft=null,headDirty=false,headDrag=null,headAngle=[0,0];
 const headKey=PROJECT.head_pose?`ChibiRigKit:headpose:1:${PROJECT.head_pose.layout_signature}:${PROJECT.head_pose.pose_space||"legacy"}`:null;
-function headWeights(x,y){x=Math.max(-1,Math.min(1,x));y=Math.max(-1,Math.min(1,y));return Object.fromEntries(Object.entries(HEAD_DIRECTIONS).map(([name,[dx,dy]])=>[name,Math.max(0,1-Math.abs(x-dx))*Math.max(0,1-Math.abs(y-dy))]))}
+function headBlendCoordinate(value){
+  // Round the joins near the center and the authored limits. Positive convex
+  // weights retain the exact nine poses without extrapolating their meshes.
+  const x=Math.max(-1,Math.min(1,value)),a=Math.abs(x),width=.10;
+  const edge=u=>u*u*(2-u);
+  const blended=a<width?width*edge(a/width):a>1-width?1-width*edge((1-a)/width):a;
+  return Math.sign(x)*blended;
+}
+function headWeights(x,y){x=headBlendCoordinate(x);y=headBlendCoordinate(y);return Object.fromEntries(Object.entries(HEAD_DIRECTIONS).map(([name,[dx,dy]])=>[name,Math.max(0,1-Math.abs(x-dx))*Math.max(0,1-Math.abs(y-dy))]))}
 function neutralHeadSetting(){return {x:0,y:0,rotation:0,scale_x:1,scale_y:1,vertices:Array.from({length:(PROJECT.head_pose.columns+1)*(PROJECT.head_pose.rows+1)},()=>[0,0])}}
 function headSetting(p,pose){
   const direct=pose.parts[p.name];
@@ -29,13 +37,17 @@ function mixedHeadSetting(p,x,y,config=PROJECT.head_pose){
   return result;
 }
 function headGrid(p){
-  const h=PROJECT.head_pose,b=p.head_bounds,points=[],triangles=[];
+  // Split eyes and expression endpoints share one canvas-space deformation
+  // field. Reusing offsets on each cropped image's bounds moves their features
+  // by different amounts and separates lashes/iris during a large turn.
+  const h=PROJECT.head_pose,b=headBounds(p),points=[],triangles=[];
   for(let r=0;r<=h.rows;r++)for(let c=0;c<=h.columns;c++)points.push([b.x+b.w*c/h.columns,b.y+b.h*r/h.rows]);
   for(let r=0;r<h.rows;r++)for(let c=0;c<h.columns;c++){
     const a=r*(h.columns+1)+c,b=a+1,d=a+h.columns+1,e=d+1;triangles.push([a,b,e],[a,e,d]);
   }
   return {points,triangles};
 }
+function headBounds(p){return transformOwner(p).head_bounds||p.head_bounds}
 function headDest(p,setting){
   const g=headGrid(p),pivot=transformOwner(p).pivot;
   const m=around(pivot,setting.rotation,setting.x,setting.y,setting.scale_x,setting.scale_y);
@@ -99,11 +111,12 @@ function amplifiedHeadSetting(p,setting,amount){
   result.vertices=setting.vertices.map((v,i)=>v.map((n,k)=>center.vertices[i][k]+(n-center.vertices[i][k])*amount));
   return result;
 }
+function sharedHeadLayout(){return ['coordinated-25-v1','authored-25-v1'].includes(PROJECT.neck_sway?.layout_mode)}
 function currentHeadSetting(p){
   const setting=mixedHeadSetting(p,...headAngle);
-  const result=PROJECT.neck_sway?.layout_mode!=='coordinated-25-v1'&&!controls.headEdit.checked&&(controls.headRandom.checked||controls.headCircle.checked)?amplifiedHeadSetting(p,setting,Number(controls.headAmount?.value??1)):setting;
+  const result=!sharedHeadLayout()&&!controls.headEdit.checked&&(controls.headRandom.checked||controls.headCircle.checked)?amplifiedHeadSetting(p,setting,Number(controls.headAmount?.value??1)):setting;
   const n=PROJECT.neck_sway;
-  if(n?.poses&&n.layout_mode!=='coordinated-25-v1'&&controls.neckSway?.checked&&!controls.headEdit.checked){
+  if(n?.poses&&!sharedHeadLayout()&&controls.neckSway?.checked&&!controls.headEdit.checked){
     const weights=headWeights(neckCurrentAngles.yaw/n.yaw_extent,neckCurrentAngles.pitch/n.pitch_extent),owner=transformOwner(p);
     for(const [name,w] of Object.entries(weights)){
       const s=n.poses[name].parts[owner.name];if(!w||!s)continue;
@@ -193,7 +206,7 @@ function drawNeckVolume(target,source,p,t,intensity){
   if(!n?.part_ids.includes(p.name)||(!a.yaw&&!a.pitch&&!a.roll&&!(hairFrame.get(p.name)))){target.drawImage(source,0,0);return}
   if(!n.mesh){target.save();target.setTransform(...neckSwayMatrix(p,t,intensity));target.drawImage(source,0,0);target.restore();return}
   const mesh=neckMasterMesh(t,intensity),owner=transformOwner(p);
-  if(owner.role==='eye'&&n.layout_mode!=='coordinated-25-v1'){target.save();target.setTransform(...neckEyeMatrix(owner,t,intensity,mesh));target.drawImage(source,0,0);target.restore();return}
+  if(owner.role==='eye'&&!sharedHeadLayout()){target.save();target.setTransform(...neckEyeMatrix(owner,t,intensity,mesh));target.drawImage(source,0,0);target.restore();return}
   const b=owner.head_bounds||{x:owner.x,y:owner.y,w:owner.w,h:owner.h},matrix=partMatrix(p,t,intensity,false);
   const points=[[b.x,b.y],[b.x+b.w,b.y],[b.x+b.w,b.y+b.h],[b.x,b.y+b.h]];
   if(headPoseActive(p))points.push(...headDest(p,currentHeadSetting(p)));
@@ -357,7 +370,7 @@ function initHeadEditor(){
 }
 
 function headMapPoint(p,point,setting){
-  const h=PROJECT.head_pose,b=p.head_bounds,d=headDest(p,setting);
+  const h=PROJECT.head_pose,b=headBounds(p),d=headDest(p,setting);
   const u=Math.max(0,Math.min(h.columns,(point[0]-b.x)/b.w*h.columns)),v=Math.max(0,Math.min(h.rows,(point[1]-b.y)/b.h*h.rows));
   const c=Math.min(h.columns-1,Math.floor(u)),r=Math.min(h.rows-1,Math.floor(v)),x=u-c,y=v-r,a=r*(h.columns+1)+c,e=a+h.columns+2;
   const ids=x>=y?[a,a+1,e]:[a,e,a+h.columns+1],weights=x>=y?[1-x,x-y,y]:[1-y,x,y-x];
@@ -389,7 +402,7 @@ function resetRandomHead(from=[0,0],time=0){headRandomFrom=[...from];headRandomS
 // patch's curved transparent edge can never expose a straight crack at the join.
 function neckFillGeometry(t,intensity){
   const fill=PROJECT.neck_fill,n=PROJECT.neck_sway;
-  if(!fill||!n||neckCurrentAngles.pitch>=0||!fill.head_edge||!fill.body_edge||!fill.skin_rect)return null;
+  if(!fill||fill.enabled===false||!n||neckCurrentAngles.pitch>=0||!fill.head_edge||!fill.body_edge||!fill.skin_rect)return null;
   const face=PROJECT.parts[n.anchor_part],body=PROJECT.parts[fill.body_part];
   const setting=currentHeadSetting(face),headMatrix=partMatrix(face,t,intensity,false);
   const bodyMatrix=body?partMatrix(body,t,intensity,false):groupMatrix(fill.body_group,t,intensity);

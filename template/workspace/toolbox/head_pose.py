@@ -12,6 +12,23 @@ DIRECTIONS = {'center':(0,0),'left':(-1,0),'right':(1,0),'up':(0,-1),'down':(0,1
 HEAD_ROLES = {'face','eye','mouth','brow'}
 
 
+def pose_owner(parts, pid):
+    """Expression layers use their owner's canvas-space deformation lattice."""
+    seen=set()
+    while parts[pid].get('transform_from'):
+        if pid in seen:raise ValueError('Cyclic head transform owner')
+        seen.add(pid)
+        pid=parts[pid]['transform_from']
+        if pid not in parts:raise ValueError('Unknown head transform owner')
+    return parts[pid]
+
+
+def pose_setting(parts, pose, pid):
+    if pid in pose['parts']:return pose['parts'][pid]
+    owner=parts[pid].get('transform_from')
+    return pose_setting(parts,pose,owner) if owner else {}
+
+
 def fill_sclera(root, spec, specs, source, mask):
     iris = specs[spec['iris_part']]
     iris_mask = Image.open(root/iris['mask']).convert('L')
@@ -55,7 +72,8 @@ def build_head_pose(plan, parts, canvas):
         if set(pose.get('parts',{}))-set(members):raise ValueError(f'{name}: unknown head part')
         for pid,setting in pose.get('parts',{}).items():
             validate_setting(setting,count)
-            if not valid_mesh(parts[pid]['head_bounds'],setting,cols,rows):raise ValueError(f'{name}/{pid}: folded head mesh')
+            bounds=pose_owner(parts,pid).get('head_bounds',parts[pid]['head_bounds'])
+            if not valid_mesh(bounds,setting,cols,rows):raise ValueError(f'{name}/{pid}: folded head mesh')
     result={'version':1,'columns':cols,'rows':rows,'part_ids':members,'layout_signature':signature,'poses':poses}
     if supplied.get('pose_space'):result['pose_space']=supplied['pose_space']
     # Check blends too. Runtime additionally rejects any folded mesh at the exact live angle.
@@ -65,8 +83,9 @@ def build_head_pose(plan, parts, canvas):
             for pid in members:
                 offsets=np.zeros((count,2))
                 for name,weight in weights.items():
-                    offsets+=np.asarray(poses[name]['parts'].get(pid,{}).get('vertices',[[0,0]]*count))*weight
-                if not valid_mesh(parts[pid]['head_bounds'],{'vertices':offsets.tolist()},cols,rows):
+                    offsets+=np.asarray(pose_setting(parts,poses[name],pid).get('vertices',[[0,0]]*count))*weight
+                bounds=pose_owner(parts,pid).get('head_bounds',parts[pid]['head_bounds'])
+                if not valid_mesh(bounds,{'vertices':offsets.tolist()},cols,rows):
                     raise ValueError(f'{pid}: head poses fold between saved directions')
     return result
 
@@ -83,8 +102,16 @@ def validate_setting(setting,count):
     if abs(setting.get('rotation',0))>45:raise ValueError('Head pose rotation must be -45..45 degrees')
 
 
+def blend_coordinate(value):
+    # Keep generation/import checks identical to headBlendCoordinate in JS.
+    x=float(np.clip(value,-1,1));a=abs(x);width=.1
+    edge=lambda u:u*u*(2-u)
+    blended=width*edge(a/width) if a<width else 1-width*edge((1-a)/width) if a>1-width else a
+    return float(np.sign(x))*blended
+
+
 def pose_weights(x,y):
-    x=float(np.clip(x,-1,1));y=float(np.clip(y,-1,1))
+    x=blend_coordinate(x);y=blend_coordinate(y)
     return {name:max(0,1-abs(x-dx))*max(0,1-abs(y-dy)) for name,(dx,dy) in DIRECTIONS.items()}
 
 
@@ -99,6 +126,18 @@ def valid_mesh(bounds,setting,cols,rows):
                 u=points[j]-points[i];v=points[k]-points[i]
                 if u[0]*v[1]-u[1]*v[0]<=.0001:return False
     return True
+
+
+def validate_neck_mesh(poses, triangles):
+    """Reject folded authored endpoints and their in-between head surfaces."""
+    indices=np.asarray(triangles,dtype=int)
+    vertices={name:np.asarray(pose['vertices'],dtype=float) for name,pose in poses.items()}
+    for y in np.linspace(-1,1,17):
+        for x in np.linspace(-1,1,17):
+            blended=sum(vertices[name]*weight for name,weight in pose_weights(x,y).items() if weight)
+            a,b,c=(blended[indices[:,i]] for i in range(3))
+            area=(b[:,0]-a[:,0])*(c[:,1]-a[:,1])-(b[:,1]-a[:,1])*(c[:,0]-a[:,0])
+            if np.any(area<=.0001):raise ValueError('Neck poses fold between saved directions')
 
 
 def suggest_poses(parts,members,cols,rows):
@@ -166,6 +205,7 @@ def build_neck_sway(plan, parts, canvas):
     for name,(yaw,pitch) in DIRECTIONS.items():
         vertices=poses[name].setdefault('vertices',[project_neck_point(point,pivot,volume,yaw*yaw_extent,pitch*pitch_extent*pitch_gain) for point in points])
         if np.asarray(vertices).shape!=(len(points),2) or not np.isfinite(vertices).all():raise ValueError('Invalid neck pose vertices')
+    validate_neck_mesh(poses,triangles)
     return {'pivot':pivot,'anchor_part':anchor,'part_ids':members,'poses':poses,'yaw_extent':yaw_extent,'pitch_extent':pitch_extent,'layout_mode':extent.get('layout_mode','legacy'),'surface':extent.get('surface'),'volume':volume,'mesh_signature':mesh_signature,'mesh':{'points':points,'triangles':triangles}}
 
 

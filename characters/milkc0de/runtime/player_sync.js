@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // Only the dedicated loopback server injects the opt-in bootstrap marker.
 const playerSyncClockOrigin=Date.now()-performance.now();
-const playerSync={role:null,active:false,applying:false,busy:false,dirty:false,timer:null,retry:null,session:null,events:null,revision:-1,received:-1,last:null,generation:0};
+const playerSync={role:null,active:false,pageSuspended:false,applying:false,busy:false,dirty:false,timer:null,retry:null,session:null,events:null,revision:-1,received:-1,last:null,generation:0};
 function playerSyncIsViewer(){return playerSync.role==='view'}
 function playerSyncMessage(message){if($('playerSyncStatus'))$('playerSyncStatus').textContent=message}
 function collectPlayerSync(){
@@ -57,9 +57,11 @@ async function publishPlayerSync(){
 }
 function reconnectPlayerSync(){
  playerSync.active=false;playerSync.events?.close();playerSync.events=null;
+ if(playerSync.pageSuspended)return;
  if(playerSync.retry===null)playerSync.retry=setTimeout(()=>{playerSync.retry=null;void connectPlayerSync()},1500);
 }
 async function connectPlayerSync(){
+ if(playerSync.pageSuspended)return;
  const generation=++playerSync.generation;
  try{
   const response=await fetch('/api/player-sync/session');if(!response.ok)throw Error('サーバーに接続できません');const session=await response.json();
@@ -69,6 +71,7 @@ async function connectPlayerSync(){
   const recoveringControl=playerSync.role==='control'&&playerSync.session!==null;
   playerSync.session=session;playerSync.received=latest.revision;playerSync.revision=-1;
   if(latest.state&&!recoveringControl)await applyPlayerSync(latest.state,latest.revision);
+  if(generation!==playerSync.generation)return;
   playerSync.active=true;playerSync.last=null;
   const source=new EventSource('/api/player-sync/events?token='+encodeURIComponent(session.token));playerSync.events=source;
   source.addEventListener('settings',event=>{
@@ -83,7 +86,7 @@ async function connectPlayerSync(){
   source.onerror=()=>{if(generation!==playerSync.generation)return;playerSyncMessage('再接続しています。現在の表示は保持します。');reconnectPlayerSync()};
   playerSyncMessage(playerSyncIsViewer()?'操作画面の設定を受信しています。':'表示を共有中です。OBS用URL：'+location.protocol+'//'+location.host+'/obs');
   if(playerSync.role==='control'){schedulePlayerSync();void publishPlayerSyncLive(true)}
- }catch(error){playerSyncMessage('接続待ち：'+error.message);reconnectPlayerSync()}
+ }catch(error){if(generation!==playerSync.generation)return;playerSyncMessage('接続待ち：'+error.message);reconnectPlayerSync()}
 }
 function initPlayerSync(){
  const bootstrap=$('playerSyncConfig');if(!bootstrap)return;
@@ -96,7 +99,14 @@ function initPlayerSync(){
   for(const event of ['input','change','click','pointerup'])document.addEventListener(event,schedulePlayerSync);
  }
  void connectPlayerSync();
- window.addEventListener('pagehide',()=>{playerSync.active=false;playerSync.generation++;playerSync.events?.close();clearTimeout(playerSync.timer);clearTimeout(playerSync.retry)});
+ window.addEventListener('pagehide',()=>{
+  playerSync.pageSuspended=true;playerSync.active=false;playerSync.generation++;playerSync.events?.close();playerSync.events=null;
+  clearTimeout(playerSync.timer);clearTimeout(playerSync.retry);playerSync.timer=null;playerSync.retry=null;stopPlayerSyncClock();
+ });
+ window.addEventListener('pageshow',event=>{
+  if(!event.persisted||!playerSync.pageSuspended)return;
+  playerSync.pageSuspended=false;if(playerSync.role==='control')startPlayerSyncClock();void connectPlayerSync();
+ });
 }
 
 // Relay only already-solved face values. Never video, audio or device identifiers.
@@ -129,5 +139,5 @@ function startPlayerSyncClock(){
  try{const worker=new Worker(url);playerSyncLive.clockWorker=worker;worker.onmessage=()=>{if(document.visibilityState==='hidden'&&trackingState.active)trackingTick(performance.now())}}
  catch{ /* Foreground tracking remains available if background workers are blocked. */ }
  finally{URL.revokeObjectURL(url)}
- window.addEventListener('pagehide',()=>{playerSyncLive.clockWorker?.terminate();playerSyncLive.clockWorker=null});
 }
+function stopPlayerSyncClock(){playerSyncLive.clockWorker?.terminate();playerSyncLive.clockWorker=null}

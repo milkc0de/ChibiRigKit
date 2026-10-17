@@ -120,7 +120,7 @@ scripts/auto-rig.mjs           Codex app-server オーケストレーター
 scripts/codex-app-server.mjs   JSON-RPC クライアント
 
 template/workspace/
-  AUTO_RIG_TASK.md             Astra 用の厳密な作業仕様
+  rig.workflow.json            Codex 用の制作契約・作業指示
   character.config.json        キャラ入力/パーツ数の希望
   rig.plan.schema.json         Astra が作るプランの形式
   toolbox/normalize_inputs.py  画像位置合わせ
@@ -212,7 +212,7 @@ cd characters/character
 - `tests/test-cases.json`: テスト実行定義と検証範囲
 - `work/test-report.json`: ローカルテストの機械可読な結果
 
-オーケストレーターはJSONのタスクを渡し、モデルの返答を `outputSchema` で制約します。自然文の進捗は配信せず、ツール実行状況を表示します。モデルの完了宣言だけでは合格にせず、成果物の存在・元画像と実装の不変性・静止画／ブラウザ検査を別々に検証します。既存のMarkdown仕様は人間向け参考資料として保持しています。
+オーケストレーターはJSONのタスクを渡し、モデルの返答を `outputSchema` で制約します。自然文の進捗は配信せず、ツール実行状況を表示します。モデルの完了宣言だけでは合格にせず、成果物の存在・元画像と実装の不変性・静止画／ブラウザ検査を別々に検証します。制作の詳細指示も `rig.workflow.json` の `authoring` にまとめ、人間向けの利用ガイドはMarkdownで保持しています。
 
 ```sh
 npm test
@@ -232,7 +232,7 @@ Python環境は `.venv` を自動選択します。ブラウザ検証は各キ�
 
 ## 首振りの基準配置
 
-`rig.plan.json` の `neck_sway.poses` はヨー×ピッチの9方向ごとのパーツ補正です。`center / left / right / up / down / up_left / up_right / down_left / down_right` に配置を保存します。顔の中央と輪郭に奥行き差を持つ共通メッシュで補間し、ロールは補間結果に重ねます。省略時はテンプレートが各キャラのパーツ役割から初期配置を生成します。初期配置は見た目の確認が必要です。
+`rig.plan.json` の `head_pose.poses` にパーツ別の配置、`neck_sway.poses.<方向>.vertices` に共有面の頂点を保存します。方向は `center / left / right / up / down / up_left / up_right / down_left / down_right`。サンプルは作画した2Dの共有面を使い、正面と8方向の位置・頭の縦横比・目の縦横サイズと遠近・メッシュを個別に調整します。パーツのローカル倍率だけで判断せず、共有メッシュとの合成後の表示を比較します。中心と端点付近のつながりを丸めて補間します（rounded-bilinear）。首と肩の接合帯は体に合わせて固定し、ロールは補間結果に重ねます。省略時はテンプレートが各キャラのパーツ役割から初期配置を生成します。初期配置は見た目の確認が必要です。
 
 キャプチャモーションはChibiRigKitの [ブラウザプレイヤー](PLAYER.md) で、指定したキャラを直接開いて利用します。再生のヨー・ピッチ・ロール倍率は各0〜3倍で、自動首振りの角度設定とは別です。新規9方向の上下変形は約50%から調整し、既存の保存済みメッシュの角度基準は引き継ぎます。
 

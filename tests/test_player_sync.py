@@ -59,6 +59,20 @@ class PlayerSyncServerTests(unittest.TestCase):
         with server_module.PlayerServer(self.temp.name,0) as fresh:
             self.assertIsNone(fresh.state);self.assertNotEqual(fresh.token,self.server.token)
 
+    def test_live_body_follow_reaches_obs_and_invalid_input_preserves_last_pose(self):
+        headers={'Content-Type':'application/json','X-ChibiRig-Sync-Token':self.server.token}
+        values={'headYaw':20,'bodyYaw':4.8,'bodyPitch':-1.2,'bodyRoll':2,'mouthOpen':.6}
+        payload={'character':self.server.character,'live':{'active':True,'values':values}}
+        with contextlib.closing(http.client.HTTPConnection('127.0.0.1',self.port,timeout=3)) as connection:
+            connection.request('GET','/api/player-sync/events?token='+self.server.token);response=connection.getresponse()
+            self.event(response);self.event(response)
+            self.assertEqual(self.request('POST','/api/player-sync/live',json.dumps(payload),headers)[0],200)
+            self.assertEqual(self.event(response)['values'],values)
+            for invalid in [{'bodyYaw':float('nan')},{'bodyRoll':True},{'bodyPitch':1001},{'deviceId':1}]:
+                payload['live']['values']=invalid
+                self.assertEqual(self.request('POST','/api/player-sync/live',json.dumps(payload),headers)[0],400)
+                self.assertEqual(self.server.live['values'],values)
+
     def test_tracking_assets_have_correct_mime_and_private_paths_stay_blocked(self):
         root=Path(self.temp.name)
         self.assertFalse(json.loads(self.request('GET','/api/tracking')[1])['camera'])
