@@ -1,10 +1,10 @@
 {
   "sampledLayouts": 1089,
-  "minimumTriangleDoubleArea": 156.9037997386974,
+  "minimumTriangleDoubleArea": 158.0580799864123,
   "pinnedVertices": 144,
   "applied": true,
   "strength": 0.75,
-  "profileSha256": "63807f30833f00c0ad5162508e31e4d323d00dfbcf6a203e1ab8f8cc4f2b9624",
+  "profileSha256": "89346b52921ad8259fbcc33cf3880c66fdb879df45da619044b271548058c63a",
   "sourceImagesChanged": false,
   "preservedRigSections": {
     "parts": true,
@@ -24,2012 +24,990 @@
   },
   "inputImagesRewritten": false,
   "previousPosesUsedAsInput": false,
-  "strengthReduction": {
-    "baselinePoseSpace": "art-directed-25-v4",
-    "currentPoseSpace": "art-directed-25-v5",
-    "strength": 0.75,
-    "rawEndpointsUnchanged": true,
-    "rawEndpointSha256": "cfef8b29d27a4ebdb42ce3812d0060299438f01d484700c8929d8617073e004f",
-    "centerUnchanged": true,
-    "maximumMasterVertexDisplacementSourcePixels": {
-      "before": 149.70448567297385,
-      "after": 112.27836425473032,
-      "ratio": 0.7499999999999996
-    },
-    "maximumLocalTranslationSourcePixels": {
-      "before": 23.259406699226016,
-      "after": 17.44455502441951,
-      "ratio": 0.75
-    },
-    "maximumLocalRotationDegrees": {
-      "before": 2,
-      "after": 1.5,
-      "ratio": 0.75
-    },
-    "maximumLocalScaleDifferenceFromCenter": {
-      "before": 0.19999999999999996,
-      "after": 0.1499999999999999,
-      "ratio": 0.7499999999999997
-    }
-  },
-  "renderedSizeComparison": {
-    "method": "Alpha > 128 bounding boxes from current JS geometry rasterized with unchanged source pixels. Head core excludes long hair tails and fixed pixels at y >= 635.",
-    "beforeScale": 0.5,
-    "afterScale": 0.5,
+  "revision": {
+    "baselinePoseSpace": "art-directed-25-v5",
+    "currentPoseSpace": "art-directed-25-v6",
+    "intent": "Keep the eyes round in every direction: no vertical eye squash on pitch, symmetric left/right foreshortening (near eye at frontal size, far eye about 85% wide), no far-eye tilt, gentler head compression looking down.",
+    "method": "Final sizes from the runtime geometry (headMapPoint, partMatrix, shared neck master mesh) at each endpoint, relative to center. Eye sizes are sclera extents through the part center.",
     "directions": {
       "up_left": {
-        "head": {
-          "before": {
-            "x": 200,
-            "y": 64,
-            "width": 772,
-            "height": 570,
-            "area": 70457
+        "before": {
+          "eye_left_sclera": {
+            "width": 0.771,
+            "height": 0.859
           },
-          "after": {
-            "x": 194,
-            "y": 50,
-            "width": 782,
-            "height": 584,
-            "area": 75123
+          "eye_right_sclera": {
+            "width": 1.049,
+            "height": 0.957
           },
-          "beforeRelativeToCenter": {
-            "width": 0.9346246973365617,
-            "height": 0.9134615384615384,
-            "area": 0.7848438265828989
+          "face_skin": {
+            "width": 0.895,
+            "height": 0.963
           },
-          "afterRelativeToCenter": {
-            "width": 0.9467312348668281,
-            "height": 0.9358974358974359,
-            "area": 0.836819943857773
-          }
+          "eye_to_mouth": 0.898
         },
-        "face": {
-          "before": {
-            "x": 326,
-            "y": 252,
-            "width": 396,
-            "height": 374,
-            "area": 20331
+        "after": {
+          "eye_left_sclera": {
+            "width": 0.845,
+            "height": 0.975
           },
-          "after": {
-            "x": 328,
-            "y": 246,
-            "width": 402,
-            "height": 382,
-            "area": 21196
+          "eye_right_sclera": {
+            "width": 1.018,
+            "height": 0.978
           },
-          "beforeRelativeToCenter": {
-            "width": 0.9166666666666666,
-            "height": 0.9396984924623115,
-            "area": 0.8478668835230827
+          "face_skin": {
+            "width": 0.91,
+            "height": 0.987
           },
-          "afterRelativeToCenter": {
-            "width": 0.9305555555555556,
-            "height": 0.9597989949748744,
-            "area": 0.88394011426665
-          }
-        },
-        "mouth": {
-          "before": {
-            "x": 438,
-            "y": 496,
-            "width": 48,
-            "height": 40,
-            "area": 369
-          },
-          "after": {
-            "x": 446,
-            "y": 506,
-            "width": 52,
-            "height": 42,
-            "area": 395
-          },
-          "beforeRelativeToCenter": {
-            "width": 0.8571428571428571,
-            "height": 0.9523809523809523,
-            "area": 0.8004338394793926
-          },
-          "afterRelativeToCenter": {
-            "width": 0.9285714285714286,
-            "height": 1,
-            "area": 0.8568329718004338
-          }
-        },
-        "eye_left_sclera": {
-          "before": {
-            "x": 338,
-            "y": 362,
-            "width": 100,
-            "height": 106,
-            "area": 1885
-          },
-          "after": {
-            "x": 336,
-            "y": 364,
-            "width": 112,
-            "height": 112,
-            "area": 2186
-          },
-          "beforeRelativeToCenter": {
-            "width": 0.704225352112676,
-            "height": 0.8153846153846154,
-            "area": 0.5746951219512195
-          },
-          "afterRelativeToCenter": {
-            "width": 0.7887323943661971,
-            "height": 0.8615384615384616,
-            "area": 0.6664634146341464
-          }
-        },
-        "eye_right_sclera": {
-          "before": {
-            "x": 502,
-            "y": 396,
-            "width": 148,
-            "height": 122,
-            "area": 3195
-          },
-          "after": {
-            "x": 518,
-            "y": 402,
-            "width": 150,
-            "height": 124,
-            "area": 3231
-          },
-          "beforeRelativeToCenter": {
-            "width": 1.0422535211267605,
-            "height": 0.953125,
-            "area": 1.0015673981191222
-          },
-          "afterRelativeToCenter": {
-            "width": 1.056338028169014,
-            "height": 0.96875,
-            "area": 1.0128526645768026
-          }
+          "eye_to_mouth": 0.962
         }
       },
       "up": {
-        "head": {
-          "before": {
-            "x": 172,
-            "y": 70,
-            "width": 836,
-            "height": 564,
-            "area": 80907
+        "before": {
+          "eye_left_sclera": {
+            "width": 1.019,
+            "height": 0.852
           },
-          "after": {
-            "x": 172,
-            "y": 56,
-            "width": 836,
-            "height": 578,
-            "area": 83234
+          "eye_right_sclera": {
+            "width": 1.019,
+            "height": 0.874
           },
-          "beforeRelativeToCenter": {
-            "width": 1.0121065375302662,
-            "height": 0.9038461538461539,
-            "area": 0.9012498329100388
+          "face_skin": {
+            "width": 1.011,
+            "height": 0.958
           },
-          "afterRelativeToCenter": {
-            "width": 1.0121065375302662,
-            "height": 0.9262820512820513,
-            "area": 0.9271710555629817
-          }
+          "eye_to_mouth": 0.947
         },
-        "face": {
-          "before": {
-            "x": 326,
-            "y": 254,
-            "width": 438,
-            "height": 372,
-            "area": 23537
+        "after": {
+          "eye_left_sclera": {
+            "width": 1.019,
+            "height": 0.956
           },
-          "after": {
-            "x": 326,
-            "y": 248,
-            "width": 436,
-            "height": 380,
-            "area": 23627
+          "eye_right_sclera": {
+            "width": 1.019,
+            "height": 0.976
           },
-          "beforeRelativeToCenter": {
-            "width": 1.0138888888888888,
-            "height": 0.9346733668341709,
-            "area": 0.981567204637391
+          "face_skin": {
+            "width": 1.011,
+            "height": 0.991
           },
-          "afterRelativeToCenter": {
-            "width": 1.0092592592592593,
-            "height": 0.9547738693467337,
-            "area": 0.9853204887609992
-          }
-        },
-        "mouth": {
-          "before": {
-            "x": 474,
-            "y": 500,
-            "width": 58,
-            "height": 46,
-            "area": 488
-          },
-          "after": {
-            "x": 474,
-            "y": 510,
-            "width": 58,
-            "height": 44,
-            "area": 483
-          },
-          "beforeRelativeToCenter": {
-            "width": 1.0357142857142858,
-            "height": 1.0952380952380953,
-            "area": 1.0585683297180044
-          },
-          "afterRelativeToCenter": {
-            "width": 1.0357142857142858,
-            "height": 1.0476190476190477,
-            "area": 1.0477223427331888
-          }
-        },
-        "eye_left_sclera": {
-          "before": {
-            "x": 334,
-            "y": 360,
-            "width": 146,
-            "height": 104,
-            "area": 2723
-          },
-          "after": {
-            "x": 334,
-            "y": 362,
-            "width": 146,
-            "height": 110,
-            "area": 2887
-          },
-          "beforeRelativeToCenter": {
-            "width": 1.028169014084507,
-            "height": 0.8,
-            "area": 0.8301829268292683
-          },
-          "afterRelativeToCenter": {
-            "width": 1.028169014084507,
-            "height": 0.8461538461538461,
-            "area": 0.8801829268292682
-          }
-        },
-        "eye_right_sclera": {
-          "before": {
-            "x": 572,
-            "y": 400,
-            "width": 146,
-            "height": 108,
-            "area": 2733
-          },
-          "after": {
-            "x": 572,
-            "y": 406,
-            "width": 144,
-            "height": 114,
-            "area": 2871
-          },
-          "beforeRelativeToCenter": {
-            "width": 1.028169014084507,
-            "height": 0.84375,
-            "area": 0.8567398119122257
-          },
-          "afterRelativeToCenter": {
-            "width": 1.0140845070422535,
-            "height": 0.890625,
-            "area": 0.9
-          }
+          "eye_to_mouth": 0.988
         }
       },
       "up_right": {
-        "head": {
-          "before": {
-            "x": 238,
-            "y": 36,
-            "width": 760,
-            "height": 598,
-            "area": 78153
+        "before": {
+          "eye_left_sclera": {
+            "width": 1.027,
+            "height": 0.955
           },
-          "after": {
-            "x": 224,
-            "y": 30,
-            "width": 776,
-            "height": 604,
-            "area": 80967
+          "eye_right_sclera": {
+            "width": 0.893,
+            "height": 0.896
           },
-          "beforeRelativeToCenter": {
-            "width": 0.9200968523002422,
-            "height": 0.9583333333333334,
-            "area": 0.870572116027269
+          "face_skin": {
+            "width": 0.932,
+            "height": 0.99
           },
-          "afterRelativeToCenter": {
-            "width": 0.9394673123486683,
-            "height": 0.967948717948718,
-            "area": 0.9019181927549793
-          }
+          "eye_to_mouth": 0.899
         },
-        "face": {
-          "before": {
-            "x": 380,
-            "y": 236,
-            "width": 392,
-            "height": 392,
-            "area": 22143
+        "after": {
+          "eye_left_sclera": {
+            "width": 1.009,
+            "height": 0.973
           },
-          "after": {
-            "x": 366,
-            "y": 236,
-            "width": 404,
-            "height": 392,
-            "area": 22522
+          "eye_right_sclera": {
+            "width": 0.851,
+            "height": 0.984
           },
-          "beforeRelativeToCenter": {
-            "width": 0.9074074074074074,
-            "height": 0.9849246231155779,
-            "area": 0.9234330038783936
+          "face_skin": {
+            "width": 0.91,
+            "height": 0.99
           },
-          "afterRelativeToCenter": {
-            "width": 0.9351851851851852,
-            "height": 0.9849246231155779,
-            "area": 0.9392385003544769
-          }
-        },
-        "mouth": {
-          "before": {
-            "x": 526,
-            "y": 496,
-            "width": 52,
-            "height": 44,
-            "area": 429
-          },
-          "after": {
-            "x": 512,
-            "y": 506,
-            "width": 54,
-            "height": 44,
-            "area": 440
-          },
-          "beforeRelativeToCenter": {
-            "width": 0.9285714285714286,
-            "height": 1.0476190476190477,
-            "area": 0.93058568329718
-          },
-          "afterRelativeToCenter": {
-            "width": 0.9642857142857143,
-            "height": 1.0476190476190477,
-            "area": 0.9544468546637744
-          }
-        },
-        "eye_left_sclera": {
-          "before": {
-            "x": 392,
-            "y": 350,
-            "width": 150,
-            "height": 124,
-            "area": 3238
-          },
-          "after": {
-            "x": 378,
-            "y": 356,
-            "width": 148,
-            "height": 124,
-            "area": 3268
-          },
-          "beforeRelativeToCenter": {
-            "width": 1.056338028169014,
-            "height": 0.9538461538461539,
-            "area": 0.9871951219512195
-          },
-          "afterRelativeToCenter": {
-            "width": 1.0422535211267605,
-            "height": 0.9538461538461539,
-            "area": 0.9963414634146341
-          }
-        },
-        "eye_right_sclera": {
-          "before": {
-            "x": 610,
-            "y": 404,
-            "width": 124,
-            "height": 112,
-            "area": 2394
-          },
-          "after": {
-            "x": 600,
-            "y": 410,
-            "width": 128,
-            "height": 116,
-            "area": 2591
-          },
-          "beforeRelativeToCenter": {
-            "width": 0.8732394366197183,
-            "height": 0.875,
-            "area": 0.7504702194357367
-          },
-          "afterRelativeToCenter": {
-            "width": 0.9014084507042254,
-            "height": 0.90625,
-            "area": 0.8122257053291536
-          }
+          "eye_to_mouth": 0.927
         }
       },
       "left": {
-        "head": {
-          "before": {
-            "x": 198,
-            "y": 4,
-            "width": 772,
-            "height": 630,
-            "area": 78705
+        "before": {
+          "eye_left_sclera": {
+            "width": 0.755,
+            "height": 0.972
           },
-          "after": {
-            "x": 192,
-            "y": 6,
-            "width": 782,
-            "height": 628,
-            "area": 81576
+          "eye_right_sclera": {
+            "width": 1.039,
+            "height": 1.02
           },
-          "beforeRelativeToCenter": {
-            "width": 0.9346246973365617,
-            "height": 1.0096153846153846,
-            "area": 0.8767210266007218
+          "face_skin": {
+            "width": 0.895,
+            "height": 1.004
           },
-          "afterRelativeToCenter": {
-            "width": 0.9467312348668281,
-            "height": 1.0064102564102564,
-            "area": 0.9087020451811255
-          }
+          "eye_to_mouth": 0.928
         },
-        "face": {
-          "before": {
-            "x": 324,
-            "y": 230,
-            "width": 398,
-            "height": 400,
-            "area": 20871
+        "after": {
+          "eye_left_sclera": {
+            "width": 0.841,
+            "height": 0.987
           },
-          "after": {
-            "x": 324,
-            "y": 232,
-            "width": 404,
-            "height": 398,
-            "area": 21656
+          "eye_right_sclera": {
+            "width": 1.021,
+            "height": 0.998
           },
-          "beforeRelativeToCenter": {
-            "width": 0.9212962962962963,
-            "height": 1.0050251256281406,
-            "area": 0.8703865882647316
+          "face_skin": {
+            "width": 0.91,
+            "height": 1.0
           },
-          "afterRelativeToCenter": {
-            "width": 0.9351851851851852,
-            "height": 1,
-            "area": 0.9031235664539806
-          }
-        },
-        "mouth": {
-          "before": {
-            "x": 432,
-            "y": 524,
-            "width": 48,
-            "height": 44,
-            "area": 398
-          },
-          "after": {
-            "x": 442,
-            "y": 528,
-            "width": 52,
-            "height": 42,
-            "area": 413
-          },
-          "beforeRelativeToCenter": {
-            "width": 0.8571428571428571,
-            "height": 1.0476190476190477,
-            "area": 0.8633405639913232
-          },
-          "afterRelativeToCenter": {
-            "width": 0.9285714285714286,
-            "height": 1,
-            "area": 0.89587852494577
-          }
-        },
-        "eye_left_sclera": {
-          "before": {
-            "x": 334,
-            "y": 372,
-            "width": 98,
-            "height": 126,
-            "area": 2175
-          },
-          "after": {
-            "x": 334,
-            "y": 372,
-            "width": 110,
-            "height": 126,
-            "area": 2451
-          },
-          "beforeRelativeToCenter": {
-            "width": 0.6901408450704225,
-            "height": 0.9692307692307692,
-            "area": 0.663109756097561
-          },
-          "afterRelativeToCenter": {
-            "width": 0.7746478873239436,
-            "height": 0.9692307692307692,
-            "area": 0.7472560975609757
-          }
-        },
-        "eye_right_sclera": {
-          "before": {
-            "x": 502,
-            "y": 418,
-            "width": 146,
-            "height": 134,
-            "area": 3463
-          },
-          "after": {
-            "x": 518,
-            "y": 420,
-            "width": 148,
-            "height": 132,
-            "area": 3436
-          },
-          "beforeRelativeToCenter": {
-            "width": 1.028169014084507,
-            "height": 1.046875,
-            "area": 1.0855799373040753
-          },
-          "afterRelativeToCenter": {
-            "width": 1.0422535211267605,
-            "height": 1.03125,
-            "area": 1.077115987460815
-          }
-        }
-      },
-      "center": {
-        "head": {
-          "before": {
-            "x": 178,
-            "y": 10,
-            "width": 826,
-            "height": 624,
-            "area": 89772
-          },
-          "after": {
-            "x": 178,
-            "y": 10,
-            "width": 826,
-            "height": 624,
-            "area": 89772
-          },
-          "beforeRelativeToCenter": {
-            "width": 1,
-            "height": 1,
-            "area": 1
-          },
-          "afterRelativeToCenter": {
-            "width": 1,
-            "height": 1,
-            "area": 1
-          }
-        },
-        "face": {
-          "before": {
-            "x": 328,
-            "y": 232,
-            "width": 432,
-            "height": 398,
-            "area": 23979
-          },
-          "after": {
-            "x": 328,
-            "y": 232,
-            "width": 432,
-            "height": 398,
-            "area": 23979
-          },
-          "beforeRelativeToCenter": {
-            "width": 1,
-            "height": 1,
-            "area": 1
-          },
-          "afterRelativeToCenter": {
-            "width": 1,
-            "height": 1,
-            "area": 1
-          }
-        },
-        "mouth": {
-          "before": {
-            "x": 476,
-            "y": 538,
-            "width": 56,
-            "height": 42,
-            "area": 461
-          },
-          "after": {
-            "x": 476,
-            "y": 538,
-            "width": 56,
-            "height": 42,
-            "area": 461
-          },
-          "beforeRelativeToCenter": {
-            "width": 1,
-            "height": 1,
-            "area": 1
-          },
-          "afterRelativeToCenter": {
-            "width": 1,
-            "height": 1,
-            "area": 1
-          }
-        },
-        "eye_left_sclera": {
-          "before": {
-            "x": 336,
-            "y": 372,
-            "width": 142,
-            "height": 130,
-            "area": 3280
-          },
-          "after": {
-            "x": 336,
-            "y": 372,
-            "width": 142,
-            "height": 130,
-            "area": 3280
-          },
-          "beforeRelativeToCenter": {
-            "width": 1,
-            "height": 1,
-            "area": 1
-          },
-          "afterRelativeToCenter": {
-            "width": 1,
-            "height": 1,
-            "area": 1
-          }
-        },
-        "eye_right_sclera": {
-          "before": {
-            "x": 574,
-            "y": 426,
-            "width": 142,
-            "height": 128,
-            "area": 3190
-          },
-          "after": {
-            "x": 574,
-            "y": 426,
-            "width": 142,
-            "height": 128,
-            "area": 3190
-          },
-          "beforeRelativeToCenter": {
-            "width": 1,
-            "height": 1,
-            "area": 1
-          },
-          "afterRelativeToCenter": {
-            "width": 1,
-            "height": 1,
-            "area": 1
-          }
+          "eye_to_mouth": 0.922
         }
       },
       "right": {
-        "head": {
-          "before": {
-            "x": 238,
-            "y": 10,
-            "width": 764,
-            "height": 624,
-            "area": 83089
+        "before": {
+          "eye_left_sclera": {
+            "width": 1.023,
+            "height": 1.016
           },
-          "after": {
-            "x": 222,
-            "y": 10,
-            "width": 780,
-            "height": 624,
-            "area": 84844
+          "eye_right_sclera": {
+            "width": 0.884,
+            "height": 0.926
           },
-          "beforeRelativeToCenter": {
-            "width": 0.9249394673123487,
-            "height": 1,
-            "area": 0.9255558526043756
+          "face_skin": {
+            "width": 0.94,
+            "height": 1.0
           },
-          "afterRelativeToCenter": {
-            "width": 0.9443099273607748,
-            "height": 1,
-            "area": 0.9451053780688856
-          }
+          "eye_to_mouth": 0.926
         },
-        "face": {
-          "before": {
-            "x": 380,
-            "y": 234,
-            "width": 398,
-            "height": 396,
-            "area": 22153
+        "after": {
+          "eye_left_sclera": {
+            "width": 1.012,
+            "height": 1.001
           },
-          "after": {
-            "x": 368,
-            "y": 232,
-            "width": 406,
-            "height": 398,
-            "area": 22587
+          "eye_right_sclera": {
+            "width": 0.849,
+            "height": 0.994
           },
-          "beforeRelativeToCenter": {
-            "width": 0.9212962962962963,
-            "height": 0.9949748743718593,
-            "area": 0.9238500354476834
+          "face_skin": {
+            "width": 0.91,
+            "height": 1.0
           },
-          "afterRelativeToCenter": {
-            "width": 0.9398148148148148,
-            "height": 1,
-            "area": 0.9419492055548605
-          }
-        },
-        "mouth": {
-          "before": {
-            "x": 530,
-            "y": 530,
-            "width": 52,
-            "height": 44,
-            "area": 433
-          },
-          "after": {
-            "x": 516,
-            "y": 532,
-            "width": 54,
-            "height": 44,
-            "area": 441
-          },
-          "beforeRelativeToCenter": {
-            "width": 0.9285714285714286,
-            "height": 1.0476190476190477,
-            "area": 0.9392624728850325
-          },
-          "afterRelativeToCenter": {
-            "width": 0.9642857142857143,
-            "height": 1.0476190476190477,
-            "area": 0.9566160520607375
-          }
-        },
-        "eye_left_sclera": {
-          "before": {
-            "x": 392,
-            "y": 374,
-            "width": 150,
-            "height": 132,
-            "area": 3501
-          },
-          "after": {
-            "x": 378,
-            "y": 374,
-            "width": 148,
-            "height": 132,
-            "area": 3456
-          },
-          "beforeRelativeToCenter": {
-            "width": 1.056338028169014,
-            "height": 1.0153846153846153,
-            "area": 1.0673780487804878
-          },
-          "afterRelativeToCenter": {
-            "width": 1.0422535211267605,
-            "height": 1.0153846153846153,
-            "area": 1.053658536585366
-          }
-        },
-        "eye_right_sclera": {
-          "before": {
-            "x": 616,
-            "y": 434,
-            "width": 122,
-            "height": 118,
-            "area": 2483
-          },
-          "after": {
-            "x": 606,
-            "y": 432,
-            "width": 128,
-            "height": 120,
-            "area": 2654
-          },
-          "beforeRelativeToCenter": {
-            "width": 0.8591549295774648,
-            "height": 0.921875,
-            "area": 0.7783699059561129
-          },
-          "afterRelativeToCenter": {
-            "width": 0.9014084507042254,
-            "height": 0.9375,
-            "area": 0.831974921630094
-          }
+          "eye_to_mouth": 0.933
         }
       },
       "down_left": {
-        "head": {
-          "before": {
-            "x": 202,
-            "y": 108,
-            "width": 768,
-            "height": 526,
-            "area": 64789
+        "before": {
+          "eye_left_sclera": {
+            "width": 0.749,
+            "height": 0.861
           },
-          "after": {
-            "x": 196,
-            "y": 82,
-            "width": 778,
-            "height": 552,
-            "area": 70686
+          "eye_right_sclera": {
+            "width": 1.043,
+            "height": 0.933
           },
-          "beforeRelativeToCenter": {
-            "width": 0.9297820823244553,
-            "height": 0.842948717948718,
-            "area": 0.7217060998975181
+          "face_skin": {
+            "width": 0.888,
+            "height": 0.892
           },
-          "afterRelativeToCenter": {
-            "width": 0.9418886198547215,
-            "height": 0.8846153846153846,
-            "area": 0.7873947333244219
-          }
+          "eye_to_mouth": 0.807
         },
-        "face": {
-          "before": {
-            "x": 326,
-            "y": 292,
-            "width": 394,
-            "height": 338,
-            "area": 17519
+        "after": {
+          "eye_left_sclera": {
+            "width": 0.842,
+            "height": 0.983
           },
-          "after": {
-            "x": 326,
-            "y": 278,
-            "width": 402,
-            "height": 352,
-            "area": 19012
+          "eye_right_sclera": {
+            "width": 1.02,
+            "height": 0.966
           },
-          "beforeRelativeToCenter": {
-            "width": 0.9120370370370371,
-            "height": 0.8492462311557789,
-            "area": 0.7305976062387923
+          "face_skin": {
+            "width": 0.91,
+            "height": 0.916
           },
-          "afterRelativeToCenter": {
-            "width": 0.9305555555555556,
-            "height": 0.8844221105527639,
-            "area": 0.7928604195337587
-          }
-        },
-        "mouth": {
-          "before": {
-            "x": 436,
-            "y": 534,
-            "width": 48,
-            "height": 36,
-            "area": 313
-          },
-          "after": {
-            "x": 446,
-            "y": 534,
-            "width": 50,
-            "height": 38,
-            "area": 353
-          },
-          "beforeRelativeToCenter": {
-            "width": 0.8571428571428571,
-            "height": 0.8571428571428571,
-            "area": 0.6789587852494577
-          },
-          "afterRelativeToCenter": {
-            "width": 0.8928571428571429,
-            "height": 0.9047619047619048,
-            "area": 0.7657266811279827
-          }
-        },
-        "eye_left_sclera": {
-          "before": {
-            "x": 336,
-            "y": 406,
-            "width": 98,
-            "height": 106,
-            "area": 1831
-          },
-          "after": {
-            "x": 336,
-            "y": 398,
-            "width": 108,
-            "height": 112,
-            "area": 2154
-          },
-          "beforeRelativeToCenter": {
-            "width": 0.6901408450704225,
-            "height": 0.8153846153846154,
-            "area": 0.5582317073170732
-          },
-          "afterRelativeToCenter": {
-            "width": 0.7605633802816901,
-            "height": 0.8615384615384616,
-            "area": 0.6567073170731708
-          }
-        },
-        "eye_right_sclera": {
-          "before": {
-            "x": 500,
-            "y": 442,
-            "width": 148,
-            "height": 118,
-            "area": 3072
-          },
-          "after": {
-            "x": 518,
-            "y": 438,
-            "width": 146,
-            "height": 122,
-            "area": 3126
-          },
-          "beforeRelativeToCenter": {
-            "width": 1.0422535211267605,
-            "height": 0.921875,
-            "area": 0.9630094043887147
-          },
-          "afterRelativeToCenter": {
-            "width": 1.028169014084507,
-            "height": 0.953125,
-            "area": 0.9799373040752352
-          }
+          "eye_to_mouth": 0.889
         }
       },
       "down": {
-        "head": {
-          "before": {
-            "x": 162,
-            "y": 96,
-            "width": 854,
-            "height": 538,
-            "area": 79907
+        "before": {
+          "eye_left_sclera": {
+            "width": 1.03,
+            "height": 0.922
           },
-          "after": {
-            "x": 166,
-            "y": 74,
-            "width": 846,
-            "height": 560,
-            "area": 82525
+          "eye_right_sclera": {
+            "width": 1.03,
+            "height": 0.914
           },
-          "beforeRelativeToCenter": {
-            "width": 1.0338983050847457,
-            "height": 0.8621794871794872,
-            "area": 0.8901105021610302
+          "face_skin": {
+            "width": 1.03,
+            "height": 0.903
           },
-          "afterRelativeToCenter": {
-            "width": 1.0242130750605327,
-            "height": 0.8974358974358975,
-            "area": 0.9192732700619347
-          }
+          "eye_to_mouth": 0.809
         },
-        "face": {
-          "before": {
-            "x": 320,
-            "y": 286,
-            "width": 448,
-            "height": 344,
-            "area": 21447
+        "after": {
+          "eye_left_sclera": {
+            "width": 1.03,
+            "height": 0.977
           },
-          "after": {
-            "x": 322,
-            "y": 272,
-            "width": 444,
-            "height": 358,
-            "area": 22076
+          "eye_right_sclera": {
+            "width": 1.03,
+            "height": 0.967
           },
-          "beforeRelativeToCenter": {
-            "width": 1.037037037037037,
-            "height": 0.864321608040201,
-            "area": 0.8944076066558239
+          "face_skin": {
+            "width": 1.03,
+            "height": 0.919
           },
-          "afterRelativeToCenter": {
-            "width": 1.0277777777777777,
-            "height": 0.8994974874371859,
-            "area": 0.920638892364152
-          }
-        },
-        "mouth": {
-          "before": {
-            "x": 472,
-            "y": 534,
-            "width": 60,
-            "height": 34,
-            "area": 402
-          },
-          "after": {
-            "x": 472,
-            "y": 534,
-            "width": 60,
-            "height": 38,
-            "area": 424
-          },
-          "beforeRelativeToCenter": {
-            "width": 1.0714285714285714,
-            "height": 0.8095238095238095,
-            "area": 0.8720173535791758
-          },
-          "afterRelativeToCenter": {
-            "width": 1.0714285714285714,
-            "height": 0.9047619047619048,
-            "area": 0.9197396963123644
-          }
-        },
-        "eye_left_sclera": {
-          "before": {
-            "x": 326,
-            "y": 398,
-            "width": 150,
-            "height": 116,
-            "area": 3095
-          },
-          "after": {
-            "x": 328,
-            "y": 392,
-            "width": 150,
-            "height": 120,
-            "area": 3166
-          },
-          "beforeRelativeToCenter": {
-            "width": 1.056338028169014,
-            "height": 0.8923076923076924,
-            "area": 0.9435975609756098
-          },
-          "afterRelativeToCenter": {
-            "width": 1.056338028169014,
-            "height": 0.9230769230769231,
-            "area": 0.9652439024390244
-          }
-        },
-        "eye_right_sclera": {
-          "before": {
-            "x": 576,
-            "y": 444,
-            "width": 146,
-            "height": 116,
-            "area": 2975
-          },
-          "after": {
-            "x": 574,
-            "y": 440,
-            "width": 148,
-            "height": 118,
-            "area": 3055
-          },
-          "beforeRelativeToCenter": {
-            "width": 1.028169014084507,
-            "height": 0.90625,
-            "area": 0.932601880877743
-          },
-          "afterRelativeToCenter": {
-            "width": 1.0422535211267605,
-            "height": 0.921875,
-            "area": 0.957680250783699
-          }
+          "eye_to_mouth": 0.882
         }
       },
       "down_right": {
-        "head": {
-          "before": {
-            "x": 242,
-            "y": 76,
-            "width": 758,
-            "height": 558,
-            "area": 73387
+        "before": {
+          "eye_left_sclera": {
+            "width": 1.029,
+            "height": 0.95
           },
-          "after": {
-            "x": 226,
-            "y": 58,
-            "width": 776,
-            "height": 576,
-            "area": 77410
+          "eye_right_sclera": {
+            "width": 0.891,
+            "height": 0.874
           },
-          "beforeRelativeToCenter": {
-            "width": 0.9176755447941889,
-            "height": 0.8942307692307693,
-            "area": 0.817482065677494
+          "face_skin": {
+            "width": 0.932,
+            "height": 0.919
           },
-          "afterRelativeToCenter": {
-            "width": 0.9394673123486683,
-            "height": 0.9230769230769231,
-            "area": 0.8622955932807557
-          }
+          "eye_to_mouth": 0.844
         },
-        "face": {
-          "before": {
-            "x": 382,
-            "y": 278,
-            "width": 394,
-            "height": 352,
-            "area": 19391
+        "after": {
+          "eye_left_sclera": {
+            "width": 1.011,
+            "height": 0.978
           },
-          "after": {
-            "x": 370,
-            "y": 266,
-            "width": 402,
-            "height": 364,
-            "area": 20467
+          "eye_right_sclera": {
+            "width": 0.85,
+            "height": 0.972
           },
-          "beforeRelativeToCenter": {
-            "width": 0.9120370370370371,
-            "height": 0.8844221105527639,
-            "area": 0.808665916009842
+          "face_skin": {
+            "width": 0.91,
+            "height": 0.911
           },
-          "afterRelativeToCenter": {
-            "width": 0.9305555555555556,
-            "height": 0.914572864321608,
-            "area": 0.8535385128654239
-          }
-        },
-        "mouth": {
-          "before": {
-            "x": 528,
-            "y": 540,
-            "width": 52,
-            "height": 38,
-            "area": 378
-          },
-          "after": {
-            "x": 514,
-            "y": 540,
-            "width": 54,
-            "height": 38,
-            "area": 403
-          },
-          "beforeRelativeToCenter": {
-            "width": 0.9285714285714286,
-            "height": 0.9047619047619048,
-            "area": 0.8199566160520607
-          },
-          "afterRelativeToCenter": {
-            "width": 0.9642857142857143,
-            "height": 0.9047619047619048,
-            "area": 0.8741865509761388
-          }
-        },
-        "eye_left_sclera": {
-          "before": {
-            "x": 396,
-            "y": 400,
-            "width": 148,
-            "height": 120,
-            "area": 3217
-          },
-          "after": {
-            "x": 380,
-            "y": 392,
-            "width": 148,
-            "height": 124,
-            "area": 3268
-          },
-          "beforeRelativeToCenter": {
-            "width": 1.0422535211267605,
-            "height": 0.9230769230769231,
-            "area": 0.9807926829268293
-          },
-          "afterRelativeToCenter": {
-            "width": 1.0422535211267605,
-            "height": 0.9538461538461539,
-            "area": 0.9963414634146341
-          }
-        },
-        "eye_right_sclera": {
-          "before": {
-            "x": 614,
-            "y": 454,
-            "width": 124,
-            "height": 108,
-            "area": 2318
-          },
-          "after": {
-            "x": 604,
-            "y": 446,
-            "width": 130,
-            "height": 114,
-            "area": 2536
-          },
-          "beforeRelativeToCenter": {
-            "width": 0.8732394366197183,
-            "height": 0.84375,
-            "area": 0.7266457680250784
-          },
-          "afterRelativeToCenter": {
-            "width": 0.9154929577464789,
-            "height": 0.890625,
-            "area": 0.7949843260188088
-          }
+          "eye_to_mouth": 0.878
         }
       }
     }
   },
-  "maximumRenderedSizeDifferenceFromCenter": {
-    "head": {
-      "widthBefore": 0.08232445520581111,
-      "widthAfter": 0.060532687651331685,
-      "heightBefore": 0.15705128205128205,
-      "heightAfter": 0.11538461538461542
-    },
-    "face": {
-      "widthBefore": 0.09259259259259256,
-      "widthAfter": 0.06944444444444442,
-      "heightBefore": 0.1507537688442211,
-      "heightAfter": 0.11557788944723613
-    },
-    "eye_left_sclera": {
-      "widthBefore": 0.3098591549295775,
-      "widthAfter": 0.23943661971830987,
-      "heightBefore": 0.19999999999999996,
-      "heightAfter": 0.15384615384615385
-    },
-    "eye_right_sclera": {
-      "widthBefore": 0.14084507042253525,
-      "widthAfter": 0.09859154929577463,
-      "heightBefore": 0.15625,
-      "heightAfter": 0.109375
-    }
-  },
-  "eyeLayoutMetrics": {
+  "renderedSizes": {
     "up_left": {
       "eye_left_sclera": {
-        "outer_margin_source_px": 6,
-        "area": 2186,
-        "outside_face": 0,
-        "outside_fraction": 0,
+        "outer_margin_source_px": -2.0,
+        "area": 2740,
+        "outside_face": 2,
+        "outside_fraction": 0.00072992700729927,
         "bounds_source_px": {
-          "x": 336,
-          "y": 364,
-          "width": 112,
-          "height": 112,
-          "area": 2186
+          "x": 330.0,
+          "y": 354.0,
+          "width": 120.0,
+          "height": 126.0,
+          "area": 2740
         },
         "relative_to_center": {
-          "width": 0.7887323943661971,
-          "height": 0.8615384615384616,
-          "area": 0.6664634146341464
+          "width": 0.8450704225352113,
+          "height": 0.9692307692307692,
+          "area": 0.8353658536585366
         }
       },
       "eye_right_sclera": {
-        "outer_margin_source_px": -2,
+        "outer_margin_source_px": 4.0,
         "area": 3231,
-        "outside_face": 15,
-        "outside_fraction": 0.004642525533890436,
+        "outside_face": 10,
+        "outside_fraction": 0.0030950170225936243,
         "bounds_source_px": {
-          "x": 518,
-          "y": 402,
-          "width": 150,
-          "height": 124,
+          "x": 522.0,
+          "y": 402.0,
+          "width": 144.0,
+          "height": 128.0,
           "area": 3231
         },
         "relative_to_center": {
-          "width": 1.056338028169014,
-          "height": 0.96875,
+          "width": 1.0140845070422535,
+          "height": 1.0,
           "area": 1.0128526645768026
         }
       },
       "head": {
         "bounds_source_px": {
-          "x": 194,
-          "y": 50,
-          "width": 782,
-          "height": 584,
-          "area": 75123
+          "x": 190.0,
+          "y": 30.0,
+          "width": 786.0,
+          "height": 604.0,
+          "area": 79011
         },
         "relative_to_center": {
-          "width": 0.9467312348668281,
-          "height": 0.9358974358974359,
-          "area": 0.836819943857773
+          "width": 0.9515738498789347,
+          "height": 0.967948717948718,
+          "area": 0.8801296618099185
         }
       },
       "face": {
         "bounds_source_px": {
-          "x": 328,
-          "y": 246,
-          "width": 402,
-          "height": 382,
-          "area": 21196
+          "x": 324.0,
+          "y": 238.0,
+          "width": 408.0,
+          "height": 390.0,
+          "area": 21915
         },
         "relative_to_center": {
-          "width": 0.9305555555555556,
-          "height": 0.9597989949748744,
-          "area": 0.88394011426665
+          "width": 0.9444444444444444,
+          "height": 0.9798994974874372,
+          "area": 0.9139246840985863
         }
       },
       "mouth": {
         "bounds_source_px": {
-          "x": 446,
-          "y": 506,
-          "width": 52,
-          "height": 42,
-          "area": 395
+          "x": 446.0,
+          "y": 512.0,
+          "width": 52.0,
+          "height": 42.0,
+          "area": 421
         },
         "relative_to_center": {
           "width": 0.9285714285714286,
-          "height": 1,
-          "area": 0.8568329718004338
+          "height": 1.0,
+          "area": 0.913232104121475
         }
       }
     },
     "up": {
       "eye_left_sclera": {
-        "outer_margin_source_px": 6,
-        "area": 2887,
-        "outside_face": 0,
-        "outside_fraction": 0,
+        "outer_margin_source_px": -2.0,
+        "area": 3238,
+        "outside_face": 1,
+        "outside_fraction": 0.00030883261272390367,
         "bounds_source_px": {
-          "x": 334,
-          "y": 362,
-          "width": 146,
-          "height": 110,
-          "area": 2887
+          "x": 334.0,
+          "y": 354.0,
+          "width": 146.0,
+          "height": 124.0,
+          "area": 3238
         },
         "relative_to_center": {
           "width": 1.028169014084507,
-          "height": 0.8461538461538461,
-          "area": 0.8801829268292682
+          "height": 0.9538461538461539,
+          "area": 0.9871951219512195
         }
       },
       "eye_right_sclera": {
-        "outer_margin_source_px": -2,
-        "area": 2871,
-        "outside_face": 1,
-        "outside_fraction": 0.00034831069313827936,
+        "outer_margin_source_px": -6.0,
+        "area": 3210,
+        "outside_face": 4,
+        "outside_fraction": 0.0012461059190031153,
         "bounds_source_px": {
-          "x": 572,
-          "y": 406,
-          "width": 144,
-          "height": 114,
-          "area": 2871
+          "x": 572.0,
+          "y": 400.0,
+          "width": 144.0,
+          "height": 128.0,
+          "area": 3210
         },
         "relative_to_center": {
           "width": 1.0140845070422535,
-          "height": 0.890625,
-          "area": 0.9
+          "height": 1.0,
+          "area": 1.006269592476489
         }
       },
       "head": {
         "bounds_source_px": {
-          "x": 172,
-          "y": 56,
-          "width": 836,
-          "height": 578,
-          "area": 83234
+          "x": 172.0,
+          "y": 30.0,
+          "width": 836.0,
+          "height": 604.0,
+          "area": 87347
         },
         "relative_to_center": {
           "width": 1.0121065375302662,
-          "height": 0.9262820512820513,
-          "area": 0.9271710555629817
+          "height": 0.967948717948718,
+          "area": 0.9729871229336542
         }
       },
       "face": {
         "bounds_source_px": {
-          "x": 326,
-          "y": 248,
-          "width": 436,
-          "height": 380,
-          "area": 23627
+          "x": 326.0,
+          "y": 236.0,
+          "width": 436.0,
+          "height": 392.0,
+          "area": 24294
         },
         "relative_to_center": {
           "width": 1.0092592592592593,
-          "height": 0.9547738693467337,
-          "area": 0.9853204887609992
+          "height": 0.9849246231155779,
+          "area": 1.0131364944326287
         }
       },
       "mouth": {
         "bounds_source_px": {
-          "x": 474,
-          "y": 510,
-          "width": 58,
-          "height": 44,
-          "area": 483
+          "x": 474.0,
+          "y": 512.0,
+          "width": 58.0,
+          "height": 44.0,
+          "area": 486
         },
         "relative_to_center": {
           "width": 1.0357142857142858,
           "height": 1.0476190476190477,
-          "area": 1.0477223427331888
+          "area": 1.054229934924078
         }
       }
     },
     "up_right": {
       "eye_left_sclera": {
-        "outer_margin_source_px": 4,
-        "area": 3268,
+        "outer_margin_source_px": 4.0,
+        "area": 3266,
         "outside_face": 0,
-        "outside_fraction": 0,
+        "outside_fraction": 0.0,
         "bounds_source_px": {
-          "x": 378,
-          "y": 356,
-          "width": 148,
-          "height": 124,
-          "area": 3268
+          "x": 382.0,
+          "y": 354.0,
+          "width": 146.0,
+          "height": 126.0,
+          "area": 3266
         },
         "relative_to_center": {
-          "width": 1.0422535211267605,
-          "height": 0.9538461538461539,
-          "area": 0.9963414634146341
+          "width": 1.028169014084507,
+          "height": 0.9692307692307692,
+          "area": 0.9957317073170732
         }
       },
       "eye_right_sclera": {
-        "outer_margin_source_px": 2,
-        "area": 2591,
-        "outside_face": 0,
-        "outside_fraction": 0,
+        "outer_margin_source_px": -6.0,
+        "area": 2706,
+        "outside_face": 4,
+        "outside_fraction": 0.0014781966001478197,
         "bounds_source_px": {
-          "x": 600,
-          "y": 410,
-          "width": 128,
-          "height": 116,
-          "area": 2591
+          "x": 602.0,
+          "y": 402.0,
+          "width": 122.0,
+          "height": 128.0,
+          "area": 2706
         },
         "relative_to_center": {
-          "width": 0.9014084507042254,
-          "height": 0.90625,
-          "area": 0.8122257053291536
+          "width": 0.8591549295774648,
+          "height": 1.0,
+          "area": 0.8482758620689655
         }
       },
       "head": {
         "bounds_source_px": {
-          "x": 224,
-          "y": 30,
-          "width": 776,
-          "height": 604,
-          "area": 80967
+          "x": 232.0,
+          "y": 30.0,
+          "width": 762.0,
+          "height": 604.0,
+          "area": 79131
         },
         "relative_to_center": {
-          "width": 0.9394673123486683,
+          "width": 0.9225181598062954,
           "height": 0.967948717948718,
-          "area": 0.9019181927549793
+          "area": 0.8814663814997995
         }
       },
       "face": {
         "bounds_source_px": {
-          "x": 366,
-          "y": 236,
-          "width": 404,
-          "height": 392,
-          "area": 22522
+          "x": 372.0,
+          "y": 236.0,
+          "width": 392.0,
+          "height": 392.0,
+          "area": 22031
         },
         "relative_to_center": {
-          "width": 0.9351851851851852,
+          "width": 0.9074074074074074,
           "height": 0.9849246231155779,
-          "area": 0.9392385003544769
+          "area": 0.9187622503023479
         }
       },
       "mouth": {
         "bounds_source_px": {
-          "x": 512,
-          "y": 506,
-          "width": 54,
-          "height": 44,
-          "area": 440
+          "x": 514.0,
+          "y": 508.0,
+          "width": 52.0,
+          "height": 42.0,
+          "area": 422
         },
         "relative_to_center": {
-          "width": 0.9642857142857143,
-          "height": 1.0476190476190477,
-          "area": 0.9544468546637744
+          "width": 0.9285714285714286,
+          "height": 1.0,
+          "area": 0.9154013015184381
         }
       }
     },
     "left": {
       "eye_left_sclera": {
-        "outer_margin_source_px": 8,
-        "area": 2451,
+        "outer_margin_source_px": 4.0,
+        "area": 2759,
         "outside_face": 0,
-        "outside_fraction": 0,
+        "outside_fraction": 0.0,
         "bounds_source_px": {
-          "x": 334,
-          "y": 372,
-          "width": 110,
-          "height": 126,
-          "area": 2451
+          "x": 326.0,
+          "y": 370.0,
+          "width": 122.0,
+          "height": 130.0,
+          "area": 2759
         },
         "relative_to_center": {
-          "width": 0.7746478873239436,
-          "height": 0.9692307692307692,
-          "area": 0.7472560975609757
+          "width": 0.8591549295774648,
+          "height": 1.0,
+          "area": 0.8411585365853659
         }
       },
       "eye_right_sclera": {
-        "outer_margin_source_px": 8,
-        "area": 3436,
-        "outside_face": 1,
-        "outside_fraction": 0.0002910360884749709,
+        "outer_margin_source_px": 10.0,
+        "area": 3305,
+        "outside_face": 0,
+        "outside_fraction": 0.0,
         "bounds_source_px": {
-          "x": 518,
-          "y": 420,
-          "width": 148,
-          "height": 132,
-          "area": 3436
+          "x": 522.0,
+          "y": 422.0,
+          "width": 144.0,
+          "height": 130.0,
+          "area": 3305
         },
         "relative_to_center": {
-          "width": 1.0422535211267605,
-          "height": 1.03125,
-          "area": 1.077115987460815
+          "width": 1.0140845070422535,
+          "height": 1.015625,
+          "area": 1.036050156739812
         }
       },
       "head": {
         "bounds_source_px": {
-          "x": 192,
-          "y": 6,
-          "width": 782,
-          "height": 628,
-          "area": 81576
+          "x": 186.0,
+          "y": 10.0,
+          "width": 790.0,
+          "height": 624.0,
+          "area": 82270
         },
         "relative_to_center": {
-          "width": 0.9467312348668281,
-          "height": 1.0064102564102564,
-          "area": 0.9087020451811255
+          "width": 0.9564164648910412,
+          "height": 1.0,
+          "area": 0.9164327407209375
         }
       },
       "face": {
         "bounds_source_px": {
-          "x": 324,
-          "y": 232,
-          "width": 404,
-          "height": 398,
-          "area": 21656
+          "x": 322.0,
+          "y": 232.0,
+          "width": 408.0,
+          "height": 398.0,
+          "area": 21889
         },
         "relative_to_center": {
-          "width": 0.9351851851851852,
-          "height": 1,
-          "area": 0.9031235664539806
+          "width": 0.9444444444444444,
+          "height": 1.0,
+          "area": 0.9128404020184328
         }
       },
       "mouth": {
         "bounds_source_px": {
-          "x": 442,
-          "y": 528,
-          "width": 52,
-          "height": 42,
-          "area": 413
+          "x": 442.0,
+          "y": 526.0,
+          "width": 52.0,
+          "height": 44.0,
+          "area": 420
         },
         "relative_to_center": {
           "width": 0.9285714285714286,
-          "height": 1,
-          "area": 0.89587852494577
+          "height": 1.0476190476190477,
+          "area": 0.911062906724512
         }
       }
     },
     "center": {
       "eye_left_sclera": {
-        "outer_margin_source_px": 6,
+        "outer_margin_source_px": 6.0,
         "area": 3280,
         "outside_face": 0,
-        "outside_fraction": 0,
+        "outside_fraction": 0.0,
         "bounds_source_px": {
-          "x": 336,
-          "y": 372,
-          "width": 142,
-          "height": 130,
+          "x": 336.0,
+          "y": 372.0,
+          "width": 142.0,
+          "height": 130.0,
           "area": 3280
         },
         "relative_to_center": {
-          "width": 1,
-          "height": 1,
-          "area": 1
+          "width": 1.0,
+          "height": 1.0,
+          "area": 1.0
         }
       },
       "eye_right_sclera": {
-        "outer_margin_source_px": 6,
+        "outer_margin_source_px": 6.0,
         "area": 3190,
         "outside_face": 0,
-        "outside_fraction": 0,
+        "outside_fraction": 0.0,
         "bounds_source_px": {
-          "x": 574,
-          "y": 426,
-          "width": 142,
-          "height": 128,
+          "x": 574.0,
+          "y": 426.0,
+          "width": 142.0,
+          "height": 128.0,
           "area": 3190
         },
         "relative_to_center": {
-          "width": 1,
-          "height": 1,
-          "area": 1
+          "width": 1.0,
+          "height": 1.0,
+          "area": 1.0
         }
       },
       "head": {
         "bounds_source_px": {
-          "x": 178,
-          "y": 10,
-          "width": 826,
-          "height": 624,
+          "x": 178.0,
+          "y": 10.0,
+          "width": 826.0,
+          "height": 624.0,
           "area": 89772
         },
         "relative_to_center": {
-          "width": 1,
-          "height": 1,
-          "area": 1
+          "width": 1.0,
+          "height": 1.0,
+          "area": 1.0
         }
       },
       "face": {
         "bounds_source_px": {
-          "x": 328,
-          "y": 232,
-          "width": 432,
-          "height": 398,
+          "x": 328.0,
+          "y": 232.0,
+          "width": 432.0,
+          "height": 398.0,
           "area": 23979
         },
         "relative_to_center": {
-          "width": 1,
-          "height": 1,
-          "area": 1
+          "width": 1.0,
+          "height": 1.0,
+          "area": 1.0
         }
       },
       "mouth": {
         "bounds_source_px": {
-          "x": 476,
-          "y": 538,
-          "width": 56,
-          "height": 42,
+          "x": 476.0,
+          "y": 538.0,
+          "width": 56.0,
+          "height": 42.0,
           "area": 461
         },
         "relative_to_center": {
-          "width": 1,
-          "height": 1,
-          "area": 1
+          "width": 1.0,
+          "height": 1.0,
+          "area": 1.0
         }
       }
     },
     "right": {
       "eye_left_sclera": {
-        "outer_margin_source_px": 10,
-        "area": 3456,
+        "outer_margin_source_px": 8.0,
+        "area": 3374,
         "outside_face": 0,
-        "outside_fraction": 0,
+        "outside_fraction": 0.0,
         "bounds_source_px": {
-          "x": 378,
-          "y": 374,
-          "width": 148,
-          "height": 132,
-          "area": 3456
+          "x": 382.0,
+          "y": 374.0,
+          "width": 146.0,
+          "height": 130.0,
+          "area": 3374
         },
         "relative_to_center": {
-          "width": 1.0422535211267605,
-          "height": 1.0153846153846153,
-          "area": 1.053658536585366
+          "width": 1.028169014084507,
+          "height": 1.0,
+          "area": 1.0286585365853658
         }
       },
       "eye_right_sclera": {
-        "outer_margin_source_px": 4,
-        "area": 2654,
+        "outer_margin_source_px": 6.0,
+        "area": 2749,
         "outside_face": 0,
-        "outside_fraction": 0,
+        "outside_fraction": 0.0,
         "bounds_source_px": {
-          "x": 606,
-          "y": 432,
-          "width": 128,
-          "height": 120,
-          "area": 2654
+          "x": 606.0,
+          "y": 426.0,
+          "width": 122.0,
+          "height": 130.0,
+          "area": 2749
         },
         "relative_to_center": {
-          "width": 0.9014084507042254,
-          "height": 0.9375,
-          "area": 0.831974921630094
+          "width": 0.8591549295774648,
+          "height": 1.015625,
+          "area": 0.8617554858934169
         }
       },
       "head": {
         "bounds_source_px": {
-          "x": 222,
-          "y": 10,
-          "width": 780,
-          "height": 624,
-          "area": 84844
+          "x": 234.0,
+          "y": 10.0,
+          "width": 762.0,
+          "height": 624.0,
+          "area": 82250
         },
         "relative_to_center": {
-          "width": 0.9443099273607748,
-          "height": 1,
-          "area": 0.9451053780688856
+          "width": 0.9225181598062954,
+          "height": 1.0,
+          "area": 0.9162099541059573
         }
       },
       "face": {
         "bounds_source_px": {
-          "x": 368,
-          "y": 232,
-          "width": 406,
-          "height": 398,
-          "area": 22587
+          "x": 374.0,
+          "y": 232.0,
+          "width": 392.0,
+          "height": 398.0,
+          "area": 21952
         },
         "relative_to_center": {
-          "width": 0.9398148148148148,
-          "height": 1,
-          "area": 0.9419492055548605
+          "width": 0.9074074074074074,
+          "height": 1.0,
+          "area": 0.9154677009049585
         }
       },
       "mouth": {
         "bounds_source_px": {
-          "x": 516,
-          "y": 532,
-          "width": 54,
-          "height": 44,
-          "area": 441
+          "x": 518.0,
+          "y": 532.0,
+          "width": 52.0,
+          "height": 44.0,
+          "area": 430
         },
         "relative_to_center": {
-          "width": 0.9642857142857143,
+          "width": 0.9285714285714286,
           "height": 1.0476190476190477,
-          "area": 0.9566160520607375
+          "area": 0.9327548806941431
         }
       }
     },
     "down_left": {
       "eye_left_sclera": {
-        "outer_margin_source_px": 6,
-        "area": 2154,
+        "outer_margin_source_px": 4.0,
+        "area": 2764,
         "outside_face": 0,
-        "outside_fraction": 0,
+        "outside_fraction": 0.0,
         "bounds_source_px": {
-          "x": 336,
-          "y": 398,
-          "width": 108,
-          "height": 112,
-          "area": 2154
+          "x": 326.0,
+          "y": 388.0,
+          "width": 122.0,
+          "height": 128.0,
+          "area": 2764
         },
         "relative_to_center": {
-          "width": 0.7605633802816901,
-          "height": 0.8615384615384616,
-          "area": 0.6567073170731708
+          "width": 0.8591549295774648,
+          "height": 0.9846153846153847,
+          "area": 0.8426829268292683
         }
       },
       "eye_right_sclera": {
-        "outer_margin_source_px": 10,
-        "area": 3126,
+        "outer_margin_source_px": 14.0,
+        "area": 3185,
         "outside_face": 5,
-        "outside_fraction": 0.001599488163787588,
+        "outside_fraction": 0.0015698587127158557,
         "bounds_source_px": {
-          "x": 518,
-          "y": 438,
-          "width": 146,
-          "height": 122,
-          "area": 3126
+          "x": 520.0,
+          "y": 438.0,
+          "width": 144.0,
+          "height": 126.0,
+          "area": 3185
         },
         "relative_to_center": {
-          "width": 1.028169014084507,
-          "height": 0.953125,
-          "area": 0.9799373040752352
+          "width": 1.0140845070422535,
+          "height": 0.984375,
+          "area": 0.9984326018808778
         }
       },
       "head": {
         "bounds_source_px": {
-          "x": 196,
-          "y": 82,
-          "width": 778,
-          "height": 552,
-          "area": 70686
+          "x": 186.0,
+          "y": 64.0,
+          "width": 790.0,
+          "height": 570.0,
+          "area": 75161
         },
         "relative_to_center": {
-          "width": 0.9418886198547215,
-          "height": 0.8846153846153846,
-          "area": 0.7873947333244219
+          "width": 0.9564164648910412,
+          "height": 0.9134615384615384,
+          "area": 0.8372432384262354
         }
       },
       "face": {
         "bounds_source_px": {
-          "x": 326,
-          "y": 278,
-          "width": 402,
-          "height": 352,
-          "area": 19012
+          "x": 322.0,
+          "y": 268.0,
+          "width": 408.0,
+          "height": 362.0,
+          "area": 19911
         },
         "relative_to_center": {
-          "width": 0.9305555555555556,
-          "height": 0.8844221105527639,
-          "area": 0.7928604195337587
+          "width": 0.9444444444444444,
+          "height": 0.9095477386934674,
+          "area": 0.8303515576129114
         }
       },
       "mouth": {
         "bounds_source_px": {
-          "x": 446,
-          "y": 534,
-          "width": 50,
-          "height": 38,
-          "area": 353
+          "x": 444.0,
+          "y": 542.0,
+          "width": 52.0,
+          "height": 38.0,
+          "area": 379
         },
         "relative_to_center": {
-          "width": 0.8928571428571429,
+          "width": 0.9285714285714286,
           "height": 0.9047619047619048,
-          "area": 0.7657266811279827
+          "area": 0.8221258134490239
         }
       }
     },
     "down": {
       "eye_left_sclera": {
-        "outer_margin_source_px": 6,
-        "area": 3166,
+        "outer_margin_source_px": 6.0,
+        "area": 3359,
         "outside_face": 0,
-        "outside_fraction": 0,
+        "outside_fraction": 0.0,
         "bounds_source_px": {
-          "x": 328,
-          "y": 392,
-          "width": 150,
-          "height": 120,
-          "area": 3166
+          "x": 328.0,
+          "y": 388.0,
+          "width": 150.0,
+          "height": 126.0,
+          "area": 3359
         },
         "relative_to_center": {
           "width": 1.056338028169014,
-          "height": 0.9230769230769231,
-          "area": 0.9652439024390244
+          "height": 0.9692307692307692,
+          "area": 1.0240853658536586
         }
       },
       "eye_right_sclera": {
-        "outer_margin_source_px": 6,
-        "area": 3055,
+        "outer_margin_source_px": 6.0,
+        "area": 3241,
         "outside_face": 0,
-        "outside_fraction": 0,
+        "outside_fraction": 0.0,
         "bounds_source_px": {
-          "x": 574,
-          "y": 440,
-          "width": 148,
-          "height": 118,
-          "area": 3055
+          "x": 574.0,
+          "y": 436.0,
+          "width": 148.0,
+          "height": 126.0,
+          "area": 3241
         },
         "relative_to_center": {
           "width": 1.0422535211267605,
-          "height": 0.921875,
-          "area": 0.957680250783699
+          "height": 0.984375,
+          "area": 1.015987460815047
         }
       },
       "head": {
         "bounds_source_px": {
-          "x": 166,
-          "y": 74,
-          "width": 846,
-          "height": 560,
-          "area": 82525
+          "x": 166.0,
+          "y": 62.0,
+          "width": 846.0,
+          "height": 572.0,
+          "area": 84645
         },
         "relative_to_center": {
           "width": 1.0242130750605327,
-          "height": 0.8974358974358975,
-          "area": 0.9192732700619347
+          "height": 0.9166666666666666,
+          "area": 0.9428886512498329
         }
       },
       "face": {
         "bounds_source_px": {
-          "x": 322,
-          "y": 272,
-          "width": 444,
-          "height": 358,
-          "area": 22076
+          "x": 322.0,
+          "y": 266.0,
+          "width": 444.0,
+          "height": 364.0,
+          "area": 22373
         },
         "relative_to_center": {
           "width": 1.0277777777777777,
-          "height": 0.8994974874371859,
-          "area": 0.920638892364152
+          "height": 0.914572864321608,
+          "area": 0.9330247299720589
         }
       },
       "mouth": {
         "bounds_source_px": {
-          "x": 472,
-          "y": 534,
-          "width": 60,
-          "height": 38,
-          "area": 424
+          "x": 472.0,
+          "y": 540.0,
+          "width": 60.0,
+          "height": 38.0,
+          "area": 430
         },
         "relative_to_center": {
           "width": 1.0714285714285714,
           "height": 0.9047619047619048,
-          "area": 0.9197396963123644
+          "area": 0.9327548806941431
         }
       }
     },
     "down_right": {
       "eye_left_sclera": {
-        "outer_margin_source_px": 10,
-        "area": 3268,
+        "outer_margin_source_px": 10.0,
+        "area": 3296,
         "outside_face": 0,
-        "outside_fraction": 0,
+        "outside_fraction": 0.0,
         "bounds_source_px": {
-          "x": 380,
-          "y": 392,
-          "width": 148,
-          "height": 124,
-          "area": 3268
+          "x": 384.0,
+          "y": 390.0,
+          "width": 146.0,
+          "height": 126.0,
+          "area": 3296
         },
         "relative_to_center": {
-          "width": 1.0422535211267605,
-          "height": 0.9538461538461539,
-          "area": 0.9963414634146341
+          "width": 1.028169014084507,
+          "height": 0.9692307692307692,
+          "area": 1.0048780487804878
         }
       },
       "eye_right_sclera": {
-        "outer_margin_source_px": 4,
-        "area": 2536,
+        "outer_margin_source_px": 6.0,
+        "area": 2680,
         "outside_face": 0,
-        "outside_fraction": 0,
+        "outside_fraction": 0.0,
         "bounds_source_px": {
-          "x": 604,
-          "y": 446,
-          "width": 130,
-          "height": 114,
-          "area": 2536
+          "x": 606.0,
+          "y": 436.0,
+          "width": 122.0,
+          "height": 126.0,
+          "area": 2680
         },
         "relative_to_center": {
-          "width": 0.9154929577464789,
-          "height": 0.890625,
-          "area": 0.7949843260188088
+          "width": 0.8591549295774648,
+          "height": 0.984375,
+          "area": 0.8401253918495298
         }
       },
       "head": {
         "bounds_source_px": {
-          "x": 226,
-          "y": 58,
-          "width": 776,
-          "height": 576,
-          "area": 77410
+          "x": 234.0,
+          "y": 66.0,
+          "width": 762.0,
+          "height": 568.0,
+          "area": 74667
         },
         "relative_to_center": {
-          "width": 0.9394673123486683,
-          "height": 0.9230769230769231,
-          "area": 0.8622955932807557
+          "width": 0.9225181598062954,
+          "height": 0.9102564102564102,
+          "area": 0.8317404090362251
         }
       },
       "face": {
         "bounds_source_px": {
-          "x": 370,
-          "y": 266,
-          "width": 402,
-          "height": 364,
-          "area": 20467
+          "x": 374.0,
+          "y": 270.0,
+          "width": 392.0,
+          "height": 360.0,
+          "area": 19917
         },
         "relative_to_center": {
-          "width": 0.9305555555555556,
-          "height": 0.914572864321608,
-          "area": 0.8535385128654239
+          "width": 0.9074074074074074,
+          "height": 0.9045226130653267,
+          "area": 0.8306017765544852
         }
       },
       "mouth": {
         "bounds_source_px": {
-          "x": 514,
-          "y": 540,
-          "width": 54,
-          "height": 38,
-          "area": 403
+          "x": 516.0,
+          "y": 540.0,
+          "width": 52.0,
+          "height": 40.0,
+          "area": 387
         },
         "relative_to_center": {
-          "width": 0.9642857142857143,
-          "height": 0.9047619047619048,
-          "area": 0.8741865509761388
+          "width": 0.9285714285714286,
+          "height": 0.9523809523809523,
+          "area": 0.8394793926247288
         }
       }
     }
-  },
-  "maximumEyeOutsideFaceFraction": 0.004642525533890436,
-  "baselinePreservedRigSections": {
-    "parts": true,
-    "sources": true,
-    "groups": true,
-    "draw_order": true,
-    "settings": true,
-    "canvas": true
-  },
-  "profile": "head-layout.profile.json",
-  "poseSpace": "art-directed-25-v5",
-  "rebuild": "python3 toolbox/author_head_layout.py --apply",
-  "sheet": "head-layout-review.png",
-  "sourceContractVerified": true,
-  "visualReview": {
-    "reviewed": true,
-    "method": "CPU rasterization of current v5 JS geometry",
-    "scale": 0.5,
-    "poses": 9,
-    "notes": [
-      "Overall authored movement is moderated to 75% of the corrected v4 endpoint differences.",
-      "Raw per-direction mouth, head and eye corrections are retained in the profile.",
-      "The right-side proportional eye corrections remain readable with milder movement."
-    ],
-    "browserRendering": "Not rerun for this strength-only adjustment.",
-    "nativeRendering": "Not evaluated by this CPU report; current native acceptance is recorded separately."
-  },
-  "currentValidation": {
-    "geometryTests": 14,
-    "pythonHeadPoseTests": 9,
-    "packagedVersion": "1.0.0-beta.8",
-    "packagedProjectMatches": true,
-    "nativePlaybackViewed": true,
-    "playbackMode": "ordinary random idle",
-    "physicalDevicesTested": false,
-    "browserFullSuiteRerun": false
   }
 }

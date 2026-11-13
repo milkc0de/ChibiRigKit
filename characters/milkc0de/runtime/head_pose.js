@@ -6,7 +6,7 @@ const HEAD_LABELS={center:'正面',left:'左',right:'右',up:'上',down:'下',up
 const headFrameCache=new Map(),headBuffers=new Map();
 const initialHeadPose=PROJECT.head_pose?structuredClone(PROJECT.head_pose):null;
 let headRandomSeed=crypto.getRandomValues(new Uint32Array(1))[0],headRandomStart=0,headRandomFrom=[0,0];
-let headDirection='center',headDraft=null,headDirty=false,headDrag=null,headAngle=[0,0];
+let headDirection='center',headDraft=null,headDirty=false,headDrag=null,headAngle=[0,0],headGazeLead=[0,0];
 const headKey=PROJECT.head_pose?`ChibiRigKit:headpose:1:${PROJECT.head_pose.layout_signature}:${PROJECT.head_pose.pose_space||"legacy"}`:null;
 function headBlendCoordinate(value){
   // Round the joins near the center and the authored limits. Positive convex
@@ -90,7 +90,8 @@ function irisGazeOffset(owner){
   const manual=[Number($('gazeX').value),Number($('gazeY').value)];
   const automatic=!controls.headEdit.checked&&(controls.headRandom.checked||controls.headCircle.checked);
   const amount=Number(controls.gazeAmount?.value??1),limit=automatic?Math.max(1,amount):1;
-  const gaze=manual.map((v,i)=>Math.max(-limit,Math.min(limit,v+(automatic?headAngle[i]*.9*amount:0))));
+  // The eyes lead a random turn, briefly overshoot, then settle as the head arrives.
+  const gaze=manual.map((v,i)=>Math.max(-limit,Math.min(limit,v+(automatic?(headAngle[i]*.9+headGazeLead[i]*1.2)*amount:0))));
   return [gaze[0]*owner.w*(owner.mesh?.gaze_x_ratio??.10),gaze[1]*owner.h*(owner.mesh?.gaze_y_ratio??.08)];
 }
 function drawSplitEye(im,p,t,intensity,eyeOpen,target){
@@ -130,7 +131,8 @@ function currentHeadSetting(p){
 // The anchor follows its body group, so the neck remains attached during sway.
 function randomNeckAngle(t,seed){
   const step=Math.max(0,t)/3.2,index=Math.floor(step),phase=step-index;
-  const target=i=>i===0?0:(i%2?1:-1)*(headNoise(0,seed)<.5?-1:1)*(.45+.55*headNoise(i,seed));
+  // Random sides with occasional rests, not a metronome swinging left and right.
+  const target=i=>i===0||headNoise(i+4001,seed)<.2?0:(headNoise(i+5001,seed)<.5?-1:1)*(.45+.55*headNoise(i,seed));
   const hold=.04+.12*headNoise(index+701,seed),end=.84+.12*headNoise(index+1701,seed);
   const u=Math.max(0,Math.min(1,(phase-hold)/(end-hold))),blend=u*u*u*(u*(u*6-15)+10);
   return target(index)+(target(index+1)-target(index))*blend;
@@ -144,10 +146,10 @@ function neckSwayAngles(t,intensity){
   let direction=[Number(controls.headX.value),Number(controls.headY.value)];
   if(controls.headRandom.checked)direction=randomHeadAngle(Math.max(0,t-headRandomStart)*Number(controls.motionSpeed.value),headRandomSeed,headRandomFrom).map(v=>v*Number(controls.headAmount.value)*gain);
   else if(controls.headCircle.checked){const a=time*2*Math.PI/4;direction=[Math.sin(a),-Math.cos(a)]}
-  const sway=controls.neckSway?.checked;
+  const sway=controls.neckSway?.checked,limit=(value,max)=>controls.headRandom.checked?headSoftLimit(value,max):captureClamp(value,-max,max);
   return {
-    yaw:captureClamp(direction[0]*extent.yaw+(sway?randomNeckAngle(time*.83,headRandomSeed^0x13a9f27b)*Number(controls.neckYaw.value)*gain:0),-extent.yaw,extent.yaw),
-    pitch:captureClamp(direction[1]*extent.pitch+(sway?randomNeckAngle(time*.71,headRandomSeed^0x37b1e5a9)*Number(controls.neckPitch.value)*gain:0),-extent.pitch,extent.pitch),
+    yaw:limit(direction[0]*extent.yaw+(sway?randomNeckAngle(time*.83,headRandomSeed^0x13a9f27b)*Number(controls.neckYaw.value)*gain:0),extent.yaw),
+    pitch:limit(direction[1]*extent.pitch+(sway?randomNeckAngle(time*.71,headRandomSeed^0x37b1e5a9)*Number(controls.neckPitch.value)*gain:0),extent.pitch),
     roll:sway?randomNeckAngle(time,headRandomSeed^0x51a7c3d9)*Number(controls.neckAmount.value)*gain:0
   };
 }
@@ -254,6 +256,12 @@ function renderHeadSurface(p,t,intensity,eyeOpen,variant="part"){
 }
 function beginHeadFrame(t){
   headFrameCache.clear();neckMasterFrame=null;neckCurrentAngles=neckSwayAngles(t,Number(controls.motionIntensity.value));
+  headGazeLead=[0,0];
+  if(controls.headRandom.checked&&!controls.headEdit.checked&&!captureHas('headYaw','headPitch','headRoll')){
+    const time=Math.max(0,t-headRandomStart)*Number(controls.motionSpeed.value),scale=Number(controls.headAmount?.value??1)*Math.min(1,Math.max(0,Number(controls.motionIntensity.value)));
+    const head=randomHeadAngle(time,headRandomSeed,headRandomFrom),gaze=randomGazeAngle(time,headRandomSeed,headRandomFrom);
+    headGazeLead=gaze.map((v,i)=>(v-head[i])*scale);
+  }
   if(!PROJECT.head_pose)return;
   const extent=neckPoseExtent();
   headAngle=[neckCurrentAngles.yaw/extent.yaw,neckCurrentAngles.pitch/extent.pitch];
@@ -377,8 +385,9 @@ function headMapPoint(p,point,setting){
   return [0,1].map(axis=>ids.reduce((sum,i,k)=>sum+d[i][axis]*weights[k],0));
 }
 
-// Smooth random targets with quiet pauses. Stateless sampling makes seeking and
-// recording reproducible within a session, without frame-dependent jitter.
+// Random looks: hold, then turn at an irregular moment. Stateless sampling makes
+// seeking and recording reproducible within a session, without frame jitter.
+const HEAD_RANDOM_STEP=4.8;
 function headNoise(index,seed){
   let n=(Math.imul(index+1,0x9e3779b1)^seed)>>>0;
   n=Math.imul(n^(n>>>16),0x21f0aaad);n=Math.imul(n^(n>>>15),0x735a2d97);
@@ -387,14 +396,38 @@ function headNoise(index,seed){
 function randomHeadTarget(index,seed,initial){
   if(index===0)return initial;
   if(headNoise(index*3,seed)<.28)return [0,0];
-  const angle=headNoise(index*3+1,seed)*Math.PI*2,radius=.3+.65*headNoise(index*3+2,seed);
-  return [Math.cos(angle)*radius,Math.sin(angle)*radius*.8];
+  // Mostly moderate turns, so the authored endpoints are passed through rather
+  // than dwelt on; the face amount still scales the whole range.
+  const angle=headNoise(index*3+1,seed)*Math.PI*2,radius=.25+.45*headNoise(index*3+2,seed);
+  return [Math.cos(angle)*radius,Math.sin(angle)*radius*.75];
+}
+function randomHeadSegment(t,seed,initial){
+  const step=Math.max(0,t)/HEAD_RANDOM_STEP,index=Math.floor(step);
+  const a=randomHeadTarget(index,seed,initial),b=randomHeadTarget(index+1,seed,initial);
+  // A longer turn takes longer; every move completes inside its own segment.
+  const distance=Math.min(1.5,Math.hypot(b[0]-a[0],b[1]-a[1]));
+  return {a,b,phase:step-index,start:.06+.24*headNoise(index*7+3001,seed),duration:(.9+.9*distance)/HEAD_RANDOM_STEP};
+}
+function headTurnEase(u){
+  // Minimum-jerk motion with its peak speed slightly early: a prompt start and a
+  // longer settle, rather than a symmetric slide.
+  u=Math.max(0,Math.min(1,u));u*=1.35-.35*u;return u*u*u*(u*(u*6-15)+10);
 }
 function randomHeadAngle(t,seed,initial=[0,0]){
-  const step=Math.max(0,t)/4.8,index=Math.floor(step),phase=step-index;
-  const a=randomHeadTarget(index,seed,initial),b=randomHeadTarget(index+1,seed,initial);
-  const u=Math.max(0,Math.min(1,(phase-.12)/.76)),mix=u*u*u*(u*(u*6-15)+10);
-  return a.map((v,i)=>v+(b[i]-v)*mix);
+  // Pitch trails yaw a little, so a diagonal look curves instead of sliding on a line.
+  const s=randomHeadSegment(t,seed,initial),yaw=headTurnEase((s.phase-s.start)/s.duration),pitch=headTurnEase((s.phase-s.start-.06)/s.duration);
+  return [s.a[0]+(s.b[0]-s.a[0])*yaw,s.a[1]+(s.b[1]-s.a[1])*pitch];
+}
+function randomGazeAngle(t,seed,initial=[0,0]){
+  // The eyes reach the next target quickly, just before the head starts turning.
+  const s=randomHeadSegment(t,seed,initial),u=headTurnEase((s.phase-s.start+.05)/.08);
+  return s.a.map((v,i)=>v+(s.b[i]-v)*u);
+}
+function headSoftLimit(value,limit){
+  // Linear for ordinary motion, then eases into the limit instead of clipping,
+  // so random looks never stall on the extreme pose or stop abruptly.
+  const knee=limit*.6,a=Math.abs(value);
+  return a<=knee?value:Math.sign(value)*(knee+(limit-knee)*Math.tanh((a-knee)/(limit-knee)));
 }
 function resetRandomHead(from=[0,0],time=0){headRandomFrom=[...from];headRandomStart=time;}
 

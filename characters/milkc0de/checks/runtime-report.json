@@ -12,6 +12,39 @@
     "rejectedImports": 4,
     "atomic": true
   },
+  "neck": {
+    "enabled": true,
+    "headParts": 21,
+    "masterVertices": 378,
+    "referenceLayouts": 9,
+    "samples": [
+      {
+        "time": 26,
+        "angle": -3.6059142511803657,
+        "yaw": -0.2705311649201221,
+        "pitch": 5.320064760744952,
+        "roll": -3.6059142511803657
+      },
+      {
+        "time": 0,
+        "angle": 0,
+        "yaw": 0,
+        "pitch": 0,
+        "roll": 0
+      },
+      {
+        "time": 29,
+        "angle": 5.100429418240674,
+        "yaw": 5.037983482360002,
+        "pitch": 2.4235198887790013,
+        "roll": 5.100429418240674
+      }
+    ],
+    "bodyUnchanged": true,
+    "pupilClipChecks": 6,
+    "jsonRoundtrip": true,
+    "reset": true
+  },
   "head": {
     "enabled": true,
     "directions": 9,
@@ -23,16 +56,19 @@
     "pupilClipChecks": 54,
     "storageRoundtrip": true,
     "wrongLayoutRejected": true,
-    "elapsedMs": 123596
+    "elapsedMs": 64905
   },
   "combinations": 48,
   "motionFrames": 16,
   "trailCheck": true,
+  "gpuRoundingTolerance": {
+    "maxChangedChannels": 32,
+    "maxChannelDelta": 1
+  },
+  "gpuRoundingFrames": [],
   "basePreserved": true,
   "reset": true,
   "mouthDeformationChecks": 1,
   "seamChangedChannels": 0,
-  "browserErrors": [],
-  "browser": "Codex in-app Chromium",
-  "scope": "Browser invariants; visual comparison is recorded separately in render-motion-report.json"
+  "browserErrors": []
 }
