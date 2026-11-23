@@ -19,7 +19,9 @@ function renderOutput(){
   if(displayCanvas.width!==w)displayCanvas.width=w;if(displayCanvas.height!==h)displayCanvas.height=h;
   const view=displayCanvas.getContext('2d');view.clearRect(0,0,w,h);view.drawImage(canvas,r.x,r.y,r.w,r.h,0,0,w,h);
  }else{
-  const view=displayCanvas.getContext('2d');view.clearRect(0,0,displayCanvas.width,displayCanvas.height);view.drawImage(canvas,0,0);
+  const view=displayCanvas.getContext('2d');view.clearRect(0,0,displayCanvas.width,displayCanvas.height);
+  if(backgroundState.mode==='studio'&&customBackgroundActive())drawStudioBackdrop(view);
+  view.drawImage(canvas,0,0);
  }
  if(!recordingActive)return;
  const c=outputCanvas.getContext('2d'),r=outputState.crop;c.fillStyle=$('outputColor')?.value||'#202020';c.fillRect(0,0,outputCanvas.width,outputCanvas.height);

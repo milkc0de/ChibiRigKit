@@ -1,0 +1,7 @@
+{
+  "name": "chibirigkit-idle-renderer",
+  "private": true,
+  "type": "module",
+  "scripts": {"build": "node build.mjs", "test": "node --test hair-physics.test.mjs", "bake:hair": "node bake-hair.mjs"},
+  "devDependencies": {"esbuild": "0.19.3", "three": "0.151.3"}
+}

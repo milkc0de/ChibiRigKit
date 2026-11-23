@@ -4,6 +4,8 @@
 import copy
 import hashlib
 import json
+import math
+from collections import Counter
 import numpy as np
 from PIL import Image, ImageChops
 
@@ -140,6 +142,59 @@ def validate_neck_mesh(poses, triangles):
             if np.any(area<=.0001):raise ValueError('Neck poses fold between saved directions')
 
 
+def neck_mesh_signature(mesh):
+    """Identify an authored reference surface, including its triangle indices."""
+    topology = {'points': [[float(x), float(y)] for x, y in mesh['points']],
+                'triangles': mesh['triangles']}
+    return hashlib.sha256(json.dumps(topology, separators=(',', ':'), allow_nan=False).encode()).hexdigest()
+
+
+def validate_neck_source_mesh(mesh, canvas, required_bounds):
+    """Check that every part can be drawn through one filled rectangular surface."""
+    if not isinstance(mesh, dict):
+        raise ValueError('Neck reference mesh must contain points and triangles')
+    points, triangles = mesh.get('points'), mesh.get('triangles')
+    if not isinstance(points, list) or len(points) < 4 or not isinstance(triangles, list) or not triangles:
+        raise ValueError('Neck reference mesh requires a triangulated surface')
+    limits = (canvas['width'], canvas['height'])
+    for point in points:
+        if (not isinstance(point, list) or len(point) != 2 or
+                any(type(v) not in (int, float) or not 0 <= v <= limit for v, limit in zip(point, limits))):
+            raise ValueError('Neck mesh points must be finite canvas coordinates')
+    if len({tuple(point) for point in points}) != len(points):
+        raise ValueError('Duplicate neck mesh point')
+    coordinates = np.asarray(points, dtype=float)
+    low, high = coordinates.min(axis=0), coordinates.max(axis=0)
+    if np.any(low > required_bounds[0]) or np.any(high < required_bounds[1]):
+        raise ValueError('Neck mesh must cover the head parts and neck pivot')
+
+    edges = Counter()
+    areas = []
+    for face in triangles:
+        if (not isinstance(face, list) or len(face) != 3 or
+                any(type(i) is not int or not 0 <= i < len(points) for i in face) or len(set(face)) != 3):
+            raise ValueError('Neck triangle must contain three distinct point indices')
+        a, b, c = face
+        u, v = coordinates[b] - coordinates[a], coordinates[c] - coordinates[a]
+        area = u[0] * v[1] - u[1] * v[0]
+        if area <= .0001:
+            raise ValueError('Neck source triangle is folded or degenerate')
+        areas.append(area)
+        edges.update(((a,b), (b,c), (c,a)))
+    if len({i for i,j in edges}) != len(points):
+        raise ValueError('Unreferenced neck mesh point')
+    for (i,j), count in edges.items():
+        if count != 1:
+            raise ValueError('Overlapping neck source triangles')
+        if (j,i) not in edges:
+            p, q = coordinates[i], coordinates[j]
+            if not np.any((p == q) & ((p == low) | (p == high))):
+                raise ValueError('Gap in neck reference mesh')
+    rectangle_area = 2 * (high[0] - low[0]) * (high[1] - low[1])
+    if not math.isclose(math.fsum(areas), rectangle_area, rel_tol=1e-10, abs_tol=1e-8):
+        raise ValueError('Neck source triangles must tile the entire reference rectangle')
+
+
 def suggest_poses(parts,members,cols,rows):
     faces=[parts[pid] for pid in members if parts[pid]['role']=='face' and parts[pid]['kind']!='blush']
     reference=max(faces,key=lambda p:p['w']*p['h']) if faces else max((parts[pid] for pid in members),key=lambda p:p['w']*p['h'])
@@ -194,10 +249,22 @@ def build_neck_sway(plan, parts, canvas):
     for r in range(len(ys)-1):
         for c in range(columns):
             a=r*len(xs)+c;b=a+1;d=a+len(xs);e=d+1;triangles.extend([[a,b,e],[a,e,d]])
+    extent=plan.get('neck_sway',{})
     mesh_signature=hashlib.sha256(json.dumps(points,separators=(',',':')).encode()).hexdigest()
-    saved_signature=plan.get('neck_sway',{}).get('mesh_signature')
+    saved_signature=extent.get('mesh_signature')
+    if 'mesh' in extent:
+        authored=extent['mesh']
+        low=[max(0,min(pivot[axis],min(parts[pid][axis] for pid in members))) for axis in ('x','y')]
+        high=[min(canvas[limit],max(pivot[axis],max(parts[pid][axis]+parts[pid][size] for pid in members)))
+              for axis,size,limit in [('x','w','width'),('y','h','height')]]
+        validate_neck_source_mesh(authored,canvas,(low,high))
+        # Older exported projects include the default grid but sign only its
+        # points. Accept that signature exclusively for the exact original grid.
+        legacy_grid=(saved_signature==mesh_signature and authored['points']==points and authored['triangles']==triangles)
+        points,triangles=copy.deepcopy((authored['points'],authored['triangles']))
+        if not legacy_grid:mesh_signature=neck_mesh_signature(authored)
     if saved_signature and saved_signature!=mesh_signature:raise ValueError('Neck reference mesh layout changed; re-layout its nine poses before rebuilding')
-    extent=plan.get('neck_sway',{});legacy=bool(extent.get('poses')) and 'yaw_extent' not in extent and 'pitch_extent' not in extent
+    legacy=bool(extent.get('poses')) and 'yaw_extent' not in extent and 'pitch_extent' not in extent
     yaw_extent=extent.get('yaw_extent',30 if legacy else 25);pitch_extent=extent.get('pitch_extent',20 if legacy else 25)
     pitch_gain=extent.get('pitch_gain',.5)
     if not isinstance(pitch_gain,(float,int)) or not 0<pitch_gain<=1:raise ValueError('Neck pitch gain must be in (0,1]')

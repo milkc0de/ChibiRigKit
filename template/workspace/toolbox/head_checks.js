@@ -22,8 +22,10 @@ window.runHeadChecks=()=>{
     assert(Math.abs(a.x-b.x)<.001&&Math.abs(a.scale_x-b.scale_x)<.001,'Pose discontinuity at grid boundary');
     const fingerprints=[];
     let n=0;
+    $('gazeX').value=0;$('gazeY').value=0;
     for(const [name,[x,y]] of Object.entries(HEAD_DIRECTIONS)){
-      controls.headX.value=x;controls.headY.value=y;$('gazeX').value=x;$('gazeY').value=y;
+      document.querySelector(`[data-head-direction="${name}"]`).click();
+      assert(Number(controls.headX.value)===x&&Number(controls.headY.value)===y,'Direction button did not select '+name);
       for(const eye of [1,.5,0]){
         controls.eyeOpenTest.value=eye;render(.37);renderCount++;
         for(const p of irisParts){

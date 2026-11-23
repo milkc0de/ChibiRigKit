@@ -86,12 +86,21 @@ function headBuffer(key,width=canvas.width,height=canvas.height){
 }
 function headPoseActive(p){return PROJECT.head_pose?.part_ids.includes(p.name)}
 function irisGazeOffset(owner){
-  if(captureHas('gazeX','gazeY'))return [captureValue('gazeX')*owner.w*(owner.mesh?.gaze_x_ratio??.10),-captureValue('gazeY')*owner.h*(owner.mesh?.gaze_y_ratio??.08)];
   const manual=[Number($('gazeX').value),Number($('gazeY').value)];
   const automatic=!controls.headEdit.checked&&(controls.headRandom.checked||controls.headCircle.checked);
   const amount=Number(controls.gazeAmount?.value??1),limit=automatic?Math.max(1,amount):1;
-  // The eyes lead a random turn, briefly overshoot, then settle as the head arrives.
-  const gaze=manual.map((v,i)=>Math.max(-limit,Math.min(limit,v+(automatic?(headAngle[i]*.9+headGazeLead[i]*1.2)*amount:0))));
+  let gaze=manual;
+  if(automatic){
+    // The eyes lead a random turn, briefly overshoot, then settle as the head arrives.
+    gaze=manual.map((v,i)=>Math.max(-limit,Math.min(limit,v+(headAngle[i]*.9+headGazeLead[i]*1.2)*amount)));
+  }else if(!controls.headEdit.checked&&!captureHas('headYaw','headPitch','headRoll')){
+    // On a manual turn, centered sliders look with the face. Each slider can
+    // still reach either edge of its eye, even against the turn.
+    const direction=[Number(controls.headX.value),Number(controls.headY.value)];
+    gaze=manual.map((trim,i)=>trim+direction[i]*.75*(1-Math.abs(trim)));
+  }
+  if(captureHas('gazeX'))gaze[0]=captureValue('gazeX');
+  if(captureHas('gazeY'))gaze[1]=-captureValue('gazeY');
   return [gaze[0]*owner.w*(owner.mesh?.gaze_x_ratio??.10),gaze[1]*owner.h*(owner.mesh?.gaze_y_ratio??.08)];
 }
 function drawSplitEye(im,p,t,intensity,eyeOpen,target){
@@ -138,10 +147,10 @@ function randomNeckAngle(t,seed){
   return target(index)+(target(index+1)-target(index))*blend;
 }
 function neckPoseExtent(){return {yaw:PROJECT.neck_sway?.yaw_extent??25,pitch:PROJECT.neck_sway?.pitch_extent??25}}
-function neckSwayAngles(t,intensity){
+function neckSwayAngles(t,intensity,useCapture=true){
   const extent=neckPoseExtent();
   if(controls.headEdit.checked){const [x,y]=HEAD_DIRECTIONS[headDirection];return {yaw:x*extent.yaw,pitch:y*extent.pitch,roll:0}}
-  if(captureHas('headYaw','headPitch','headRoll')){const gain=captureClamp(intensity,0,5);return {yaw:captureClamp(captureValue('headYaw',0,-180,180)*gain*captureAxisGain('Yaw'),-extent.yaw,extent.yaw),pitch:captureClamp(-captureValue('headPitch',0,-180,180)*gain*captureAxisGain('Pitch'),-extent.pitch,extent.pitch),roll:captureClamp(captureValue('headRoll',0,-30,30)*gain*captureAxisGain('Roll'),-30,30)}}
+  if(useCapture&&captureHas('headYaw','headPitch','headRoll')){const gain=captureClamp(intensity,0,5);return {yaw:captureClamp(captureValue('headYaw',0,-180,180)*gain*captureAxisGain('Yaw'),-extent.yaw,extent.yaw),pitch:captureClamp(-captureValue('headPitch',0,-180,180)*gain*captureAxisGain('Pitch'),-extent.pitch,extent.pitch),roll:captureClamp(captureValue('headRoll',0,-30,30)*gain*captureAxisGain('Roll'),-30,30)}}
   const time=Math.max(0,t)*Number(controls.motionSpeed.value),gain=Math.min(1,Math.max(0,intensity));
   let direction=[Number(controls.headX.value),Number(controls.headY.value)];
   if(controls.headRandom.checked)direction=randomHeadAngle(Math.max(0,t-headRandomStart)*Number(controls.motionSpeed.value),headRandomSeed,headRandomFrom).map(v=>v*Number(controls.headAmount.value)*gain);
@@ -189,6 +198,65 @@ function mapNeckMasterPoint(point,mesh){
     if(u>=-1e-7&&v>=-1e-7&&w>=-1e-7)return [0,1].map(axis=>mesh.dest[i][axis]*u+mesh.dest[j][axis]*v+mesh.dest[k][axis]*w);
   }
   return [...point];
+}
+// A single cloth-and-body surface preserves overlaps between limbs, clothing,
+// neck underpaint and the already-posed head.
+let bodyTurnFrame=null;
+function bodyTurnAtTime(t){
+  if(!PROJECT.neck_sway?.surface?.body_turn||controls.showBaseOnly.checked)return null;
+  if(captureHas('headYaw','headPitch','headRoll')){
+    const gain=Number($('captureBodyGain').value);
+    return bodyTurnMesh(headAngle[0]*gain,headAngle[1]*gain);
+  }
+  if(!controls.headEdit.checked&&(controls.headRandom.checked||controls.headCircle.checked)){
+    // Resample the same trajectory slightly earlier instead of filtering the
+    // previous frame: seeks, recordings and different frame rates then agree.
+    const earlier=neckSwayAngles(Math.max(0,t-.15),Number(controls.motionIntensity.value));
+    const extent=neckPoseExtent();
+    return bodyTurnMesh(earlier.yaw/extent.yaw,earlier.pitch/extent.pitch);
+  }
+  return bodyTurnMesh(...headAngle);
+}
+function bodyTurnMesh(x,y){
+  const profile=PROJECT.neck_sway?.surface?.body_turn;
+  if(!profile||(!x&&!y)||!profile.rows?.length)return null;
+  const {center_x,half_width,rows}=profile,first=rows[0],last=rows[rows.length-1];
+  const yaw=headBlendCoordinate(x),pitch=headBlendCoordinate(y);
+  // Most of the head translates rigidly with the collar. Ease upward lift to
+  // zero near the canvas edge so the crown stays inside the original frame.
+  const upper={...first,depth:0,narrow:0,yaw_rise:0};
+  const bands=[{...upper,y:0,pitch_shift:pitch<0?0:first.pitch_shift},
+    {...upper,y:first.y/3},...rows,{...last,y:canvas.height}];
+  const {points:source,triangles}=profile.mesh??bodyBandGrid(bands,center_x,half_width);
+  const dest=source.map(([sx,sy])=>{
+    // At an elbow or knee between two rows, evaluate the depth field at the
+    // joint itself. Interpolating old triangle corners would flatten it.
+    let i=1;
+    while(i<bands.length-1&&sy>bands[i].y)i++;
+    const low=bands[i-1],high=bands[i],u=(sy-low.y)/(high.y-low.y);
+    const sample=key=>(1-u)*(low[key]??0)+u*(high[key]??0);
+    const lateral=Math.max(-1,Math.min(1,(sx-center_x)/half_width));
+    const shift=yaw*(sample('yaw_shift')+sample('depth')*(1-Math.abs(lateral)));
+    const squeeze=Math.abs(yaw)*sample('narrow')*half_width*lateral;
+    const lift=yaw*lateral*sample('yaw_rise');
+    return [sx+shift-squeeze,sy+pitch*sample('pitch_shift')-lift];
+  });
+  return {source,dest,triangles};
+}
+function bodyBandGrid(bands,centerX,halfWidth){
+  const columns=[0,centerX-halfWidth,centerX,centerX+halfWidth,canvas.width];
+  const points=bands.flatMap(row=>columns.map(x=>[x,row.y])),triangles=[];
+  for(let row=0;row<bands.length-1;row++)for(let col=0;col<columns.length-1;col++){
+    const a=row*columns.length+col,b=a+1,c=a+columns.length,d=c+1;
+    triangles.push([a,b,d],[a,d,c]);
+  }
+  return {points,triangles};
+}
+function headPointerPoint(event){
+  const rect=displayCanvas.getBoundingClientRect();
+  const point=[(event.clientX-rect.left)*canvas.width/rect.width,(event.clientY-rect.top)*canvas.height/rect.height];
+  if(!bodyTurnFrame)return point;
+  return mapNeckMasterPoint(point,{source:bodyTurnFrame.dest,dest:bodyTurnFrame.source,triangles:bodyTurnFrame.triangles});
 }
 function neckEyeMatrix(owner,t,intensity,mesh){
   let center=[owner.x+owner.w/2,owner.y+owner.h/2];
@@ -363,14 +431,14 @@ function initHeadEditor(){
   const autoplay=controls.headRandom.checked,sway=controls.neckSway.checked;selectHeadDirection('center');controls.headRandom.checked=autoplay;controls.neckSway.checked=sway;
   displayCanvas.addEventListener('pointerdown',e=>{
     if(!controls.headEdit.checked)return;
-    const rect=displayCanvas.getBoundingClientRect(),x=(e.clientX-rect.left)*canvas.width/rect.width,y=(e.clientY-rect.top)*canvas.height/rect.height;
+    const rect=displayCanvas.getBoundingClientRect(),[x,y]=headPointerPoint(e);
     const p=PROJECT.parts[$('headPart').value],dest=headEditorDest(p,headSetting(p,headDraft));let best=-1,distance=12*canvas.width/rect.width;
     dest.forEach(([px,py],i)=>{const d=Math.hypot(px-x,py-y);if(d<distance){best=i;distance=d}});
     if(best<0)return;$('headVertex').value=best;headDrag={x,y};displayCanvas.setPointerCapture(e.pointerId);syncHeadEditor();e.preventDefault();
   });
   displayCanvas.addEventListener('pointermove',e=>{
     if(!headDrag)return;
-    const rect=displayCanvas.getBoundingClientRect(),x=(e.clientX-rect.left)*canvas.width/rect.width,y=(e.clientY-rect.top)*canvas.height/rect.height,dx=x-headDrag.x,dy=y-headDrag.y;
+    const [x,y]=headPointerPoint(e),dx=x-headDrag.x,dy=y-headDrag.y;
     const p=PROJECT.parts[$('headPart').value];
     editHeadSetting(s=>{const i=Number($('headVertex').value),delta=headEditorDelta(p,s,i,dx,dy);s.vertices[i][0]+=delta[0];s.vertices[i][1]+=delta[1]});headDrag={x,y};
   });

@@ -27,6 +27,28 @@ test('automatic gaze moves both pupils and respects manual offsets, editing, and
   f.controls.headEdit.checked=false;f.controls.headRandom.checked=false;
   assert.deepEqual([...f.context.irisGazeOffset(eye)],[0,0]);
 });
+test('manual head directions guide the pupils while each gaze axis stays adjustable',()=>{
+  const f=fixture(),eye={w:100,h:100,mesh:{gaze_x_ratio:.1,gaze_y_ratio:.08}};
+  const offset=()=>[...f.context.irisGazeOffset(eye)];
+  f.controls.headRandom.checked=false;
+  for(const x of [-1,0,1])for(const y of [-1,0,1]){
+    f.controls.headX.value=x;f.controls.headY.value=y;
+    const [px,py]=offset();
+    assert.equal(Math.sign(px),x);assert.equal(Math.sign(py),y);
+    assert.ok(Math.abs(px)<10&&Math.abs(py)<8);
+  }
+  f.controls.headX.value=.5;f.controls.headY.value=1;
+  const [halfRight,down]=offset();assert.ok(halfRight>0&&halfRight<7.5);
+  f.fields.gazeX.value=-1;assert.deepEqual(offset(),[-10,down]);
+  f.fields.gazeY.value=.5;
+  vm.runInContext('captureFrame={gazeX:.25}',f.context);
+  assert.deepEqual(offset(),[2.5,7]);
+  vm.runInContext('captureFrame={gazeY:1}',f.context);
+  assert.deepEqual(offset(),[-10,-8]);
+  vm.runInContext('captureFrame=null',f.context);
+  f.controls.headEdit.checked=true;f.fields.gazeX.value=0;f.fields.gazeY.value=0;
+  assert.deepEqual(offset(),[0,0]);
+});
 test('zero deformation draws once instead of sampling fractional strip boundaries',()=>{
   const f=fixture(),p={w:173,h:251,x:10,y:20,mesh:{slices:8,amp_px:0,squash_pct:0}};
   f.context.drawSoftBody({},p,1.25,1);f.context.drawBendVertical({},p,1.25,1);

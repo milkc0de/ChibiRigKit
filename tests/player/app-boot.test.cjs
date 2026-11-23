@@ -13,6 +13,13 @@ test('preview removes the previous frame before drawing a transparent character'
  vm.runInContext("backgroundState={...backgroundState,mode:'transparent'};renderOutput()",c);
  assert.deepEqual(calls,[['clear',0,0,elements.get('c').width,elements.get('c').height],['draw']]);
 });
+test('the studio gradient appears behind the preview while the OBS canvas keeps character alpha',async()=>{
+ const {context:c,elements}=browserHarness();await c.rigReady;
+ const view=elements.get('c').getContext('2d'),calls=[];
+ view.clearRect=()=>calls.push('clear');view.fillRect=()=>calls.push('background');view.drawImage=()=>calls.push('character');
+ vm.runInContext("backgroundState.mode='studio';renderOutput()",c);assert.deepEqual(calls,['clear','background','character']);
+ calls.length=0;vm.runInContext("playerSync.role='view';renderOutput()",c);assert.deepEqual(calls,['clear','character']);
+});
 test('camera and audio start only on request, motion take replays, and stop releases devices',async()=>{
  const {context:c,elements}=browserHarness();await c.rigReady;let requests=0,stopped=0,terminated=0,closed=0;
  const videoTrack={kind:'video',stop(){stopped++}},audioTrack={kind:'audio',stop(){stopped++}},stream={getTracks:()=>[videoTrack,audioTrack],getVideoTracks:()=>[videoTrack]};

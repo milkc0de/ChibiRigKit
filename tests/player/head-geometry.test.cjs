@@ -19,6 +19,59 @@ test('all nine authored layouts reproduce their local transforms and vertices ex
  assert.equal(checks.length,9*run(f,'PROJECT.head_pose.part_ids.length'));
 });
 
+test('each direction turns the sample face relative to the crown and preserves the eyes',async()=>{
+ const f=await fixture();
+ const poses=run(f,`(()=>{
+  controls.motionIntensity.value=0;
+  function landmarks(){
+   beginHeadFrame(0);
+   const mesh=neckMasterMesh(0,0);
+   function point(id,u=.5,v=.5){
+    const p=PROJECT.parts[id],setting=currentHeadSetting(p);
+    const [x,y]=headMapPoint(p,[p.x+p.w*u,p.y+p.h*v],setting);
+    const m=partMatrix(p,0,0,false);
+    return mapNeckMasterPoint([m[0]*x+m[2]*y+m[4],m[1]*x+m[3]*y+m[5]],mesh);
+   }
+   const eyes=['eye_left_sclera','eye_right_sclera'];
+   const eyeCenters=eyes.map(id=>point(id));
+   return {
+    eyes:[0,1].map(axis=>(eyeCenters[0][axis]+eyeCenters[1][axis])/2),
+    mouth:point('mouth_open'),crown:point('hair_cap'),
+    size:eyes.map(id=>[point(id,1)[0]-point(id,0)[0],point(id,.5,1)[1]-point(id,.5,0)[1]])
+   };
+  }
+  const poses={};
+  for(const [name,[x,y]] of Object.entries(HEAD_DIRECTIONS)){
+   document.querySelector('[data-head-direction="'+name+'"]').click();
+   const full=landmarks();
+   controls.headX.value=x/2;controls.headY.value=y/2;
+   poses[name]={x,y,full,half:landmarks()};
+  }
+  return poses;
+ })()`);
+ const front=poses.center.full,face=run(f,'PROJECT.parts.face_skin');
+ for(const [name,{x,y,full,half}] of Object.entries(poses)){
+  // A translation of the whole head gives zero. An actual turn brings the
+  // face forward relative to the cap, on both axes for a diagonal.
+  for(const [axis,sign] of [x,y].entries()){
+   if(!sign)continue;
+   const minimum=.03*[face.w,face.h][axis];
+   for(const feature of ['eyes','mouth']){
+    const displacement=pose=>sign*((pose[feature][axis]-pose.crown[axis])-(front[feature][axis]-front.crown[axis]));
+    const end=displacement(full),middle=displacement(half);
+    assert.ok(end>=minimum,`${name} ${feature} lead on ${axis?'y':'x'}: ${end.toFixed(1)}px (minimum ${minimum.toFixed(1)}px)`);
+    assert.ok(middle>0&&middle<end,`${name} ${feature} must turn progressively on ${axis?'y':'x'}`);
+   }
+  }
+  const sizes=full.size.map(([w,h],i)=>[w/front.size[i][0],h/front.size[i][1]]);
+  for(const [,height] of sizes)assert.ok(height>=.88&&height<=1.12,`${name} eye height: ${height}`);
+  if(x){
+   const far=sizes[x<0?0:1][0],near=sizes[x<0?1:0][0];
+   assert.ok(far>=.75&&near>=.90&&far+.05<=near,`${name} eye widths: far ${far}, near ${near}`);
+  }
+ }
+});
+
 test('eye layers and closed mouth share their owner deformation at the same canvas point',async()=>{
  const f=await fixture();
  const result=run(f,`(()=>{

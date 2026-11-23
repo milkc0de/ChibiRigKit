@@ -5,9 +5,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#fcf8f3">
-  <meta name="description" content="1枚のイラストから、配信で動くキャラクターへ。AIで動きの土台を作り、ブラウザで調整。カメラや声で動かし、OBSで使えるオープンソースツールです。">
+  <meta name="description" content="元のイラスト1枚から、14方向の資料とリグ付き3Dモデルを制作。milkc0deの60秒の待機モーションを見て、ブラウザで表情や髪の揺れを調整できます。">
   <meta property="og:title" content="ChibiRigKit — その一枚が、配信で動きだす。">
-  <meta property="og:description" content="イラストからつくる。ブラウザで動かす。表情も、声も、あなたらしく。">
+  <meta property="og:description" content="1枚の原画が、瞬きや視線、髪の揺れのある3Dキャラクターになるまで。14方向の制作資料と60秒の動画で紹介します。">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://milkc0de.github.io/ChibiRigKit/">
   <meta property="og:image" content="https://milkc0de.github.io/ChibiRigKit/ogp.png">
@@ -168,6 +168,7 @@
   <header class="site-header">
     <a class="brand" href="#top" aria-label="ChibiRigKit ホーム"><span class="brand-mark" aria-hidden="true">✿</span>Chibi<span>Rig</span>Kit<span class="brand-dot">.</span></a>
     <nav aria-label="メインナビゲーション">
+      <a href="#showcase">制作例</a>
       <a href="#playground">Playground</a>
       <a href="#features">できること</a>
       <a href="#obs">OBS連携</a>
@@ -177,6 +178,35 @@
   </header>
 
   <main id="main">
+    <section class="showcase shell" id="showcase" aria-labelledby="showcase-title">
+      <h1 id="showcase-title">1枚の原画から、<br><span class="petal-word">全身が動く3Dキャラクターへ。</span></h1>
+      <p class="showcase-lead">サンプルキャラクター「milkc0de」の制作例です。原画をもとに別の角度の姿を生成し、髪と指先まで調整して、60秒の待機モーションを作りました。</p>
+      <div class="showcase-result">
+        <figure>
+          <img src="site/media/milkc0de-original.webp" width="410" height="487" alt="元の正面イラスト。茶色の巻き髪と白いリボンのキャラクター">
+          <figcaption>制作に使った1枚の原画</figcaption>
+        </figure>
+        <figure>
+          <video controls muted playsinline preload="none" width="420" height="540" poster="site/media/milkc0de-idle.webp" aria-label="3Dキャラクターの60秒の待機モーション。音声なし">
+            <source src="site/media/milkc0de-idle.mp4" type="video/mp4">
+            <a href="site/media/milkc0de-idle.mp4">待機モーションの動画を開く</a>
+          </video>
+          <figcaption>完成した3Dモデルの待機モーション（60秒・音声なし）</figcaption>
+        </figure>
+      </div>
+      <div class="showcase-process">
+        <figure>
+          <img loading="lazy" src="site/media/milkc0de-views.webp" width="990" height="591" alt="前後・左右・真上・真下の6方向と、斜め上・斜め下の8方向から描いた同じキャラクター">
+          <figcaption><strong>Aポーズをそろえて14方向を描く</strong>正面で腕を少し開いた姿を基準に、背中や髪の裏など原画に写っていない部分を画像生成で補いました。</figcaption>
+        </figure>
+        <figure>
+          <img loading="lazy" src="site/media/milkc0de-mesh.webp" width="990" height="343" alt="同じ3Dモデルの正面・側面・背面と、形を構成する頂点の表示">
+          <figcaption><strong>立体にして、動きをつける</strong>14方向の輪郭から立体を組み、画像の色を表面に貼りました。骨と頂点の重みを調整し、待機中は腕を下ろして指をゆるく曲げています。待機中も瞬きや目線が変わり、長い髪は頭の動きに遅れて揺れます。</figcaption>
+        </figure>
+      </div>
+      <a class="text-link" href="#playground">この3Dモデルの顔や揺れを調整する <span aria-hidden="true">↓</span></a>
+    </section>
+
     <!--
       Live Playground
       The sample player is the actual ChibiRigKit character player.
@@ -188,9 +218,9 @@
         <div class="playground-heading">
           <div>
             <p class="eyebrow">LIVE PLAYGROUND · TRY IT HERE</p>
-            <h2 id="playground-title">説明より先に、<br>まず触ってみる。</h2>
+            <h2 id="playground-title">ブラウザで動きを調整する。</h2>
           </div>
-          <p>実際のChibiRigKit Playerを、そのままこのページに読み込んでいます。動きの調整やモーション再生を試せます。カメラ・マイクは自分で「追従開始」を押すまで起動しません。</p>
+          <p>「3D待機」で顔の向きや目の開き、髪の揺れを調整できます。ローカル版で「追従開始」を押すと、カメラの顔の動きやマイクの口パクがそのまま3Dモデルに反映されます。2Dパーツを編集するには「3D待機」をオフにしてください。</p>
         </div>
 
         <div class="playground-card">
@@ -213,7 +243,7 @@
             src="characters/milkc0de/index.html"
             title="ChibiRigKit Playground"
             allow="camera; microphone; clipboard-read; clipboard-write"
-            loading="eager"></iframe>
+            loading="lazy"></iframe>
 
           <div class="playground-note">
             <span><strong>このページ上で操作できます。</strong> サンプル画像はPlayer側に埋め込み済みです。</span>
@@ -226,7 +256,7 @@
     <section class="hero shell" id="top" aria-labelledby="hero-title">
       <div class="hero-copy">
         <p class="eyebrow"><span class="tiny-flower" aria-hidden="true">✦</span> A LITTLE MOTION, A LOT OF CHARACTER.</p>
-        <h1 id="hero-title">その一枚が、<br><span class="petal-word">配信</span>で動きだす。</h1>
+        <h2 id="hero-title">その一枚が、<br><span class="petal-word">配信</span>で動きだす。</h2>
         <p class="hero-description">1枚のイラストから、カメラや声で動くキャラクターへ。<br>AIで動きの土台をつくり、ブラウザで自分好みに調整。<br>OBSにつないで、あなたらしい配信を。</p>
         <p class="offline-note"><strong>完成品はインターネット接続不要。</strong><br>ダウンロードしたHTMLで、再生・調整・動画保存までオフラインで使えます。<br><small>初回セットアップとCodexによる制作には接続が必要です。カメラ・マイクは追跡モデルを準備済みなら、ローカル起動でオフライン利用できます。</small></p>
         <div class="actions">
@@ -240,7 +270,7 @@
         <div class="visual-note"><span aria-hidden="true">✧</span> a little hello!</div>
         <div class="demo-card">
           <div class="demo-bar"><span><span class="status-dot" aria-hidden="true"></span> CHARACTER PREVIEW</span><span>01</span></div>
-          <div class="demo-image"><img id="character-demo" src="template/workspace/demo.gif" width="576" height="683" alt="ChibiRigKitで制作した、髪や体がゆっくり動くキャラクターのサンプル" fetchpriority="high"></div>
+          <div class="demo-image"><img id="character-demo" src="template/workspace/demo.gif" width="420" height="540" alt="3Dモデルのmilkc0deがまばたきして腕を動かす待機モーション" fetchpriority="high"></div>
           <figcaption><span>milkc0de <span class="caption-muted">/ サンプルアニメーション</span></span><button id="motion-toggle" type="button" hidden aria-pressed="false">Ⅱ 動きを止める</button></figcaption>
         </div>
         <div class="visual-sticker"><span aria-hidden="true">♡</span> illustration → motion</div>

@@ -2,12 +2,13 @@
 # SPDX-FileCopyrightText: 2026 milkc0de
 # SPDX-License-Identifier: Apache-2.0
 from __future__ import annotations
-import json, shutil, html, math, base64, hashlib
+import json, shutil, math, base64, hashlib
 import numpy as np
 from head_pose import build_head_pose, build_neck_sway, fill_sclera
 from rig_contract import validate_plan, verify_sources, digest, local_path, validate_project
 from pathlib import Path
-from player_output import preview_path, export_player, launcher_files
+from player_output import preview_path, export_player
+from render_player import render_project
 from PIL import Image, ImageChops
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -18,7 +19,8 @@ validate_plan(ROOT, plan)
 verify_sources(ROOT)
 reg=json.loads((ROOT/'work'/'registration.json').read_text())
 W,H=reg['canvas']['width'],reg['canvas']['height']
-blink_cfg=json.loads((ROOT/'character.config.json').read_text()).get('blink',{})
+config=json.loads((ROOT/'character.config.json').read_text())
+blink_cfg=config.get('blink',{})
 if not 0<=blink_cfg.get('closed_eye_swap_start',.92)<blink_cfg.get('closed_eye_swap_end',.995)<=1:
     raise ValueError('blink swap thresholds must satisfy 0 <= start < end <= 1')
 for p in [ROOT/'assets/layers',ROOT/'assets/masks',ROOT/'assets/sources']:
@@ -132,7 +134,8 @@ sources={}
 for role in reg['roles']:
     src=aligned(role);dst=ROOT/'assets/sources'/f'{role}.png';shutil.copy2(src,dst);sources[role]=str(dst.relative_to(ROOT))
 
-project={'name':plan.get('name','Generic Character Rig'),'version':2,'canvas':{'width':W,'height':H,'transparent':True},'sources':sources,'settings':{'duration_seconds':plan.get('duration_seconds',4),'fps':60,'motion_intensity':1,'head_motion_amount':1.5,'gaze_motion_amount':1.5,'neck_sway':True,'neck_sway_degrees':6,'neck_yaw_degrees':12,'neck_pitch_degrees':8,'expression':0,'auto_blink':True,'auto_expression':False,'blink':json.loads((ROOT/'character.config.json').read_text()).get('blink',{})},'groups':plan.get('groups',{}),'parts':parts,'draw_order':plan['draw_order'],'notes':{'generated_by':'ChibiRigKit + Codex app-server','character_plan':str(PLAN_PATH.name)}}
+project={'name':plan.get('name','Generic Character Rig'),'version':2,'canvas':{'width':W,'height':H,'transparent':True},'sources':sources,'settings':{'duration_seconds':plan.get('duration_seconds',4),'fps':60,'motion_intensity':1,'head_motion_amount':1.5,'gaze_motion_amount':1.5,'neck_sway':True,'neck_sway_degrees':6,'neck_yaw_degrees':12,'neck_pitch_degrees':8,'expression':0,'auto_blink':True,'auto_expression':False,'blink':blink_cfg},'groups':plan.get('groups',{}),'parts':parts,'draw_order':plan['draw_order'],'notes':{'generated_by':'ChibiRigKit + Codex app-server','character_plan':str(PLAN_PATH.name)}}
+if config.get('default_background')=='studio':project['default_background']='studio'
 head_pose=build_head_pose(plan,parts,project['canvas'])
 if head_pose:
     project['head_pose']=head_pose
@@ -153,9 +156,7 @@ motion_template={'$schema':'motion.schema.json','format':'chibirigkit.motion','v
 (ROOT/'motion.template.json').write_text(json.dumps(motion_template,ensure_ascii=False,indent=2)+'\n')
 (ROOT/'rig.project.json').write_text(json.dumps(project,ensure_ascii=False,indent=2)+'\n')
 
-tpl=(ROOT/'runtime'/'index.template.html').read_text().replace('__LICENSE_TEXT__',(ROOT/'LICENSE.txt').read_text()).replace('__MEDIA_NOTICE_TEXT__',(ROOT/'MEDIA_NOTICE.txt').read_text()).replace('__RECORDING_JS__',(ROOT/'runtime'/'recording.js').read_text()).replace('__BUNDLE_JS__',(ROOT/'runtime'/'bundle.js').read_text()).replace('__HEAD_POSE_JS__',(ROOT/'runtime'/'head_pose.js').read_text()).replace('__PROJECT_IO_JS__',(ROOT/'runtime'/'project_io.js').read_text()).replace('__BACKGROUND_JS__',(ROOT/'runtime'/'background.js').read_text()).replace('__MOTION_CLIP_JS__',(ROOT/'runtime'/'motion_clip.js').read_text()).replace('__CAPTURE_PLAYER_JS__',(ROOT/'runtime'/'capture_player.js').read_text()).replace('__EXPRESSION_UNDERPAINT_JS__',(ROOT/'runtime'/'expression_underpaint.js').read_text()).replace('__HAIR_DYNAMICS_JS__',(ROOT/'runtime'/'hair_dynamics.js').read_text()).replace('__HAIR_PLAYER_JS__',(ROOT/'runtime'/'hair_player.js').read_text()).replace('__TRACKING_CORE_JS__',(ROOT/'runtime'/'tracking_core.js').read_text()).replace('__TRACKING_JS__',(ROOT/'runtime'/'tracking.js').read_text()).replace('__OUTPUT_JS__',(ROOT/'runtime'/'output.js').read_text()).replace('__PLAYER_SYNC_JS__',(ROOT/'runtime'/'player_sync.js').read_text())
-payload=json.dumps(project,ensure_ascii=False,separators=(',',':')).replace('<','\\u003c')
-rendered=tpl.replace('__PLAYER_LAUNCHERS_JSON__',json.dumps(launcher_files(),ensure_ascii=False).replace('<','\\u003c')).replace('__TITLE__',html.escape(project['name'])).replace('__W__',str(W)).replace('__H__',str(H)).replace('__PROJECT_JSON__',payload)
+rendered,_=render_project(ROOT)
 preview_path(ROOT).parent.mkdir(parents=True,exist_ok=True)
 preview_path(ROOT).write_text(rendered)
 validate_project(ROOT,project)

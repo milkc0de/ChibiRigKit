@@ -2,9 +2,9 @@
   "$schema": "motion.schema.json",
   "format": "chibirigkit.motion",
   "version": 1,
-  "layout_signature": "e86c4febeabb4152dac108539e846b947ee8152225ff0c3507dc9eff98b82dc4",
+  "layout_signature": "06bc8f5e53bc0e1811da6ced7f28132a7ebcc4ff49dd235d6612c2884fb5ee27",
   "settings": {
-    "duration_seconds": 5,
+    "duration_seconds": 60,
     "fps": 60,
     "motion_intensity": 1,
     "head_motion_amount": 1.5,

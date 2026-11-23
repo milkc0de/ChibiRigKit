@@ -1,5 +1,6 @@
 {
   "name": "milkc0de",
+  "default_background": "studio",
   "inputs": {
     "normal": "normal.png",
     "flat": null,

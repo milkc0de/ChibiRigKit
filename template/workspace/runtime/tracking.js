@@ -225,7 +225,7 @@ function liveCaptureFrame(values=trackingState.values){
  const camera=trackingInputMode()!=='audio',allow=key=>{
   if(key.startsWith('eye')||key.startsWith('gaze'))return camera&&!$('trackingEyesOff').checked;
   if(key.startsWith('head')||key.startsWith('body'))return camera&&!$('trackingHeadOff').checked;
-  if(key.startsWith('mouth'))return trackingInputMode()==='audio'||!$('trackingMouthOff').checked;
+  if(key.startsWith('mouth'))return camera?!$('trackingMouthOff').checked:key==='mouthOpen';
   return camera&&key.startsWith('brow');
  };
  return Object.fromEntries(Object.entries(values).filter(([key])=>allow(key)));

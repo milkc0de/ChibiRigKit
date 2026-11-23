@@ -30,7 +30,8 @@ function parsePlayer(bytes){
  const parts=Object.values(project.parts);if(!parts.length||parts.length>1000||!project.draw_order.every(id=>Object.hasOwn(project.parts,id)))throw Error('パーツ構成が不正です');
  const image=value=>{if(typeof value!=='string'||!/^data:image\/(png|webp|jpeg);base64,[a-z0-9+/=\s]+$/i.test(value))throw Error('完成品には画像の内蔵が必要です')};
  for(const p of parts){image(p.image_data_url);if(p.seam)image(p.seam.data_url)}if(project.neck_fill)image(project.neck_fill.data_url);if(snapshot?.background?.image)image(snapshot.background.image);
- return {project,snapshot:snapshot||{motion:project,background:{version:1,mode:'original',color:'#e9dfd3',fit:'cover',image:null,name:''}}};
+ const mode=project.default_background==='studio'?'studio':'original';
+ return {project,snapshot:snapshot||{motion:project,background:{version:1,mode,color:'#e9dfd3',fit:'cover',image:null,name:''}}};
 }
 module.exports={parsePlayer,zipHTML,zipTextFile,LIMIT};
 

@@ -59,6 +59,45 @@ class HeadPoseTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'fold'):
             head.build_neck_sway({'neck_sway':bad},parts,{'width':240,'height':300})
 
+    def test_explicit_neck_mesh_preserves_its_topology_and_invalidates_stale_poses(self):
+        parts={'face':{'role':'face','kind':'normal','x':40,'y':30,'w':100,'h':120}}
+        canvas={'width':240,'height':300}
+        mesh={'points':[[0,0],[240,0],[240,200],[0,200]],'triangles':[[0,1,2],[0,2,3]]}
+        built=head.build_neck_sway({'neck_sway':{'mesh':mesh}},parts,canvas)
+        self.assertEqual(built['mesh'],mesh)
+        self.assertEqual(built['mesh_signature'],head.neck_mesh_signature(mesh))
+        self.assertEqual(head.build_neck_sway({'neck_sway':built},parts,canvas),built)
+        other=copy.deepcopy(built)
+        other['mesh']['triangles']=[[0,1,3],[1,2,3]]
+        self.assertNotEqual(head.neck_mesh_signature(other['mesh']),built['mesh_signature'])
+        with self.assertRaisesRegex(ValueError,'layout changed'):
+            head.build_neck_sway({'neck_sway':other},parts,canvas)
+        legacy=head.build_neck_sway({},parts,canvas)
+        expected=hashlib.sha256(json.dumps(legacy['mesh']['points'],separators=(',',':')).encode()).hexdigest()
+        self.assertEqual(legacy['mesh_signature'],expected)
+        self.assertEqual(head.build_neck_sway({'neck_sway':legacy},parts,canvas),legacy)
+
+    def test_neck_mesh_rejects_bad_geometry_and_incomplete_coverage(self):
+        corners=[[0,0],[100,0],[100,100],[0,100]]
+        quads=[[0,1,2],[0,2,3]]
+        for points,triangles in [
+                ([[float('nan'),0]]+corners[1:],quads),
+                ([[-1,0]]+corners[1:],quads),
+                ([[True,0]]+corners[1:],quads),
+                (corners[:3]+[corners[0]],quads),
+                (corners+[[40,70]],quads),
+                (corners,[[0,1,4],[0,2,3]]),
+                (corners,[[0,1,2.0],[0,2,3]]),
+                (corners,[[0,True,2],[0,2,3]]),
+                (corners,[[0,1,1],[0,2,3]]),
+                (corners,[[0,2,1],[0,2,3]]),
+                (corners,quads+[quads[0]]),
+                (corners+[[50,50]],[[0,1,4],[1,2,4],[2,3,4]]),
+                ([[10,0],[90,0],[90,100],[10,100]],quads)]:
+            with self.subTest(points=points,triangles=triangles),self.assertRaises(ValueError):
+                head.validate_neck_source_mesh({'points':points,'triangles':triangles},
+                                               {'width':100,'height':100},([0,0],[100,100]))
+
     def test_sample_profile_is_absolute_repeatable_and_preserves_sources_and_attachment(self):
         sample=ROOT/'characters/milkc0de';script=sample/'toolbox/author_head_layout.py'
         spec=importlib.util.spec_from_file_location('sample_head_authoring',script);authoring=importlib.util.module_from_spec(spec);spec.loader.exec_module(authoring)
@@ -82,7 +121,16 @@ class HeadPoseTests(unittest.TestCase):
             shutil.copytree(sample,clone,ignore=shutil.ignore_patterns('checks','eight-direction','eight-direction-original','player','generated_references','index.html','runtime-check.html','__pycache__'))
             def source_hashes():
                 return {str(path.relative_to(clone)):hashlib.sha256(path.read_bytes()).hexdigest() for folder in ['input','work/aligned'] for path in (clone/folder).rglob('*') if path.is_file()}
+            def layer_pixels(root, rig):
+                pixels = {}
+                for part_id, part in rig['parts'].items():
+                    path = root / part['file']
+                    self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), part['sha256'], part_id)
+                    with Image.open(path) as image:
+                        pixels[part_id] = (image.size, image.mode, hashlib.sha256(image.tobytes()).hexdigest())
+                return pixels
             hashes=source_hashes();snapshots=[]
+            expected_pixels = layer_pixels(sample, project)
             self.assertFalse((clone/'work/eight-direction-original').exists())
             for _ in range(2):
                 result=subprocess.run([sys.executable,str(clone/'toolbox/author_head_layout.py'),'--apply'],capture_output=True,text=True)
@@ -91,9 +139,11 @@ class HeadPoseTests(unittest.TestCase):
                 result=subprocess.run([sys.executable,str(clone/'toolbox/build_project.py')],capture_output=True,text=True)
                 self.assertEqual(result.returncode,0,result.stderr)
                 built=json.loads((clone/'rig.project.json').read_text())
-                snapshots.append({'head_pose':built['head_pose'],'neck_sway':built['neck_sway']})
+                snapshots.append({'head_pose':built['head_pose'],'neck_sway':built['neck_sway'],
+                                  'layer_hashes':{pid:p['sha256'] for pid,p in built['parts'].items()}})
                 self.assertEqual(source_hashes(),hashes)
-                self.assertEqual({pid:p['sha256'] for pid,p in built['parts'].items()},{pid:p['sha256'] for pid,p in project['parts'].items()})
+                # PNG encoders can produce different byte streams for exactly the same artwork.
+                self.assertEqual(layer_pixels(clone, built), expected_pixels)
             self.assertEqual(snapshots[0],snapshots[1])
     def test_sclera_underpaint_preserves_surroundings(self):
         with tempfile.TemporaryDirectory(dir=ROOT/'work') as td:

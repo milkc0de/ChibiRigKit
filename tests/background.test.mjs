@@ -5,9 +5,10 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 const source=fs.readFileSync(new URL('../template/workspace/runtime/background.js',import.meta.url),'utf8');
-function fixture({desktop=false}={}){
+function fixture({desktop=false,defaultBackground}={}){
   const fields=Object.fromEntries(['backgroundMode','backgroundColor','backgroundFit','backgroundStatus','backgroundFile','resetBackground'].map(k=>[k,{value:''}]));
   const storage=new Map(),draws=[],PROJECT={name:'test',parts:{face:{name:'face',role:'base',kind:'static'}}};
+  if(defaultBackground)PROJECT.default_background=defaultBackground;
   const controls={showBaseOnly:{checked:false}};
   const context=vm.createContext({PROJECT,canvas:{width:200,height:300},controls,$:id=>fields[id],ctx:{save(){},restore(){},fillRect(...args){draws.push(['fill',...args])},drawImage(...args){draws.push(['image',...args])}},localStorage:{getItem:k=>storage.get(k)??null,setItem:(k,v)=>storage.set(k,v),removeItem:k=>storage.delete(k)},loadImage:async()=>({width:100,height:100})});
   if(desktop)context.chibiDesktop={};
@@ -53,4 +54,17 @@ test('desktop starts transparent and keeps an explicit return to the original ba
   assert.equal(f.state().mode,'transparent');assert.equal(f.context.customBackgroundActive(),true);
   f.fields.resetBackground.onclick();assert.equal(f.state().mode,'original');
   await f.context.initBackground();assert.equal(f.state().mode,'original');
+});
+test('an authored studio backdrop starts on both platforms and preserves explicit background choices',async()=>{
+  for(const desktop of [false,true]){
+    const f=fixture({desktop,defaultBackground:'studio'});await f.context.initBackground();
+    assert.equal(f.fields.backgroundMode.value,'studio');
+    f.context.drawBackground();assert.deepEqual(f.draws,[]);
+    f.fields.resetBackground.onclick();assert.equal(JSON.parse([...f.storage.values()][0]).mode,'original');
+    for(const mode of ['original','transparent','color','image','studio']){
+      const stored=f.state();stored.mode=mode;stored.image=mode==='image'?'data:image/png;base64,AA==':null;
+      f.storage.set([...f.storage.keys()][0],JSON.stringify(stored));await f.context.initBackground();
+      assert.equal(f.fields.backgroundMode.value,mode);
+    }
+  }
 });

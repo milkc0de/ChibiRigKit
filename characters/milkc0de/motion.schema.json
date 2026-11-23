@@ -77,6 +77,26 @@
           "minimum": -1,
           "maximum": 1
         },
+        "hair_physics": {
+          "type": "boolean"
+        },
+        "show_mesh": {
+          "type": "boolean"
+        },
+        "show_head_mesh": {
+          "type": "boolean"
+        },
+        "show_pivots": {
+          "type": "boolean"
+        },
+        "hair_physics_amount": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 2
+        },
+        "idle_3d": {
+          "type": "boolean"
+        },
         "auto_blink": {
           "type": "boolean"
         },

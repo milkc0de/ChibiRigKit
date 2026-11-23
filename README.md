@@ -2,7 +2,7 @@
 
 # ChibiRigKit
 
-**1枚のイラストから、配信で動く2Dキャラクターを作るツール。**
+**1枚のイラストから、配信で動くキャラクターを作るツール。**
 
 <p>
   <a href="https://milkc0de.github.io/ChibiRigKit/">Web / Playground</a> ·
@@ -16,7 +16,9 @@
   <img src="https://img.shields.io/badge/Runtime-Browser-7e9992?style=flat-square" alt="Browser runtime">
 </p>
 
-<img src="template/workspace/demo.gif" width="560" alt="ChibiRigKit demo">
+<a href="https://milkc0de.github.io/ChibiRigKit/#playground"><img src="template/workspace/demo.gif" width="420" alt="3Dモデルのmilkc0deがまばたきし、髪や腕をゆっくり動かす待機モーション"></a>
+
+<p>60秒の待機モーションからの抜粋 · <a href="https://milkc0de.github.io/ChibiRigKit/site/media/milkc0de-idle.mp4">全編を見る</a> · <a href="https://milkc0de.github.io/ChibiRigKit/#playground">プレイヤーで動かす</a></p>
 
 </div>
 
@@ -25,6 +27,8 @@
 1枚絵を動かすまでの面倒な部分を、なるべくまとめて自動化したくて作っています。
 
 画像からリグ用のパーツや差分を作り、専用アプリまたはブラウザで顔・目・口・髪・体の動きを調整できます。カメラやマイクからの追従、モーションの録画・再生、WebM録画、OBSへのリアルタイム反映にも対応しています。
+
+上の制作例では、正面の原画をもとに14方向のイラストを用意し、髪の揺れや手首の向きも調整した3Dモデルに仕上げました。同梱のmilkc0deで「3D待機」を選ぶと、ローカル版ではカメラの瞬きや視線、マイクの口パクが3Dモデルに反映されます。
 
 最初は自分用の小さな実験でしたが、だいぶ普通に使えるところまで育ってきたので公開しています。まだbetaです。
 

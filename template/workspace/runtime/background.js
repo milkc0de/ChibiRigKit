@@ -1,7 +1,23 @@
 // SPDX-FileCopyrightText: 2026 milkc0de
 // SPDX-License-Identifier: Apache-2.0
 // Background selection is local to this browser; source layers remain immutable.
-const backgroundDefaults={version:1,mode:globalThis.chibiDesktop?'transparent':'original',color:'#e9dfd3',fit:'cover',image:null,name:''};
+const defaultBackgroundMode=PROJECT.default_background==='studio'?'studio':globalThis.chibiDesktop?'transparent':'original';
+const backgroundDefaults={version:1,mode:defaultBackgroundMode,color:'#e9dfd3',fit:'cover',image:null,name:''};
+const studioBackdrops=new WeakMap();
+function drawStudioBackdrop(view){
+  const {width,height}=view.canvas;
+  let cached=studioBackdrops.get(view);
+  if(!cached||cached.width!==width||cached.height!==height){
+    const gradient=view.createLinearGradient(width*.12,0,width*.76,height);
+    gradient.addColorStop(0,'#a3c0c0');
+    gradient.addColorStop(.55,'#7d9fa4');
+    gradient.addColorStop(1,'#5c7883');
+    cached={width,height,gradient};
+    studioBackdrops.set(view,cached);
+  }
+  view.fillStyle=cached.gradient;
+  view.fillRect(0,0,width,height);
+}
 let backgroundState={...backgroundDefaults},backgroundImage=null,backgroundRevision=0;
 const backgroundKey=`ChibiRigKit:background:1:${PROJECT.name}:${canvas.width}x${canvas.height}`;
 function isBackgroundPart(p){return p.role==='background'||(p.name==='background'&&p.kind==='static')}
@@ -11,13 +27,13 @@ function backgroundRect(width,height,targetWidth,targetHeight,fit){
   const w=width*scale,h=height*scale;return [(targetWidth-w)/2,(targetHeight-h)/2,w,h];
 }
 function drawBackground(){
-  if(!customBackgroundActive()||backgroundState.mode==='transparent')return;
+  if(!customBackgroundActive()||backgroundState.mode==='transparent'||backgroundState.mode==='studio')return;
   ctx.save();ctx.fillStyle=backgroundState.color;ctx.fillRect(0,0,canvas.width,canvas.height);
   if(backgroundState.mode==='image'&&backgroundImage)ctx.drawImage(backgroundImage,...backgroundRect(backgroundImage.width,backgroundImage.height,canvas.width,canvas.height,backgroundState.fit));
   ctx.restore();
 }
 function validBackground(data){
-  if(!data||data.version!==1||!['original','color','image','transparent'].includes(data.mode)||!/^#[0-9a-f]{6}$/i.test(data.color)||!['cover','contain'].includes(data.fit))throw Error('背景の保存データが不正です');
+  if(!data||data.version!==1||!['original','studio','color','image','transparent'].includes(data.mode)||!/^#[0-9a-f]{6}$/i.test(data.color)||!['cover','contain'].includes(data.fit))throw Error('背景の保存データが不正です');
   if(data.image!==null&&(typeof data.image!=='string'||data.image.length>12000000||!/^data:image\/(png|jpeg|webp);base64,[a-z0-9+/]+=*$/i.test(data.image)))throw Error('背景画像の保存データが不正です');
   if(data.mode==='image'&&!data.image)throw Error('背景画像を選んでください');
   return {version:1,mode:data.mode,color:data.color,fit:data.fit,image:data.image,name:typeof data.name==='string'?data.name.slice(0,200):''};
@@ -49,11 +65,11 @@ async function initBackground(){
   $('backgroundColor').oninput=()=>{backgroundRevision++;setBackground({...backgroundState,mode:'color',color:$('backgroundColor').value})};
   $('backgroundFit').onchange=()=>{backgroundRevision++;setBackground({...backgroundState,fit:$('backgroundFit').value})};
   $('backgroundFile').onchange=e=>{const file=e.target.files[0];e.target.value='';if(file)chooseBackgroundFile(file)};
-  $('resetBackground').onclick=()=>{backgroundRevision++;backgroundState={...backgroundDefaults,mode:'original'};backgroundImage=null;syncBackground();try{if(globalThis.chibiDesktop)persistBackground();else localStorage.removeItem(backgroundKey);backgroundMessage('元の背景に戻しました')}catch(e){persistBackground()}};
+  $('resetBackground').onclick=()=>{backgroundRevision++;backgroundState={...backgroundDefaults,mode:'original'};backgroundImage=null;syncBackground();try{if(backgroundDefaults.mode==='original')localStorage.removeItem(backgroundKey);else persistBackground();backgroundMessage('元の背景に戻しました')}catch(e){persistBackground()}if(typeof requestRender==='function')requestRender()};
   const revision=++backgroundRevision;
   try{
     const saved=localStorage.getItem(backgroundKey);
     if(saved){const data=validBackground(JSON.parse(saved)),image=data.image?await loadImage(data.image):null;if(revision!==backgroundRevision)return;backgroundState=data;backgroundImage=image;backgroundMessage('保存した背景を復元しました')}
-  }catch(e){backgroundMessage('保存した背景を復元できないため、元の背景を表示しています')}
+  }catch(e){backgroundMessage('保存した背景を復元できないため、標準の背景を表示しています')}
   syncBackground();
 }

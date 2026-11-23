@@ -6,7 +6,7 @@ const require=createRequire(import.meta.url),{parsePlayer}=require('../studio/pl
 const template=new URL('../template/workspace/',import.meta.url);
 test('parent opens its authored character with the shared runtime and retains capture controls',async()=>{
  const project=JSON.parse(fs.readFileSync(new URL('../characters/milkc0de/rig.project.json',import.meta.url),'utf8')),html=playerHTML();
- assert.deepEqual(parsePlayer(Buffer.from(html)).project,project);assert.ok(!/__\w+_JS__/.test(html));
+ const parsed=parsePlayer(Buffer.from(html));assert.deepEqual(parsed.project,project);assert.equal(parsed.snapshot.background.mode,'studio');assert.ok(!/__\w+_JS__/.test(html));
  const {context,elements}=browserHarness(html);await context.rigReady;assert.equal(elements.get('loadStatus').textContent,'読み込み完了');
  assert.equal(elements.get('c').width,project.canvas.width);assert.equal(elements.get('desktopOutput'),undefined);assert.equal(elements.get('playerImport'),undefined);assert.ok(elements.get('captureLoad'));
 });
